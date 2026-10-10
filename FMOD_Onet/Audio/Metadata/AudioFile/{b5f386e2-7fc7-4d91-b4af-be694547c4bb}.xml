@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
-	<object class="AudioFile" id="{f8d5449f-f9f2-4590-bdf5-a41cf73a9c82}">
+	<object class="AudioFile" id="{b5f386e2-7fc7-4d91-b4af-be694547c4bb}">
 		<property name="assetPath">
-			<value>BGM_Gameplay.mp3</value>
-		</property>
-		<property name="isStreaming">
-			<value>true</value>
+			<value>SFX_Error.mp3</value>
 		</property>
 		<property name="frequencyInKHz">
-			<value>48</value>
+			<value>24</value>
 		</property>
 		<property name="channelCount">
 			<value>2</value>
 		</property>
 		<property name="length">
-			<value>42.359999999999999</value>
+			<value>3.0720000000000001</value>
 		</property>
 		<relationship name="masterAssetFolder">
 			<destination>{cd4599a4-3344-4895-ad57-ae361a7ac719}</destination>

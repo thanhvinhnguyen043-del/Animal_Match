@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
-	<object class="AudioFile" id="{5e475763-7183-4a2b-a6a3-d4b23e3b7bfa}">
+	<object class="AudioFile" id="{3eb7d23c-9b1a-4158-9447-0c3eddc868b7}">
 		<property name="assetPath">
-			<value>SFX_Combo.mp3</value>
+			<value>SFX_Win.mp3</value>
 		</property>
 		<property name="frequencyInKHz">
 			<value>32</value>
 		</property>
 		<property name="channelCount">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<property name="length">
-			<value>1.0800000000000001</value>
+			<value>3.3119999999999998</value>
 		</property>
 		<relationship name="masterAssetFolder">
 			<destination>{cd4599a4-3344-4895-ad57-ae361a7ac719}</destination>

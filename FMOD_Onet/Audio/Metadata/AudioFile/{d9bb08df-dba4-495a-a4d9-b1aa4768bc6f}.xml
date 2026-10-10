@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
-	<object class="AudioFile" id="{375445ce-c903-431f-b7c4-b8875f5f4f86}">
+	<object class="AudioFile" id="{d9bb08df-dba4-495a-a4d9-b1aa4768bc6f}">
 		<property name="assetPath">
-			<value>MusicInGame.mp3</value>
-		</property>
-		<property name="isStreaming">
-			<value>true</value>
+			<value>SFX_StoneBreak.mp3</value>
 		</property>
 		<property name="frequencyInKHz">
-			<value>48</value>
+			<value>44.0999985</value>
 		</property>
 		<property name="channelCount">
 			<value>2</value>
 		</property>
 		<property name="length">
-			<value>42.359999999999999</value>
+			<value>0.65306122448979587</value>
 		</property>
 		<relationship name="masterAssetFolder">
 			<destination>{cd4599a4-3344-4895-ad57-ae361a7ac719}</destination>

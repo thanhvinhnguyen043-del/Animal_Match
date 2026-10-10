@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
-	<object class="AudioFile" id="{af39d646-8541-4c1a-9600-e4972ea4c9d8}">
+	<object class="AudioFile" id="{f8d5449f-f9f2-4590-bdf5-a41cf73a9c82}">
 		<property name="assetPath">
-			<value>BackgroundMusic.mp3</value>
+			<value>BGM_Gameplay.mp3</value>
 		</property>
 		<property name="isStreaming">
 			<value>true</value>
 		</property>
 		<property name="frequencyInKHz">
-			<value>44.0999985</value>
+			<value>48</value>
 		</property>
 		<property name="channelCount">
 			<value>2</value>
 		</property>
 		<property name="length">
-			<value>187.82040816326531</value>
+			<value>42.359999999999999</value>
 		</property>
 		<relationship name="masterAssetFolder">
 			<destination>{cd4599a4-3344-4895-ad57-ae361a7ac719}</destination>

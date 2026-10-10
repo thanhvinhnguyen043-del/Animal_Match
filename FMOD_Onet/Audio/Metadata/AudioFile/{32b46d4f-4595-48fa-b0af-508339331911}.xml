@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
-	<object class="AudioFile" id="{7d4baf09-9bd4-49fe-a621-5cd2a9e61e2a}">
+	<object class="AudioFile" id="{32b46d4f-4595-48fa-b0af-508339331911}">
 		<property name="assetPath">
-			<value>Break.mp3</value>
+			<value>SFX_Click.mp3</value>
 		</property>
 		<property name="frequencyInKHz">
-			<value>44.0999985</value>
+			<value>48</value>
 		</property>
 		<property name="channelCount">
 			<value>2</value>
 		</property>
 		<property name="length">
-			<value>0.65306122448979587</value>
+			<value>0.91200000000000003</value>
 		</property>
 		<relationship name="masterAssetFolder">
 			<destination>{cd4599a4-3344-4895-ad57-ae361a7ac719}</destination>

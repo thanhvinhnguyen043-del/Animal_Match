@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
-	<object class="AudioFile" id="{b1866c29-66c0-49db-8441-4b363987abd8}">
+	<object class="AudioFile" id="{5e475763-7183-4a2b-a6a3-d4b23e3b7bfa}">
 		<property name="assetPath">
-			<value>Combo.mp3</value>
+			<value>SFX_Combo.mp3</value>
 		</property>
 		<property name="frequencyInKHz">
 			<value>32</value>

@@ -1,0 +1,42 @@
+# Unity-generated folders
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Bb]uild/
+/[Bb]uilds/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Local screenshots and editor logs
+/GardenPreviews/
+*.log
+
+# Editor/IDE-generated files
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.opendb
+*.VC.db
+*.tmp
+
+# FMOD local caches; keep source project, audio assets, Metadata and Build banks
+/FMOD_Onet/Audio/.cache/
+/FMOD_Onet/Audio/.user/
+/FMOD_Onet/Audio/.unsaved/
+
+# OS files and local credentials
+.DS_Store
+Thumbs.db
+Desktop.ini
+.env
+.env.*
+!.env.example

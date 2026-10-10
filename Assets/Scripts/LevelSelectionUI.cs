@@ -29,7 +29,7 @@ public class LevelSelectionUI : MonoBehaviour
         scroll.movementType = ScrollRect.MovementType.Clamped;
         scroll.scrollSensitivity = 45;
 
-        // Clip rows outside the viewport and accept swipes even in gaps between buttons.
+
         var viewport = scroll.viewport;
         if (viewport != null)
         {
@@ -73,7 +73,7 @@ public class LevelSelectionUI : MonoBehaviour
                 button.name = "Level_" + (i + 1);
                 button.onClick = new Button.ButtonClickedEvent();
                 button.onClick.AddListener(() => ui.StartLevel(index));
-                // A template is inactive; activate only after assigning its event.
+
                 button.gameObject.SetActive(true);
                 buttons[i] = button;
             }
@@ -85,7 +85,7 @@ public class LevelSelectionUI : MonoBehaviour
             var label = buttons[i].GetComponentInChildren<TextMeshProUGUI>(true);
             if (label) label.text = "LEVEL " + (i + 1) + (i > unlocked ? "\nLOCKED" : "");
         }
-        // Update the scrollable height immediately when the level count changes.
+
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(content);
     }

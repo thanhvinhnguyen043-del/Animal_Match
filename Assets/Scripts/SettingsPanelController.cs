@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-// Prefab buttons resolve the UI manager in their own scene instead of storing scene references.
+
 public class SettingsPanelController : MonoBehaviour
 {
     public Button closeButton;

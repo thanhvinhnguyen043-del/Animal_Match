@@ -111,7 +111,7 @@ public class LevelDatabaseWindow : EditorWindow
         {
             if (GUILayout.Button("Tao/doi kich thuoc ban (giu o theo thu tu danh sach)"))
             {
-                // Serialized cells have no previous width after a resize; keep linear slots explicitly.
+
                 while (level.cells.Count < level.columns * level.rows) level.cells.Add(new LevelCell { empty = true });
                 if (level.cells.Count > level.columns * level.rows) level.cells.RemoveRange(level.columns * level.rows, level.cells.Count - level.columns * level.rows);
                 Save();

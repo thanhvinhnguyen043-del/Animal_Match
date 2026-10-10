@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Only the selected level crosses scene boundaries. FMOD keeps its own runtime alive.
+
 public static class GameSession
 {
     public static int SelectedLevel { get; private set; }

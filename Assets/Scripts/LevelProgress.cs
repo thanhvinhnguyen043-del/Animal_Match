@@ -18,7 +18,7 @@ public static class LevelProgress
     {
         int next = Mathf.Clamp(index + 1, 0, Mathf.Max(0, count - 1));
         PlayerPrefs.SetInt(UnlockedKey, Mathf.Max(HighestUnlocked(count), next));
-        // Continue to the next level after a win, even when returning home first.
+
         PlayerPrefs.SetInt(LatestKey, next);
         PlayerPrefs.Save();
     }

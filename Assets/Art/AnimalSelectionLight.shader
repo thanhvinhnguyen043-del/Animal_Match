@@ -71,7 +71,7 @@ Shader "Game/UI/AnimalSelectionLight"
             }
             fixed4 frag(v2f input) : SV_Target
             {
-                // Use the animal's alpha as a silhouette; transparent pixels stay clear.
+
                 fixed alpha = (tex2D(_MainTex, input.texcoord) + _TextureSampleAdd).a * input.color.a;
                 #ifdef UNITY_UI_CLIP_RECT
                 alpha *= UnityGet2DClipping(input.worldPosition.xy, _ClipRect);

@@ -14,7 +14,7 @@ public class UIButtonClickSound : MonoBehaviour
     private void Awake()
     {
         button = GetComponent<Button>();
-        // Play before navigation callbacks can unload this scene.
+
         originalClick = button.onClick;
         button.onClick = new Button.ButtonClickedEvent();
         button.onClick.AddListener(() =>

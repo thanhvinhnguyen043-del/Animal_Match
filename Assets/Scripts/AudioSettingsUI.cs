@@ -47,8 +47,8 @@ public class AudioSettingsUI : MonoBehaviour
     {
         if (channel == AudioChannel.Master)
         {
-            // FMOD reapplies its global mute state every frame in the Editor.
-            // Set that state through its API so the master bus is not unmuted again.
+
+
             RuntimeManager.MuteAllEvents(IsMuted(channel));
             return;
         }

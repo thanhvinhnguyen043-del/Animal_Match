@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum TileState { Normal, Ice, Hidden, Barrier } // Thêm trạng thái Barrier (Chặn)
+public enum TileState { Normal, Ice, Hidden, Barrier }
 
 public class AnimalTile : MonoBehaviour
 {
@@ -15,7 +15,7 @@ public class AnimalTile : MonoBehaviour
     public Image animalImage;
     public GameObject iceOverlay;
     public GameObject hiddenOverlay;
-    public GameObject barrierOverlay; // Biến mới để hứng cái ảnh Khối Chặn
+    public GameObject barrierOverlay;
     public GameObject highlightObj;
     public Button button;
     
@@ -44,7 +44,7 @@ public class AnimalTile : MonoBehaviour
         if (iceOverlay) iceOverlay.SetActive(currentState == TileState.Ice);
         if (hiddenOverlay) hiddenOverlay.SetActive(currentState == TileState.Hidden);
         
-        // Bật/tắt ảnh khối chặn
+
         if (barrierOverlay) barrierOverlay.SetActive(currentState == TileState.Barrier); 
     }
 

@@ -1,6 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
-using FMODUnity; // Khai báo sử dụng FMOD
+using FMODUnity;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
@@ -18,7 +18,7 @@ public class UIManager : MonoBehaviour
     public RectTransform mainMenuPanel;
     public RectTransform settingsPanel;
     public RectTransform levelSelectPanel;
-    public RectTransform gameplayPanel; // Bảng chơi game chính
+    public RectTransform gameplayPanel;
 
     [Header("Settings")]
     public float tweenDuration = 0.5f;
@@ -29,28 +29,28 @@ public class UIManager : MonoBehaviour
     private float SettingsHiddenX => settingsPanel.rect.width + 200f;
 
     [Header("Audio")]
-    public EventReference bgmMenu;     // Nhạc Menu (thư giãn)
-    public EventReference bgmGameplay; // Nhạc trong trận (kịch tính)
+    public EventReference bgmMenu;
+    public EventReference bgmGameplay;
     private FMOD.Studio.EventInstance currentBGM;
 
     void Start()
     {
-        // Setup vị trí ban đầu
+
         if (mainMenuPanel != null) mainMenuPanel.anchoredPosition = Vector2.zero;
         settingsPanel.anchoredPosition = new Vector2(SettingsHiddenX, 0);
         settingsPanel.gameObject.SetActive(false);
         if (levelSelectPanel != null) levelSelectPanel.anchoredPosition = new Vector2(-1920, 0);
         
-        // Giấu bảng Game ở tít trên cùng màn hình (Y = 1080)
+
         if (gameplayPanel != null)
             gameplayPanel.anchoredPosition = screen == GameScreen.Gameplay ? Vector2.zero : new Vector2(0, 1080);
 
-        // Vừa vào game là phát nhạc Menu ngay
+
         gameplayActive = screen == GameScreen.Gameplay;
         if (!gameplayActive) PlayMusic(bgmMenu);
     }
 
-    // --- CÁC HÀM TRƯỢT MENU CŨ CỦA BẠN (Giữ nguyên) ---
+
     public void OpenSettings()
     {
         if (!settingsPanel.gameObject.activeSelf)
@@ -115,7 +115,7 @@ public class UIManager : MonoBehaviour
         mainMenuPanel.DOAnchorPosX(0, tweenDuration).SetEase(Ease.OutBack);
     }
 
-    // --- HÀM MỚI: BẮT ĐẦU VÀO GAME ---
+
     public void PlayLatestLevel()
     {
         var database = Resources.Load<LevelDatabase>("LevelDatabase");
@@ -132,21 +132,21 @@ public class UIManager : MonoBehaviour
         }
         HideSettingsImmediately();
         gameplayActive = true;
-        // 1. Gọi RestartGame TRƯỚC để nó quét sạch bàn cờ và gọi KillAll() dọn dẹp
+
         FindObjectOfType<GridManager>().RestartGame();
 
-        // 2. SAU ĐÓ mới bắt đầu gọi hiệu ứng trượt UI
+
         levelSelectPanel.DOAnchorPosX(-1920, tweenDuration).SetEase(Ease.OutBack);
         mainMenuPanel.DOAnchorPosX(-1920, tweenDuration).SetEase(Ease.OutBack);
         
-        // 3. Kéo bảng Game rơi từ trên trần nhà xuống giữa màn hình
+
         gameplayPanel.DOAnchorPosY(0, tweenDuration).SetEase(Ease.OutBack);
 
-        // RestartGame phát nhạc gameplay khi bàn mới đã tạo thành công.
+
     }
 
-    // Thêm sẵn hàm Thoát game về lại Menu (dùng cho nút Home/Quit sau này)
-    // Button integer argument is zero-based: 0 = first level.
+
+
     public void StartLevel(int index)
     {
         var database = Resources.Load<LevelDatabase>("LevelDatabase");
@@ -218,10 +218,10 @@ public class UIManager : MonoBehaviour
         SceneManager.LoadScene(name);
     }
 
-    // --- HỆ THỐNG TRÌNH PHÁT NHẠC FMOD ---
+
     private void PlayMusic(EventReference newMusic)
     {
-        // Nếu đang có nhạc cũ nổ thì tắt nó đi một cách êm ái (Fade out)
+
         if (currentBGM.isValid())
         {
             currentBGM.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
@@ -229,7 +229,7 @@ public class UIManager : MonoBehaviour
             currentBGM.clearHandle();
         }
 
-        // Bật nhạc mới lên
+
         if (!newMusic.IsNull)
         {
             currentBGM = RuntimeManager.CreateInstance(newMusic);

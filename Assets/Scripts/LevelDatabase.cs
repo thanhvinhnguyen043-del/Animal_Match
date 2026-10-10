@@ -28,7 +28,7 @@ public class LevelDefinition
     public bool randomEachPlay = true;
     [Range(0, 1)] public float iceChance;
     [Range(0, 1)] public float barrierChance;
-    // Row-major order: x + y * columns; top-left is (0, 0).
+
     public List<LevelCell> cells = new List<LevelCell>();
 
     public List<LevelCell> Generate(int spriteCount, int generationSeed)
@@ -45,7 +45,7 @@ public class LevelDefinition
             result.Add(new LevelCell { animalID = id, state = state });
             result.Add(new LevelCell { animalID = id, state = state });
         }
-        // Keep at least one selectable pair when a high barrier ratio rolls all barriers.
+
         if (result.Count >= 2 && result.TrueForAll(cell => cell.state == TileState.Barrier))
         { result[0].state = TileState.Normal; result[1].state = TileState.Normal; }
         for (int i = result.Count - 1; i > 0; i--)

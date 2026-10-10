@@ -11,7 +11,7 @@ public enum GravityDirection { None, Down, Up, Left, Right }
 public class GridManager : MonoBehaviour
 {   
     private static bool isDOTweenInitialized = false;
-    // Cache dùng chung cho Hint để không tạo rác bộ nhớ
+
     private Dictionary<int, List<AnimalTile>> hintCache = new Dictionary<int, List<AnimalTile>>();
     public static GridManager Instance;
 
@@ -59,17 +59,17 @@ public class GridManager : MonoBehaviour
     public Button btnHint;
     private bool isBoosterCooldown = false;
 
-    // Biến ghi nhớ 2 ô đang được gợi ý
+
     private AnimalTile hintedTile1;
     private AnimalTile hintedTile2;
     
     [Header("Time System")]
-    public Slider timeSlider; // Kéo thả Time_Slider vào đây
-    public float maxTime = 60f; // Thời gian tối đa của màn chơi
-    public float timeBonusPerMatch = 2f; // Thưởng 2 giây mỗi khi ăn được thú
+    public Slider timeSlider;
+    public float maxTime = 60f;
+    public float timeBonusPerMatch = 2f;
     private float currentTime;
     private bool isGameOver = false;
-    private int totalTilesRemaining = 0; // Đếm số thú còn lại để biết lúc nào Win
+    private int totalTilesRemaining = 0;
 
     [Header("Effects")]
     public GameObject floatingTextPrefab;
@@ -78,7 +78,7 @@ public class GridManager : MonoBehaviour
     public EventReference sfxMatch;
     public EventReference sfxError; 
     public EventReference sfxCombo; 
-    public EventReference sfxClick; // THÊM DÒNG NÀY
+    public EventReference sfxClick;
     public EventReference sfxWaterBreak;
     public EventReference sfxStoneBreak;
     public EventReference winSound;
@@ -102,38 +102,38 @@ public class GridManager : MonoBehaviour
             return;
         }
         GenerateGrid();
-        WarmUpSystem(); // Gọi hàm chạy nháp
+        WarmUpSystem();
         isGameOver = true;
         
     }
 
-    // --- HỆ THỐNG CHỐNG LAG LẦN ĐẦU ---
+
     private void WarmUpSystem()
     {
-        // 1. Ép DOTween khởi tạo toàn bộ lõi engine ngay từ đầu
+
         if (!isDOTweenInitialized)
         {
             DOTween.Init();
             isDOTweenInitialized = true;
         }
 
-        // 2. Ép CPU biên dịch (JIT) hàm FindPath bằng 2 ô giả ngoài rìa bản đồ
+
         AnimalTile dummy1 = new GameObject("Dummy1").AddComponent<AnimalTile>();
         AnimalTile dummy2 = new GameObject("Dummy2").AddComponent<AnimalTile>();
         
         dummy1.gridX = -2; dummy1.gridY = -2; 
         dummy2.gridX = -2; dummy2.gridY = -2;
         
-        FindPath(dummy1, dummy2); // Chạy nháp thuật toán
+        FindPath(dummy1, dummy2);
         
         Destroy(dummy1.gameObject);
         Destroy(dummy2.gameObject);
     }
     void Update()
     {
-        if (isGameOver) return; // Nếu game kết thúc thì dừng mọi hoạt động
+        if (isGameOver) return;
 
-        // Xử lý đếm ngược thời gian
+
         if (currentTime > 0)
         {
             currentTime -= Time.deltaTime;
@@ -142,11 +142,11 @@ public class GridManager : MonoBehaviour
             if (currentTime <= 0)
             {
                 currentTime = 0;
-                GameOver(false); // Hết giờ -> Thua
+                GameOver(false);
             }
         }
 
-        // Xử lý điểm Combo
+
         if (comboTimer > 0)
         {
             comboTimer -= Time.deltaTime;
@@ -228,7 +228,7 @@ public class GridManager : MonoBehaviour
     public void SelectTile(AnimalTile clickedTile)
     {
         if (isGameOver) return;
-        // LUẬT MỚI: Không cho phép click vào ô đang bị Ẩn hoặc bị Chặn
+
         if (clickedTile.currentState == TileState.Hidden || clickedTile.currentState == TileState.Barrier) 
             return; 
         RuntimeManager.PlayOneShot(sfxClick);
@@ -267,20 +267,20 @@ public class GridManager : MonoBehaviour
         secondSelectedTile = null;
     }
 
-    // --- BỘ MÁY XỬ LÝ NỔ THÚ ---
+
     private void ProcessMatch(AnimalTile t1, AnimalTile t2)
     {
         combo++;
         comboTimer = comboDuration;
-        int matchScore = 100 * combo; // Lưu tạm điểm để hiện chữ
+        int matchScore = 100 * combo;
         score += matchScore;
         UpdateScoreUI();
         RuntimeManager.PlayOneShot(sfxMatch);
         Vector2 spawnPos = t1.rect.anchoredPosition;
 
-        // Hiện chữ bay +Điểm
+
         SpawnFloatingText(spawnPos, "+" + matchScore, Color.white);
-        // THƯỞNG THỜI GIAN THEO MỐC COMBO (Cứ 5, 10, 15... là được cộng)
+
         
         if (combo > 0 && combo % 5 == 0)
         {
@@ -288,18 +288,18 @@ public class GridManager : MonoBehaviour
             if (currentTime > maxTime) currentTime = maxTime;
             SpawnFloatingText(spawnPos + new Vector2(0, 40), "+" + timeBonusPerMatch + " GIÂY!", Color.yellow);
             RuntimeManager.PlayOneShot(sfxCombo);
-            // Báo ra Console để test, sau này có thể làm hiệu ứng Text bay lên báo "+5 Giây!"
+
         
         }
 
         int x1 = t1.gridX, y1 = t1.gridY;
         int x2 = t2.gridX, y2 = t2.gridY;
 
-        // 1. Phá hủy hoặc vỡ băng
+
         BreakTile(t1);
         BreakTile(t2);
 
-        // 2. Phá các khối Chặn (Barrier) nằm liền kề 2 con vừa nối
+
         BreakNeighborBarriers(x1, y1);
         BreakNeighborBarriers(x2, y2);
 
@@ -308,28 +308,28 @@ public class GridManager : MonoBehaviour
         firstSelectedTile = null;
         secondSelectedTile = null;
 
-        ApplyGravity(); // Gọi trọng lực rơi tiếp
+        ApplyGravity();
         if (totalTilesRemaining <= 0) GameOver(true);
     }
 
-    // Xử lý mất Băng thay vì chết
+
     private void BreakTile(AnimalTile t)
     {
         if (t.currentState == TileState.Ice)
         {
-            t.SetState(TileState.Normal); // Mất lớp băng, trở về bình thường
+            t.SetState(TileState.Normal);
             if (!sfxWaterBreak.IsNull) RuntimeManager.PlayOneShot(sfxWaterBreak);
         }
         else
         {
             gridArray[t.gridX, t.gridY] = null;
-            totalTilesRemaining--; // Chỉ đếm giảm khi thú thực sự bị xóa.
+            totalTilesRemaining--;
             t.rect.DOKill();
-            Destroy(t.gameObject); // Chết hẳn
+            Destroy(t.gameObject);
         }
     }
 
-    // Quét 4 hướng xung quanh để phá Barrier
+
     private void BreakNeighborBarriers(int x, int y)
     {
         Vector2Int[] dirs = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
@@ -343,7 +343,7 @@ public class GridManager : MonoBehaviour
                 AnimalTile neighbor = gridArray[nx, ny];
                 if (neighbor != null && neighbor.currentState == TileState.Barrier)
                 {
-                    neighbor.SetState(TileState.Normal); // Phá vỡ khóa chắn
+                    neighbor.SetState(TileState.Normal);
                     if (!sfxStoneBreak.IsNull) RuntimeManager.PlayOneShot(sfxStoneBreak);
                     
                 }
@@ -351,24 +351,24 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    // --- THUẬT TOÁN DÒ ĐƯỜNG SIÊU TỐC (CẮT BỎ HOÀN TOÀN PHÉP TÍNH THỪA) ---
+
     private bool FindPath(AnimalTile t1, AnimalTile t2)
     {
         int x1 = t1.gridX, y1 = t1.gridY;
         int x2 = t2.gridX, y2 = t2.gridY;
 
-        // 1. Đường thẳng (0 góc)
+
         if (x1 == x2 && CheckLine(x1, y1, x2, y2)) return true;
         if (y1 == y2 && CheckLine(x1, y1, x2, y2)) return true;
 
-        // 2. Chữ L (1 góc)
+
         if (IsEmpty(x1, y2) && CheckLine(x1, y1, x1, y2) && CheckLine(x1, y2, x2, y2)) return true;
         if (IsEmpty(x2, y1) && CheckLine(x1, y1, x2, y1) && CheckLine(x2, y1, x2, y2)) return true;
 
-        // 3. Chữ U/Z (2 góc) - Tia ngang
+
         for (int x = x1 + 1; x <= columns; x++) {
             if (!IsEmpty(x, y1)) break; 
-            // Cắt bỏ bước tính thừa: Đoạn (x1 -> x) đã trống sẵn, chỉ cần tính nốt 2 đoạn còn lại
+
             if (IsEmpty(x, y2) && CheckLine(x, y1, x, y2) && CheckLine(x, y2, x2, y2)) return true;
         }
         for (int x = x1 - 1; x >= -1; x--) {
@@ -376,7 +376,7 @@ public class GridManager : MonoBehaviour
             if (IsEmpty(x, y2) && CheckLine(x, y1, x, y2) && CheckLine(x, y2, x2, y2)) return true;
         }
         
-        // Tia dọc
+
         for (int y = y1 + 1; y <= rows; y++) {
             if (!IsEmpty(x1, y)) break;
             if (IsEmpty(x2, y) && CheckLine(x1, y, x2, y) && CheckLine(x2, y, x2, y2)) return true;
@@ -391,10 +391,10 @@ public class GridManager : MonoBehaviour
 
     private bool CheckLine(int x1, int y1, int x2, int y2)
     {
-        // THÊM DÒNG NÀY: Nếu trùng đúng 1 điểm (độ dài = 0) thì luôn luôn là khoảng trống
+
         if (x1 == x2 && y1 == y2) return true;
 
-        if (x1 == x2) // Cùng cột dọc
+        if (x1 == x2)
         {
             int step = (y1 < y2) ? 1 : -1;
             for (int y = y1 + step; y != y2; y += step)
@@ -403,7 +403,7 @@ public class GridManager : MonoBehaviour
             }
             return true;
         }
-        else if (y1 == y2) // Cùng hàng ngang
+        else if (y1 == y2)
         {
             int step = (x1 < x2) ? 1 : -1;
             for (int x = x1 + step; x != x2; x += step)
@@ -417,16 +417,16 @@ public class GridManager : MonoBehaviour
 
     private bool IsEmpty(int x, int y)
     {
-        // 1. CHỐNG LỖI: Nếu tọa độ chạy ra viền ngoài cùng (-1 hoặc bằng số cột/hàng), luôn coi là đường trống để đi vòng
+
         if (x < 0 || x >= columns || y < 0 || y >= rows) 
             return true;
 
-        // 2. Nếu nằm trong bàn cờ, kiểm tra xem ô đó có bị trống không
+
         return gridArray[x, y] == null || gridArray[x, y].currentState == TileState.Hidden;
     }
 
-    // --- HỆ THỐNG TRỌNG LỰC VÀ AUTO-CHAIN ---
-    // --- HỆ THỐNG TRỌNG LỰC VÀ AUTO-CHAIN TỐI ƯU ---
+
+
     private void ApplyGravity()
     {
         if (currentGravity == GravityDirection.None) return;
@@ -445,7 +445,7 @@ public class GridManager : MonoBehaviour
                     AnimalTile tile = gridArray[x, y];
                     if (tile != null)
                     {
-                        // SỬA LỖI Ở ĐÂY: Cả Băng và Chặn đều phải đứng im làm bệ đỡ
+
                         if (tile.currentState == TileState.Ice || tile.currentState == TileState.Barrier) emptyY = y - 1;
                         else if (y < emptyY)
                         {
@@ -558,7 +558,7 @@ public class GridManager : MonoBehaviour
         {
             if (tile == null || tile.gameObject == null) continue;
 
-            // SỬA LỖI Ở ĐÂY: Bảo vệ an toàn, nếu chính nó là Chặn hoặc Ẩn thì không được tự đi nối ô khác
+
             if (tile.currentState == TileState.Barrier || tile.currentState == TileState.Hidden) continue;
 
             Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
@@ -571,14 +571,14 @@ public class GridManager : MonoBehaviour
                 {
                     AnimalTile neighbor = gridArray[neighborX, neighborY];
 
-                    // KHÔNG auto-chain nếu cục bên cạnh đang bị Chặn hoặc Ẩn
+
                     if (neighbor != null && neighbor != tile && 
                         neighbor.currentState != TileState.Hidden && 
                         neighbor.currentState != TileState.Barrier)
                     {
                         if (neighbor.animalID == tile.animalID)
                         {
-                            ProcessMatch(tile, neighbor); // Dùng chung hàm xử lý nổ
+                            ProcessMatch(tile, neighbor);
                             yield break; 
                         }
                     }
@@ -586,7 +586,7 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-    // --- HỆ THỐNG VẬT PHẨM HỖ TRỢ (BOOSTERS) ---
+
     public void ShuffleBoard()
     {
         if (isGameOver || isBoosterCooldown) return;
@@ -595,7 +595,7 @@ public class GridManager : MonoBehaviour
         ClearHint();
         Debug.Log("Kích hoạt Đảo Lưới!");
 
-        // 1. Thu thập toàn bộ các ô thú đang còn trên bàn (Bỏ qua các ô null)
+
         List<AnimalTile> activeTiles = new List<AnimalTile>();
         List<Vector2Int> activePositions = new List<Vector2Int>();
 
@@ -611,7 +611,7 @@ public class GridManager : MonoBehaviour
             }
         }
 
-        // 2. Thuật toán xáo trộn danh sách vị trí (Fisher-Yates Shuffle)
+
         for (int i = 0; i < activePositions.Count; i++)
         {
             Vector2Int temp = activePositions[i];
@@ -620,32 +620,32 @@ public class GridManager : MonoBehaviour
             activePositions[randomIndex] = temp;
         }
 
-        // 3. Xóa sạch mảng cũ để xếp lại từ đầu
+
         System.Array.Clear(gridArray, 0, gridArray.Length);
 
-        // Tính tọa độ gốc để biểu diễn UI
+
         float startX = -(columns / 2f * tileSize) + (tileSize / 2f);
         float startY = (rows / 2f * tileSize) - (tileSize / 2f);
 
-        // 4. Gán các ô thú vào vị trí mới đã xáo trộn
+
         for (int i = 0; i < activeTiles.Count; i++)
         {
             AnimalTile tile = activeTiles[i];
             Vector2Int newPos = activePositions[i];
 
-            // Cập nhật tọa độ logic
+
             tile.gridX = newPos.x;
             tile.gridY = newPos.y;
             gridArray[newPos.x, newPos.y] = tile;
 
-            // Hiệu ứng DOTween bay tới chỗ mới trong 0.5s
+
             float targetX = startX + (newPos.x * tileSize);
             float targetY = startY - (newPos.y * tileSize);
             tile.rect.DOKill();
             tile.rect.DOAnchorPos(new Vector2(targetX, targetY), 0.5f).SetEase(Ease.InOutQuad);
         }
 
-        // Nếu người chơi đang chọn dở 1 con thì tắt nó đi để tránh lỗi logic
+
         if (firstSelectedTile != null)
         {
             firstSelectedTile.SetHighlight(false);
@@ -658,7 +658,7 @@ public class GridManager : MonoBehaviour
         StartCoroutine(BoosterCooldownRoutine());
         
         ClearHint();
-        // 1. Dọn sạch cache cũ để dùng lại, KHÔNG DÙNG "new" (Tiết kiệm 100% RAM)
+
         foreach (var list in hintCache.Values) list.Clear();
 
         for (int x = 0; x < columns; x++)
@@ -676,7 +676,7 @@ public class GridManager : MonoBehaviour
             }
         }
 
-        // 2. Dò tìm và break ngay lập tức
+
         foreach (var kvp in hintCache)
         {
             List<AnimalTile> tiles = kvp.Value;
@@ -688,7 +688,7 @@ public class GridManager : MonoBehaviour
                 {
                     if (FindPath(tiles[i], tiles[j]))
                     {
-                        // Ghi nhớ lại 2 ô này để tí nữa biết đường mà tắt đi
+
                         hintedTile1 = tiles[i];
                         hintedTile2 = tiles[j];
 
@@ -706,10 +706,10 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-    // Tắt viền sáng của các ô đang được gợi ý
+
     private void ClearHint()
     {
-        // Chỉ tắt viền nếu nó đang không được người chơi bấm chọn (để tránh xung đột)
+
         if (hintedTile1 != null && hintedTile1 != firstSelectedTile) hintedTile1.SetHighlight(false);
         if (hintedTile2 != null && hintedTile2 != firstSelectedTile) hintedTile2.SetHighlight(false);
         
@@ -717,12 +717,12 @@ public class GridManager : MonoBehaviour
         hintedTile2 = null;
     }
 
-    // Thời gian chờ 1.5 giây giữa mỗi lần bấm
+
     private System.Collections.IEnumerator BoosterCooldownRoutine()
     {
         isBoosterCooldown = true;
         
-        // Làm mờ và khóa nút bấm
+
         if (btnShuffle != null) btnShuffle.interactable = false;
         if (btnHint != null) btnHint.interactable = false;
         
@@ -730,7 +730,7 @@ public class GridManager : MonoBehaviour
         
         isBoosterCooldown = false;
         
-        // Sáng lại và mở khóa nút bấm
+
         if (btnShuffle != null) btnShuffle.interactable = true;
         if (btnHint != null) btnHint.interactable = true;
     }
@@ -751,14 +751,14 @@ public class GridManager : MonoBehaviour
         if (levelOneWinBanner != null) levelOneWinBanner.SetActive(showLevelOneBanner);
         if (textTitle != null) textTitle.gameObject.SetActive(!showLevelOneBanner);
         
-        // Khóa các nút Booster
+
         if (btnShuffle != null) btnShuffle.interactable = false;
         if (btnHint != null) btnHint.interactable = false;
 
-        // Bật bảng Game Over lên
+
         if (gameOverPanel != null) gameOverPanel.SetActive(true);
 
-        // Hiển thị chữ và điểm
+
         if (isWin)
         {
             textTitle.text = "LEVEL " + (levelIndex + 1) + "\nCOMPLETED!";
@@ -779,7 +779,7 @@ public class GridManager : MonoBehaviour
     {
         if (floatingTextPrefab == null) return;
 
-        // Sinh ra chữ tại vị trí con thú vừa nổ
+
         GameObject floatingObj = Instantiate(floatingTextPrefab, boardContainer);
         RectTransform rect = floatingObj.GetComponent<RectTransform>();
         rect.anchoredPosition = startPos;
@@ -788,12 +788,12 @@ public class GridManager : MonoBehaviour
         tmp.text = text;
         tmp.color = color;
 
-        // Dùng DOTween làm chữ bay lên 100 pixel và mờ dần trong 1 giây, sau đó tự hủy
+
         rect.DOAnchorPosY(startPos.y + 100f, 1f).SetEase(Ease.OutCirc);
         tmp.DOFade(0, 1f).OnComplete(() => Destroy(floatingObj));
     }
 
-    // Hàm này để gắn vào các Nút Bấm trên màn hình
+
     public void PlayUIButtonSound()
     {
         RuntimeManager.PlayOneShot(sfxClick);
@@ -840,14 +840,14 @@ public class GridManager : MonoBehaviour
     {
         hasWonLevel = false;
         if (btnNextLevel != null) btnNextLevel.gameObject.SetActive(false);
-        // 1. Dập tắt mọi hiệu ứng bay lượn cũ
+
         DOTween.KillAll();
         StopAllCoroutines(); autoChainCoroutine = null;
         isBoosterCooldown = false;
         firstSelectedTile = null; secondSelectedTile = null;
         hintCache.Clear(); 
 
-        // 2. Quét sạch toàn bộ các con thú cũ còn sót lại trên bàn
+
         if (gridArray != null)
         {
             for (int x = 0; x < gridArray.GetLength(0); x++)
@@ -864,21 +864,21 @@ public class GridManager : MonoBehaviour
             System.Array.Clear(gridArray, 0, gridArray.Length);
         }
 
-        // 3. Reset lại điểm số và UI
+
         score = 0;
         combo = 0;
         comboTimer = 0;
         UpdateScoreUI();
 
-        // Xóa các ô đang được gợi ý (nếu có)
+
         ClearHint();
 
-        // 4. Tắt cái bảng Thua/Thắng đi và mở khóa nút
+
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (btnShuffle != null) btnShuffle.interactable = true;
         if (btnHint != null) btnHint.interactable = true;
 
-        // 5. Gọi hàm chia bài mới (Bên trong hàm này đã có sẵn lệnh reset thời gian và isGameOver = false)
+
         GenerateGrid();
         if (!isGameOver)
         {
@@ -893,4 +893,4 @@ public class GridManager : MonoBehaviour
         }
     }
     
-} // Đừng quên giữ lại ngoặc nhọn này của class nhé!
+}

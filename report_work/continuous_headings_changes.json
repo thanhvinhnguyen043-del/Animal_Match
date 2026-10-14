@@ -1,0 +1,150 @@
+[
+  {
+    "heading": "1. Môi trường và dữ liệu thực hành",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "1.1 Gói mẫu và thư mục làm việc",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "1.2 Khởi chạy UABEA và dnSpy",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "1.3 Khởi chạy Il2CppDumper và Ghidra",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "1.4 Mã nhận diện thư viện được phân tích",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "2 Khảo sát APK và xuất tài nguyên Unity",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "2.1 Cấu trúc APK sau khi giải nén",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "2.2 Xem trước tài nguyên hình ảnh",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "2.3 Kết quả xuất asset",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "3. Tạo dữ liệu tra cứu IL2CPP",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "Đầu ra và cách sử dụng dữ liệu dump",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "4. Tìm ứng viên bằng dnSpy và dump.cs",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "4.1. Xác định field chứa số coin",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "4.2. Danh sách phương thức ứng viên và đối chiếu RVA",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "5. Import và gắn tên phương thức trong Ghidra",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "5.1. Import đúng thư viện ARM64",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "5.2. Quy ước địa chỉ",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "5.3 Khắc phục môi trường chạy script và hoàn tất gắn tên",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "6. Xác định nơi đọc và ghi field coin trong mã native",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "6.1. Loại trừ Awake khỏi luồng nạp coin",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "6.2. Logic coin khi vào game",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "6.3. Đối chiếu khóa lưu và kết luận luồng khởi tạo",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "7. Logic cập nhật coin sau khi nhận thưởng",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "7.1. Hàm StateCoin cộng trừ và lưu số dư",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "7.2. Nhánh thưởng 100 coin trong luồng NextLevel",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "7.3. Điều kiện bắt đầu nhận thưởng",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "7.4. Đối chiếu tên cờ và nơi đặt lại",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "7.5. Gắn callback cho các nút nhận thưởng",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "7.5.1. BindClaimActions đăng ký NextLevel và ClaimX2Reward",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "7.6. Sự kiện nhả chuột thực thi callback của UIClick",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "7.7. Tổng hợp luồng và giới hạn chứng minh",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "Các ứng viên đã loại trừ hoặc thu hẹp vai trò",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "8. Nhận xét an toàn và giới hạn phân tích tĩnh",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "8.1. Kịch bản can thiệp tài nguyên phía client",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "8.2 Tác động và giới hạn của kết luận",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "8.3 Cách giảm phụ thuộc vào dữ liệu do client quyết định",
+    "prior_page_break": "1"
+  },
+  {
+    "heading": "9. Kết luận",
+    "prior_page_break": "1"
+  }
+]

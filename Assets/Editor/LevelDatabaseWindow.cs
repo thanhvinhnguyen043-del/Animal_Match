@@ -88,6 +88,8 @@ public class LevelDatabaseWindow : EditorWindow
         level.tileSize = EditorGUILayout.FloatField("Co o", level.tileSize);
         level.timeLimit = EditorGUILayout.FloatField("Thoi gian (giay)", level.timeLimit);
         level.timeBonus = EditorGUILayout.FloatField("Thuong combo (giay)", level.timeBonus);
+        level.hintReward = Mathf.Max(0,EditorGUILayout.IntField("Thuong goi y khi thang",level.hintReward));
+        level.shuffleReward = Mathf.Max(0,EditorGUILayout.IntField("Thuong dao ban khi thang",level.shuffleReward));
         level.gravity = (GravityDirection)EditorGUILayout.EnumPopup("Trong luc", level.gravity);
         level.animalKinds = EditorGUILayout.IntField("So loai thu tu dong", level.animalKinds);
         level.seed = EditorGUILayout.IntField("Seed", level.seed);

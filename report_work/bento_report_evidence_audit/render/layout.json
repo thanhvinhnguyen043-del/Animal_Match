@@ -1,0 +1,225 @@
+{
+  "pages": 13,
+  "positions": [
+    {
+      "text": "1 Mục tiêu và môi trường thực hành",
+      "page": 3,
+      "logicalPage": 2
+    },
+    {
+      "text": "2 Chuẩn bị thư viện và xác định VerifyLicense",
+      "page": 3,
+      "logicalPage": 2
+    },
+    {
+      "text": "2.1 Decompile bằng APK Easy Tool",
+      "page": 3,
+      "logicalPage": 2
+    },
+    {
+      "text": "Hình 1. Chọn BentoLoop.apk và sử dụng Decompile trong APK Easy Tool",
+      "page": 3,
+      "logicalPage": 2
+    },
+    {
+      "text": "2.2 Tra cứu hàm trong dữ liệu dump",
+      "page": 3,
+      "logicalPage": 2
+    },
+    {
+      "text": "Hình 2. Khai báo LicenseVerifier và RVA của VerifyLicense trong dump.cs",
+      "page": 4,
+      "logicalPage": 3
+    },
+    {
+      "text": "3 Phân tích và kiểm chứng license key",
+      "page": 4,
+      "logicalPage": 3
+    },
+    {
+      "text": "3.1 Theo dõi phép so sánh và giá trị trả về",
+      "page": 4,
+      "logicalPage": 3
+    },
+    {
+      "text": "Hình 3. VerifyLicense xử lý đầu vào và so sánh với StringLiteral_2770",
+      "page": 4,
+      "logicalPage": 3
+    },
+    {
+      "text": "Hình 4. Các dòng 27 đến 38 nối kết quả Equals với các nhánh kiểm tra bổ sung",
+      "page": 4,
+      "logicalPage": 3
+    },
+    {
+      "text": "Hình 5. Các nhánh cuối VerifyLicense trả về 1 khi thành công và 0 khi thất bại",
+      "page": 5,
+      "logicalPage": 4
+    },
+    {
+      "text": "3.2 Đọc StringLiteral 2770 và đối chiếu địa chỉ",
+      "page": 5,
+      "logicalPage": 4
+    },
+    {
+      "text": "Hình 6. StringLiteral_2770 tại 044fce70 chứa BENTO-EASY-2025",
+      "page": 5,
+      "logicalPage": 4
+    },
+    {
+      "text": "Hình 7. stringliteral.json ghi cùng key với address 0x43FCE70",
+      "page": 5,
+      "logicalPage": 4
+    },
+    {
+      "text": "Hình 8. Memory Map hiển thị Image Base 00100000",
+      "page": 5,
+      "logicalPage": 4
+    },
+    {
+      "text": "3.3 Kiểm chứng trên APK gốc",
+      "page": 6,
+      "logicalPage": 5
+    },
+    {
+      "text": "Hình 9. APK gốc chấp nhận key BENTO-EASY-2025",
+      "page": 6,
+      "logicalPage": 5
+    },
+    {
+      "text": "Hình 10. APK gốc chuyển vào Level 1 sau khi xác nhận key",
+      "page": 6,
+      "logicalPage": 5
+    },
+    {
+      "text": "4 Sửa hàm và thay thư viện",
+      "page": 7,
+      "logicalPage": 6
+    },
+    {
+      "text": "4.1 Thay hai lệnh đầu VerifyLicense",
+      "page": 7,
+      "logicalPage": 6
+    },
+    {
+      "text": "Hình 11. Hai lệnh đầu VerifyLicense trước khi sửa",
+      "page": 7,
+      "logicalPage": 6
+    },
+    {
+      "text": "Hình 12. Hai lệnh sau khi sửa là mov w0, #0x1 và ret",
+      "page": 7,
+      "logicalPage": 6
+    },
+    {
+      "text": "Hình 13. Decompiler của VerifyLicense sau sửa chỉ còn return 1",
+      "page": 7,
+      "logicalPage": 6
+    },
+    {
+      "text": "4.2 Xuất thư viện có chứa byte đã sửa",
+      "page": 7,
+      "logicalPage": 6
+    },
+    {
+      "text": "Hình 14. Xuất chương trình với định dạng Original File",
+      "page": 7,
+      "logicalPage": 6
+    },
+    {
+      "text": "Hình 15. Bật Export User Byte Modifications để đưa byte đã sửa vào file xuất",
+      "page": 8,
+      "logicalPage": 7
+    },
+    {
+      "text": "Hình 16. Export Results Summary ghi file đích và định dạng Original File",
+      "page": 8,
+      "logicalPage": 7
+    },
+    {
+      "text": "Hình 17. File thư viện mang tên libil2cpp.so trước khi copy",
+      "page": 8,
+      "logicalPage": 7
+    },
+    {
+      "text": "4.3 Thay thư viện trong thư mục đã Decompile",
+      "page": 8,
+      "logicalPage": 7
+    },
+    {
+      "text": "Hình 18. Thay libil2cpp.so trong thư mục arm64-v8a",
+      "page": 8,
+      "logicalPage": 7
+    },
+    {
+      "text": "5 Build APK và kiểm thử bản đã sửa",
+      "page": 9,
+      "logicalPage": 8
+    },
+    {
+      "text": "5.1 Compile và ký bằng APK Easy Tool",
+      "page": 9,
+      "logicalPage": 8
+    },
+    {
+      "text": "Hình 19. Log build báo unexpected element property trong AndroidManifest.xml",
+      "page": 9,
+      "logicalPage": 8
+    },
+    {
+      "text": "Hình 20. Apktool 2.12.1 báo Unrecognized option với use aapt2",
+      "page": 9,
+      "logicalPage": 8
+    },
+    {
+      "text": "Hình 21. Bỏ tích Use the aapt2 binary instead of aapt trong phần Compile",
+      "page": 9,
+      "logicalPage": 8
+    },
+    {
+      "text": "Hình 22. Build tiếp tục nhưng báo thiếu enableOnBackInvokedCallback",
+      "page": 10,
+      "logicalPage": 9
+    },
+    {
+      "text": "Hình 23. Framework mới 1.apk nằm cạnh bản sao cũ 1.apk.bak",
+      "page": 10,
+      "logicalPage": 9
+    },
+    {
+      "text": "Hình 24. APK Easy Tool báo Sign successful sau khi build và ký",
+      "page": 11,
+      "logicalPage": 10
+    },
+    {
+      "text": "Hình 25. BentoLoop.apk được tạo trong thư mục 2 Recompiled APKs",
+      "page": 11,
+      "logicalPage": 10
+    },
+    {
+      "text": "5.2 Kiểm thử với chuỗi khác key tìm được",
+      "page": 11,
+      "logicalPage": 10
+    },
+    {
+      "text": "Hình 26. APK đã sửa báo kích hoạt thành công với chuỗi vinh123",
+      "page": 12,
+      "logicalPage": 11
+    },
+    {
+      "text": "6 Nhận xét và phương án phòng tránh",
+      "page": 12,
+      "logicalPage": 11
+    },
+    {
+      "text": "6.1 Nguyên nhân cơ chế bị vòng tránh",
+      "page": 12,
+      "logicalPage": 11
+    },
+    {
+      "text": "6.2 Biện pháp giảm rủi ro",
+      "page": 12,
+      "logicalPage": 11
+    }
+  ]
+}

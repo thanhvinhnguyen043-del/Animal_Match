@@ -18,6 +18,11 @@ public class AnimalTile : MonoBehaviour
     public GameObject barrierOverlay;
     public GameObject highlightObj;
     public Button button;
+    [Header("Collider Input")]
+    public BoxCollider2D hitCollider;
+    private TileColliderInput colliderInput;
+    public bool CanReceiveColliderClick => isActiveAndEnabled && hitCollider && hitCollider.enabled &&
+        currentState!=TileState.Hidden && currentState!=TileState.Barrier;
     
     [HideInInspector] public RectTransform rect;
 
@@ -35,7 +40,6 @@ public class AnimalTile : MonoBehaviour
             highlightImage.sprite = sprite;
         SetHighlight(false);
         SetState(state);
-        button.onClick.AddListener(OnTileClicked);
     }
 
     public void SetState(TileState newState)
@@ -46,6 +50,7 @@ public class AnimalTile : MonoBehaviour
         
 
         if (barrierOverlay) barrierOverlay.SetActive(currentState == TileState.Barrier); 
+        if(hitCollider) hitCollider.enabled=currentState!=TileState.Hidden && currentState!=TileState.Barrier;
     }
 
     public void SetHighlight(bool isOn)
@@ -53,8 +58,31 @@ public class AnimalTile : MonoBehaviour
         if (highlightObj) highlightObj.SetActive(isOn);
     }
 
-    private void OnTileClicked()
+    public void ConfigureColliderInput(TileColliderInput input)
     {
-        GridManager.Instance.SelectTile(this);
+        colliderInput=input;
+        if(!hitCollider) hitCollider=GetComponent<BoxCollider2D>();
+        if(!hitCollider) hitCollider=gameObject.AddComponent<BoxCollider2D>();
+        gameObject.layer=input.TileLayer;
+        hitCollider.isTrigger=true;
+        RefreshHitbox();
+        if(button) button.enabled=false;
+        foreach(var graphic in GetComponentsInChildren<Graphic>(true)) graphic.raycastTarget=false;
+        SetState(currentState);
+        input.Register(this);
+    }
+    private void RefreshHitbox()
+    {
+        if(!rect || !hitCollider) return;
+        hitCollider.size=rect.rect.size;
+        hitCollider.offset=rect.rect.center;
+    }
+    private void OnRectTransformDimensionsChange() { RefreshHitbox(); }
+    private void OnEnable() { if(colliderInput) colliderInput.Register(this); }
+    private void OnDisable() { if(colliderInput) colliderInput.Unregister(this); }
+    public void DisableColliderInput()
+    {
+        if(hitCollider) hitCollider.enabled=false;
+        if(colliderInput) colliderInput.Unregister(this);
     }
 }

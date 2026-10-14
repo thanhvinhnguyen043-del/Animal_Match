@@ -19,82 +19,213 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 4b791bcbe2c2be74a8e935d2e241befd, type: 3}
   - {fileID: 21300000, guid: c4d65d474871fc345ac6ea761309e408, type: 3}
   - {fileID: 21300000, guid: 4134a376c6ec57141a67d4442272d0b7, type: 3}
+  - {fileID: 21300000, guid: 1dd382299ade42ebb6d84c4be5419d61, type: 3}
+  - {fileID: 21300000, guid: ae332adb5aab495a85ce7c5c28484a7e, type: 3}
+  - {fileID: 21300000, guid: 2575d9640cc8444885967791346d734d, type: 3}
+  - {fileID: 21300000, guid: bd3ebbca64e34f06a0a62bc17c2124e7, type: 3}
+  - {fileID: 21300000, guid: 0936564334b340f9b2765f77e150cffb, type: 3}
+  - {fileID: 21300000, guid: aafd61b4732b4b64b0e134f01d7dc477, type: 3}
+  - {fileID: 21300000, guid: 84869957ed2046a5aee83ea1780dfbb4, type: 3}
+  - {fileID: 21300000, guid: 8e96ade2a27a4783a46d00ffb0593764, type: 3}
+  - {fileID: 21300000, guid: b81e5d52581a44b4a0b6461a416022b8, type: 3}
+  - {fileID: 21300000, guid: 774f1f8e702b40e4ab370769876e1062, type: 3}
   levels:
   - name: Level 1
-    mode: 0
+    mode: 1
     columns: 10
     rows: 5
     tileSize: 110
     timeLimit: 180
     timeBonus: 2
+    hintReward: 0
+    shuffleReward: 0
     gravity: 1
     animalKinds: 6
     seed: 1
     randomEachPlay: 0
     iceChance: 0.055
     barrierChance: 0.055
-    cells: []
+    cells:
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
   - name: Level 2
     mode: 1
     columns: 10
     rows: 5
     tileSize: 110
-    timeLimit: 75
+    timeLimit: 180
     timeBonus: 2
-    gravity: 3
-    animalKinds: 5
-    seed: 2
-    randomEachPlay: 1
-    iceChance: 0
-    barrierChance: 0
+    hintReward: 0
+    shuffleReward: 0
+    gravity: 1
+    animalKinds: 6
+    seed: 1
+    randomEachPlay: 0
+    iceChance: 0.055
+    barrierChance: 0.055
     cells:
     - empty: 0
-      animalID: 0
-      state: 0
-    - empty: 0
-      animalID: 0
-      state: 0
-    - empty: 0
       animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 2
       state: 0
     - empty: 0
       animalID: 3
       state: 0
     - empty: 0
-      animalID: 3
-      state: 0
+      animalID: 5
+      state: 3
     - empty: 0
-      animalID: 4
-      state: 0
-    - empty: 0
-      animalID: 4
+      animalID: 5
       state: 0
     - empty: 0
       animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 3
-      state: 0
-    - empty: 0
-      animalID: 3
       state: 0
     - empty: 0
       animalID: 4
@@ -106,16 +237,118 @@ MonoBehaviour:
       animalID: 0
       state: 0
     - empty: 0
-      animalID: 0
+      animalID: 1
       state: 0
     - empty: 0
       animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
       state: 0
     - empty: 0
       animalID: 2
       state: 0
     - empty: 0
       animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 1
       state: 0
     - empty: 0
       animalID: 3
@@ -125,144 +358,370 @@ MonoBehaviour:
       state: 0
     - empty: 0
       animalID: 4
-      state: 0
-    - empty: 0
-      animalID: 0
-      state: 0
-    - empty: 0
-      animalID: 0
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 3
-      state: 0
-    - empty: 0
-      animalID: 3
-      state: 0
+      state: 1
     - empty: 0
       animalID: 4
-      state: 0
-    - empty: 0
-      animalID: 4
-      state: 0
-    - empty: 0
-      animalID: 0
-      state: 0
-    - empty: 0
-      animalID: 0
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 4
-      state: 0
-    - empty: 0
-      animalID: 4
-      state: 0
-    - empty: 0
-      animalID: 0
-      state: 0
-    - empty: 0
-      animalID: 0
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 3
-      state: 0
-    - empty: 0
-      animalID: 3
       state: 0
   - name: Level 3
-    mode: 0
+    mode: 1
     columns: 10
     rows: 5
     tileSize: 110
-    timeLimit: 75
+    timeLimit: 180
     timeBonus: 2
-    gravity: 3
-    animalKinds: 5
-    seed: 2
-    randomEachPlay: 1
-    iceChance: 0
-    barrierChance: 0
+    hintReward: 1
+    shuffleReward: 0
+    gravity: 1
+    animalKinds: 6
+    seed: 1
+    randomEachPlay: 0
+    iceChance: 0.055
+    barrierChance: 0.055
+    cells:
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+  - name: Level 4
+    mode: 1
+    columns: 10
+    rows: 5
+    tileSize: 110
+    timeLimit: 180
+    timeBonus: 2
+    hintReward: 0
+    shuffleReward: 0
+    gravity: 1
+    animalKinds: 6
+    seed: 1
+    randomEachPlay: 0
+    iceChance: 0.055
+    barrierChance: 0.055
+    cells:
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+  - name: Level 5
+    mode: 1
+    columns: 10
+    rows: 5
+    tileSize: 110
+    timeLimit: 180
+    timeBonus: 2
+    hintReward: 0
+    shuffleReward: 1
+    gravity: 1
+    animalKinds: 6
+    seed: 1
+    randomEachPlay: 0
+    iceChance: 0.055
+    barrierChance: 0.055
     cells:
     - empty: 0
       animalID: 0
       state: 0
     - empty: 0
-      animalID: 0
+      animalID: 2
       state: 0
     - empty: 0
       animalID: 1
       state: 0
     - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 3
-      state: 0
-    - empty: 0
-      animalID: 3
-      state: 0
-    - empty: 0
-      animalID: 4
-      state: 0
-    - empty: 0
-      animalID: 4
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 3
-      state: 0
-    - empty: 0
-      animalID: 3
-      state: 0
-    - empty: 0
-      animalID: 4
-      state: 0
+      animalID: 5
+      state: 3
     - empty: 0
       animalID: 4
       state: 0
@@ -270,22 +729,43 @@ MonoBehaviour:
       animalID: 0
       state: 0
     - empty: 0
-      animalID: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 3
       state: 0
     - empty: 0
       animalID: 2
       state: 0
     - empty: 0
-      animalID: 2
-      state: 0
-    - empty: 0
-      animalID: 3
-      state: 0
-    - empty: 0
-      animalID: 3
+      animalID: 1
       state: 0
     - empty: 0
       animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 3
       state: 0
     - empty: 0
       animalID: 4
@@ -294,16 +774,70 @@ MonoBehaviour:
       animalID: 0
       state: 0
     - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
       animalID: 0
       state: 0
     - empty: 0
       animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 1
-      state: 0
-    - empty: 0
-      animalID: 3
       state: 0
     - empty: 0
       animalID: 3
@@ -315,11 +849,452 @@ MonoBehaviour:
       animalID: 4
       state: 0
     - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+  - name: Level 6
+    mode: 1
+    columns: 10
+    rows: 5
+    tileSize: 110
+    timeLimit: 180
+    timeBonus: 2
+    hintReward: 1
+    shuffleReward: 0
+    gravity: 1
+    animalKinds: 6
+    seed: 1
+    randomEachPlay: 0
+    iceChance: 0.055
+    barrierChance: 0.055
+    cells:
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
       animalID: 0
       state: 0
     - empty: 0
       animalID: 0
       state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+  - name: Level 7
+    mode: 1
+    columns: 10
+    rows: 5
+    tileSize: 110
+    timeLimit: 180
+    timeBonus: 2
+    hintReward: 0
+    shuffleReward: 0
+    gravity: 1
+    animalKinds: 6
+    seed: 1
+    randomEachPlay: 0
+    iceChance: 0.055
+    barrierChance: 0.055
+    cells:
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+  - name: Level 8
+    mode: 1
+    columns: 10
+    rows: 5
+    tileSize: 110
+    timeLimit: 180
+    timeBonus: 2
+    hintReward: 0
+    shuffleReward: 0
+    gravity: 1
+    animalKinds: 6
+    seed: 1
+    randomEachPlay: 0
+    iceChance: 0.055
+    barrierChance: 0.055
+    cells:
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
     - empty: 0
       animalID: 1
       state: 0
@@ -333,6 +1308,139 @@ MonoBehaviour:
       animalID: 2
       state: 0
     - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+  - name: Level 9
+    mode: 1
+    columns: 10
+    rows: 5
+    tileSize: 110
+    timeLimit: 180
+    timeBonus: 2
+    hintReward: 1
+    shuffleReward: 0
+    gravity: 1
+    animalKinds: 6
+    seed: 1
+    randomEachPlay: 0
+    iceChance: 0.055
+    barrierChance: 0.055
+    cells:
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
       animalID: 4
       state: 0
     - empty: 0
@@ -342,23 +1450,243 @@ MonoBehaviour:
       animalID: 0
       state: 0
     - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+  - name: Level 10
+    mode: 1
+    columns: 10
+    rows: 5
+    tileSize: 110
+    timeLimit: 180
+    timeBonus: 2
+    hintReward: 0
+    shuffleReward: 1
+    gravity: 1
+    animalKinds: 6
+    seed: 1
+    randomEachPlay: 0
+    iceChance: 0.055
+    barrierChance: 0.055
+    cells:
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
       animalID: 0
       state: 0
     - empty: 0
       animalID: 1
       state: 0
     - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
       animalID: 1
       state: 0
     - empty: 0
       animalID: 2
       state: 0
     - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
       animalID: 2
       state: 0
     - empty: 0
-      animalID: 3
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 0
+    - empty: 0
+      animalID: 0
       state: 0
     - empty: 0
       animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 5
+      state: 3
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 0
+      state: 0
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 0
+    - empty: 0
+      animalID: 2
+      state: 0
+    - empty: 0
+      animalID: 1
+      state: 0
+    - empty: 0
+      animalID: 4
+      state: 1
+    - empty: 0
+      animalID: 3
+      state: 0
+    - empty: 0
+      animalID: 4
       state: 0

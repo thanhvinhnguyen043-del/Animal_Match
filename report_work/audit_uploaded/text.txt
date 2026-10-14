@@ -1,0 +1,172 @@
+[1] HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG | BÁO CÁO GIỮA HỌC PHẦN | AN TOÀN GAME | Giảng viên hướng dẫn: | Cao Minh Thắng | Lớp: | D24CQGA02-B | Thành viên | MSV | Nguyễn Thành Vinh | B24DCGA162 | HÀ NỘI - 10/2026
+[1] IMAGE 1: fig_01.png (240, 314)
+[3] MỤC LỤC
+[5] 1. Môi trường và dữ liệu thực hành21.1 Gói mẫu và thư mục làm việc31.2 Khởi chạy UABEA và dnSpy41.3 Khởi chạy Il2CppDumper và Ghidra51.4 Mã nhận diện thư viện được phân tích62 Khảo sát APK và xuất tài nguyên Unity72.1 Cấu trúc APK sau khi giải nén72.2 Xem trước tài nguyên hình ảnh82.3 Kết quả xuất asset93. Tạo dữ liệu tra cứu IL2CPP9Đầu ra và cách sử dụng dữ liệu dump104. Tìm ứng viên bằng dnSpy và dump.cs114.1. Xác định field chứa số coin114.2. Danh sách phương thức ứng viên và đối chiếu RVA125. Import và gắn tên phương thức trong Ghidra135.1. Import đúng thư viện ARM64135.2. Quy ước địa chỉ135.3 Khắc phục môi trường chạy script và hoàn tất gắn tên146. Xác định nơi đọc và ghi field coin trong mã native156.1. Loại trừ Awake khỏi luồng nạp coin156.2. Logic coin khi vào game166.3. Đối chiếu khóa lưu và kết luận luồng khởi tạo177. Logic cập nhật coin sau khi nhận thưởng177.1. Hàm StateCoin cộng trừ và lưu số dư187.2. Nhánh thưởng 100 coin trong luồng NextLevel197.3. Điều kiện bắt đầu nhận thưởng207.4. Đối chiếu tên cờ và nơi đặt lại217.5. Tổng hợp luồng và giới hạn chứng minh22Các ứng viên đã loại trừ hoặc thu hẹp vai trò228. Nhận xét an toàn và giới hạn phân tích tĩnh238.1. Kịch bản can thiệp tài nguyên phía client238.2 Tác động và giới hạn của kết luận238.3 Cách giảm phụ thuộc vào dữ liệu do client quyết định239. Kết luận24
+[6] Bài thực hành khảo sát cấu trúc APK Unity, xuất tài nguyên hình ảnh và phân tích hai luồng xử lý coin trong thư viện IL2CPP ARM64. Mục tiêu là xác định đúng lớp, phương thức, vị trí mã thực thi và đường đi của giá trị; không thực hiện sửa APK hoặc thay đổi số dư trong game.
+[7] Kết quả phân tích tĩnh cho thấy PlayerResourceManager.Start nạp coin từ PlayerPrefs với khóa Coin_SandSort, dùng 100 khi chưa tồn tại khóa. Trong nhánh nhận thưởng của UIWinGame.NextLevel, phần thực thi MoveNext gọi StateCoin với state = true và coin = 100. StateCoin cập nhật field _coin rồi lưu số dư mới. Một tài nguyên Texture2D hình chai cũng đã được xuất bằng UABEA.
+[8] 1. Môi trường và dữ liệu thực hành
+[9] Thực hành được thực hiện trong Windows chạy trên VMware Workstation, với máy ảo có tên thuchanhdichnguoc1. Thư mục làm việc là C:\LabGame. Gói mẫu đang lưu trong APK_goc có tên SandSort_14-9.zip; dữ liệu game giải nén được đặt trong APK_giai_nen. Kiến trúc dùng xuyên suốt phần dịch ngược là ARM64.
+[10] Thành phần | Thông tin và trạng thái | Gói mẫu game | SandSort_14-9.zip, lưu tại C:\LabGame\APK_goc. Tên và đuôi file được xác nhận bằng ảnh File Explorer. | Thư viện được chọn | C:\LabGame\APK_giai_nen\lib\arm64-v8a\libil2cpp.so; ELF AARCH64, little-endian, địa chỉ 64 bit. | UABEA | Gói uabea-windows; chạy UABEANext4.Desktop.exe thành công. Đã xem Preview và xuất Texture2D ở phần thực hành. | Il2CppDumper | Gói v6.7.46; ứng dụng khởi chạy đến hộp chọn file đầu vào. Lần phân tích trước đã tạo dump.cs, DummyDll và script.json. | dnSpy | v6.1.8, 64 bit .NET; cửa sổ Assembly Explorer mở được. Đã tra cứu DummyDll của game. | Ghidra | Gói v12.1.2; ghidraRun.bat mở được cửa sổ quản lý project. Đã phân tích thư viện và chạy script gắn tên thành công.
+[11] Các ảnh ở mục 1.1 đến 1.3 chứng minh vị trí dữ liệu và trạng thái khởi chạy công cụ. Kiến trúc cùng mã nhận diện libil2cpp.so được đối chiếu ở mục 1.4 và phần import Ghidra. Các công cụ được giữ trong thư mục giải nén cùng thư viện và file cấu hình đi kèm.
+[13] 1.1 Gói mẫu và thư mục làm việc
+[14] File Explorer hiển thị đầy đủ tên SandSort_14-9.zip tại C:\LabGame\APK_goc, loại Compressed (zipped) Folder, dung lượng hiển thị 110 605 KB. Đây là tên gói đầu vào thực tế được ghi nhận. Chưa xác minh gói ZIP là APK được đổi đuôi hay gói chứa APK bên trong; versionName và versionCode của ứng dụng cũng chưa được đọc. Vì vậy, không dùng phần 14-9 trong tên file để suy ra phiên bản Android của game.
+[15] IMAGE 2: fig_02.png (807, 116)
+[16] Hình 1. Tên gói mẫu SandSort_14-9.zip trong thư mục APK_goc
+[17] Thư mục C:\LabGame tập hợp APK_goc, APK_giai_nen, Asset_xuat và các thư mục công cụ. APK_goc giữ gói mẫu; APK_giai_nen chứa dữ liệu phân tích; Asset_xuat chứa tài nguyên đã xuất. Các đầu ra dump hiện nằm trong thư mục Il2CppDumper-win-v6.7.46 (1), đúng vị trí đã được dùng để chạy script Ghidra.
+[18] IMAGE 3: fig_03.png (670, 232)
+[19] Hình 2. Thư mục làm việc LabGame với dữ liệu và các công cụ đã giải nén
+[20] Project Ghidra có tên dichnguoc và được lưu riêng tại vị trí đã chọn khi tạo project. Dữ liệu phân tích được giữ trong file project cùng thư mục dữ liệu đi kèm. Thư mục chương trình ghidra_12.1.2_PUBLIC_20260605 chứa bộ công cụ; các file dump.cs, DummyDll và script.json nằm trong thư mục Il2CppDumper được nêu trên. Các vị trí này giúp đối chiếu ảnh với kết quả thực hành.
+[22] 1.2 Khởi chạy UABEA và dnSpy
+[23] UABEA
+[24] Trong C:\LabGame\uabea-windows, chạy UABEANext4.Desktop.exe. Cửa sổ UABEANext xuất hiện với Workspace Explorer, Inspector và vùng mở asset. Ảnh cho thấy ứng dụng đã khởi chạy thành công; nội dung Preview và kết quả Export được trình bày ở mục 2.
+[25] IMAGE 4: fig_04.png (1285, 793)
+[26] Hình 3. UABEANext mở thành công và file chạy hiện trong thư mục công cụ
+[27] dnSpy
+[28] Trong C:\LabGame\dnSpy-net-win64, chạy dnSpy.exe. Thanh tiêu đề hiển thị dnSpy v6.1.8, 64 bit .NET và bảng Assembly Explorer xuất hiện. Đây là trạng thái công cụ đã mở được; việc tra cứu lớp và phương thức trong DummyDll được đối chiếu ở mục 4.
+[29] IMAGE 5: fig_05.png (1713, 876)
+[30] Hình 4. dnSpy v6.1.8 khởi chạy với bảng Assembly Explorer
+[32] 1.3 Khởi chạy Il2CppDumper và Ghidra
+[33] Il2CppDumper
+[34] Chạy Il2CppDumper.exe trong C:\LabGame\Il2CppDumper-win-v6.7.46 (1). Console và hộp Open xuất hiện, yêu cầu Il2Cpp binary file. Ảnh chứng minh ứng dụng đã khởi chạy, chưa chọn đầu vào. Khi dump, chọn libil2cpp.so trước, rồi global-metadata.dat ở hộp tiếp theo; không dùng file metadata cho hộp chọn binary.
+[35] IMAGE 6: fig_06.png (1189, 489)
+[36] Hình 5. Il2CppDumper đã khởi chạy và chờ chọn file binary đầu vào
+[37] Ghidra
+[38] Chạy ghidraRun.bat trong C:\LabGame\ghidra_12.1.2_PUBLIC_20260605\ghidra_12.1.2_PUBLIC. Cửa sổ quản lý project Ghidra hiện tên dichnguoc và dòng Ghidra startup complete. Trạng thái này chứng minh bộ công cụ mở được; Listing, Decompiler và kết quả gắn tên được trình bày ở phần phân tích native.
+[39] IMAGE 7: fig_07.png (768, 598)
+[40] Hình 6. Ghidra hoàn tất khởi động và mở cửa sổ quản lý project
+[42] 1.4 Mã nhận diện thư viện được phân tích
+[43] Thư viện native sử dụng xuyên suốt bài là C:\LabGame\APK_giai_nen\lib\arm64-v8a\libil2cpp.so. Cửa sổ Import Results Summary của Ghidra ghi nhận định dạng ELF shared object, processor AARCH64 và mã nhận diện dưới đây. Mã băm này thuộc libil2cpp.so, không phải mã băm của toàn bộ APK.
+[44] GNU Build ID02f85baf0795b27bc93c81d2846ad54135610db3MD5 của libil2cpp.sofbfcc2616006ee6ef7bc501ec0c6b086SHA256 của libil2cpp.soe07d562a09889db333a1f6e1d85bb74356cc29fa92f788a8154e16ac1b5cab3f
+[45] Gói đầu vào đang lưu có tên SandSort_14-9.zip. Chưa xác minh versionName, versionCode hoặc tên file APK trước khi đóng gói. Mã nhận diện dưới đây thuộc chính thư viện libil2cpp.so đã import, giúp đối chiếu bản native đang phân tích; không thay thế mã băm của gói ZIP hoặc APK.
+[46] IMAGE 8: fig_08.png (749, 590)
+[47] Hình 7. Thông tin kiến trúc và mã nhận diện của libil2cpp.so trong Ghidra
+[49] 2 Khảo sát APK và xuất tài nguyên Unity
+[50] 2.1 Cấu trúc APK sau khi giải nén
+[51] Bản sao APK được giải nén vào C:\LabGame\APK_giai_nen. Các thư mục assets, lib, res và các file classes.dex, classes2.dex cùng AndroidManifest xuất hiện trong thư mục này. Thư mục assets chứa dữ liệu Unity; lib chứa thư viện native theo kiến trúc. Các file DEX và manifest thuộc phần ứng dụng Android, không thay thế mã IL2CPP của game.
+[52] Trong UABEA, workspace data.unity3d chứa các mục sharedassets0.assets, sharedassets1.assets, sharedassets2.assets và các file dữ liệu liên quan. Dữ liệu Unity được khảo sát dưới assets/bin/Data. sharedassets0.assets là mục serialized asset bên trong workspace đang mở; không mặc định coi tên này là một file rời ngoài ổ đĩa nếu chưa kiểm tra cách đóng gói.
+[53] IMAGE 9: fig_09.png (787, 594)
+[54] Hình 8. Cấu trúc thư mục APK_giai_nen sau khi giải nén
+[56] 2.2 Xem trước tài nguyên hình ảnh
+[57] Trong workspace data.unity3d, chọn sharedassets0.assets và duyệt các đối tượng Texture2D. Asset được chọn có tên bottle 1, loại Texture2D. Khung Preview hiển thị một chai chứa vật liệu màu vàng cam; kích thước texture hiển thị là 281 × 552 pixel. Đây là tài nguyên hình ảnh, không phải phương thức xử lý coin.
+[58] Theo hình dạng trong Preview, tài nguyên có thể phục vụ phần hiển thị chai chứa cát hoặc vật liệu màu trong nội dung game. Nhận xét này dựa trên hình ảnh tài nguyên; chưa truy vết prefab hoặc scene để khẳng định toàn bộ vị trí sử dụng.
+[59] IMAGE 10: fig_10.png (1042, 845)
+[60] Hình 9. Asset bottle 1 thuộc loại Texture2D trong sharedassets0.assets và ảnh Preview
+[62] 2.3 Kết quả xuất asset
+[63] Sau khi xem Preview, sử dụng chức năng Export của UABEA để xuất một bản sao tài nguyên vào C:\LabGame\Asset_xuat. File Explorer hiển thị một file ảnh có thumbnail hình chai tương ứng với Preview. Tên hiển thị của file là Bottle_Texture2D_sharedassets0.assets; phần mở rộng ảnh không hiện trong ảnh chụp nên không tự khẳng định định dạng PNG hoặc định dạng khác.
+[64] IMAGE 11: fig_11.png (785, 270)
+[65] Hình 10. File tài nguyên đã xuất trong thư mục Asset_xuat
+[66] Kết quả gồm vị trí workspace gốc, mục sharedassets0.assets, tên bottle 1, loại Texture2D, ảnh Preview và bằng chứng file xuất. UABEA hỗ trợ nhận diện và trích xuất tài nguyên Unity; việc xác định nơi cộng coin phải được thực hiện bằng metadata và mã native ở các bước sau.
+[67] 3. Tạo dữ liệu tra cứu IL2CPP
+[68] Il2CppDumper được sử dụng để đối chiếu mã máy trong libil2cpp.so với thông tin lớp và phương thức trong global-metadata.dat. Hai file đầu vào lấy từ cùng APK đã giải nén; kiến trúc ARM64 được giữ thống nhất khi import sang Ghidra.
+[69] File mã native C:\LabGame\APK_giai_nen\lib\arm64-v8a\libil2cpp.so
+[70] File metadata C:\LabGame\APK_giai_nen\assets\bin\Data\Managed\Metadata\global-metadata.dat
+[71] Đường dẫn metadata là vị trí đầu vào theo cấu trúc IL2CPP được dùng trong bài. Các ảnh kết quả hiện thể hiện thư mục đầu ra và bản thư viện import; chưa có ảnh riêng của cả hai hộp chọn đầu vào Il2CppDumper.
+[73] Đầu ra và cách sử dụng dữ liệu dump
+[74] Thư mục kết quả Il2CppDumper-win-v6.7.46 (1) có DummyDll, dump.cs, script.json, ghidra.py, il2cpp.h và stringliteral.json. Các file này phục vụ tra cứu, gắn tên và đối chiếu địa chỉ; không phải toàn bộ mã nguồn C# gốc của game.
+[75] Đầu ra | Vai trò trong bài | dump.cs | Tra tên lớp, field, chữ ký phương thức, RVA và File Offset. | DummyDll | Mở Assembly-CSharp.dll trong dnSpy để xem cấu trúc namespace và thành viên. | script.json | Cung cấp tên và địa chỉ để script gắn nhãn trong Ghidra. | ghidra.py | Áp dụng dữ liệu script.json vào chương trình native đã import. | il2cpp.h và stringliteral.json | Dữ liệu hỗ trợ về kiểu và chuỗi; chỉ sử dụng khi cần đối chiếu thêm.
+[77] IMAGE 12: fig_12.png (787, 563)
+[78] Hình 11. Các file đầu ra của Il2CppDumper trong thư mục làm việc
+[80] 4. Tìm ứng viên bằng dnSpy và dump.cs
+[81] 4.1. Xác định field chứa số coin
+[82] Mở DummyDll\Assembly-CSharp.dll trong dnSpy, duyệt namespace FoodSort và tìm từ khóa coin. Trong PlayerResourceManager tìm thấy private int _coin với FieldOffset 0x20. Kiểu int phù hợp với giá trị số lượng coin; vai trò của field được kiểm chứng tiếp bằng lệnh đọc và ghi trong mã native.
+[83] Kết quả tìm kiếm cũng có _coinGain của UIWinGame, nhưng field này có kiểu Transform. Vì vậy, nó được xem là ứng viên tài nguyên giao diện, không dùng làm bằng chứng trực tiếp cho biến số dư. Tên field chỉ định hướng tìm kiếm; kết luận xử lý coin phải dựa trên đường đi của giá trị.
+[84] IMAGE 13: fig_13.png (655, 545)
+[85] Hình 12. Field _coin kiểu int trong FoodSort.PlayerResourceManager có offset 0x20
+[87] 4.2. Danh sách phương thức ứng viên và đối chiếu RVA
+[88] Các phương thức get_Coin, set_Coin, Awake, Start và StateCoin được chọn để kiểm tra. Trong dnSpy, địa chỉ native được lấy từ thuộc tính Address, sau đó đối chiếu dòng RVA trong dump.cs. RVA ở chú thích của DLL giả và Token metadata không được dùng thay cho địa chỉ native.
+[89] Phương thức | RVA | File Offset | get_Coin | 0x22A0708 | 0x229C708 | set_Coin | 0x22A0710 | 0x229C710 | Awake | 0x22A15D0 | 0x229D5D0 | Start | 0x22A15D4 | 0x229D5D4 | StateCoin | 0x22A16F8 | 0x229D6F8
+[91] get_Coin trả về int, không có tham số; set_Coin nhận int value và trả về void. Thân hàm return 0 hoặc rỗng trong DummyDll là nội dung dựng phục vụ tra cứu, không chứng minh giá trị coin bằng 0 hoặc hàm không hoạt động.
+[92] IMAGE 14: fig_14.png (656, 151)
+[93] Hình 13. Khai báo get_Coin và thuộc tính Address trong dnSpy
+[94] IMAGE 15: fig_15.png (403, 124)
+[95] Hình 14. RVA và File Offset của get_Coin và set_Coin trong dump.cs
+[96] StateCoin có chữ ký public void StateCoin(bool state, int coin, string placement = "unknown", string groupPlacement = "unknown"). Hướng cộng hoặc trừ của state chưa được suy đoán ở bước này; được xác nhận trong Ghidra ở mục 7.
+[98] 5. Import và gắn tên phương thức trong Ghidra
+[99] 5.1. Import đúng thư viện ARM64
+[100] Tạo project Non-Shared tên dichnguoc và import libil2cpp.so đã dùng trong lần dump. Hộp import nhận dạng Executable and Linking Format (ELF), language AARCH64:LE:64:v8A:default. Sau khi mở CodeBrowser, thực hiện phân tích tự động để nhận diện các vùng mã, hàm và tham chiếu.
+[101] IMAGE 16: fig_16.png (506, 259)
+[102] Hình 15. Import libil2cpp.so với định dạng ELF và ngôn ngữ AARCH64
+[103] 5.2. Quy ước địa chỉ
+[104] Ghidra sử dụng Image Base 0x100000 trong lần import này. Ví dụ, get_Coin có RVA 0x22A0708 và được gắn nhãn tại 0x23A0708. File Offset là vị trí trong file ELF, còn địa chỉ Ghidra là vị trí trong không gian địa chỉ của chương trình đã import; hai giá trị không được tráo đổi.
+[105] Địa chỉ Ghidra = Image Base + RVA0x100000 + 0x22A0708 = 0x23A0708
+[106] Listing cung cấp lệnh ARM64 và địa chỉ; Decompiler dựng mã giả để giải thích luồng xử lý. Mã giả được đối chiếu với khai báo dnSpy và các offset, không coi là mã C++ hoặc C# gốc.
+[108] 5.3 Khắc phục môi trường chạy script và hoàn tất gắn tên
+[109] Thêm thư mục Il2CppDumper-win-v6.7.46 (1) vào Script Directories. Chọn cả thư mục, không thêm riêng file ghidra.py làm bundle. Lần chạy đầu báo Ghidra was not started with PyGhidra. Python is not available, cho thấy script chưa được thực thi bằng môi trường tương thích.
+[110] Trong cửa sổ quản lý project, mở File > Install Extensions, bật Jython rồi khởi động lại Ghidra. Do script Il2CppDumper sử dụng kiểu Python 2/Jython, thêm chỉ thị runtime vào đầu ghidra.py để Ghidra chọn đúng môi trường:
+[111] # -*- coding: utf-8 -*-# @runtime Jythonimport json
+[112] IMAGE 17: fig_17.png (703, 547)
+[113] Hình 16. Extension Jython phiên bản 12.1.2 được bật trong Ghidra
+[114] Chạy lại ghidra.py và chọn script.json của cùng lần dump. Console xuất hiện Script finished! và ghidra.py> Finished!. Sau đó lưu project; tên phương thức FoodSort xuất hiện trong Symbol Tree.
+[115] IMAGE 18: fig_18.png (677, 59)
+[116] Hình 17. Thông báo hoàn tất của lần chạy script thành công
+[118] 6. Xác định nơi đọc và ghi field coin trong mã native
+[119] get_Coin tại 0x23A0708 chỉ gồm lệnh ldr w0, [x0, #0x20] rồi ret. Lệnh đọc giá trị 32 bit từ offset 0x20 của đối tượng và trả về; khớp private int _coin trong dnSpy. set_Coin tại 0x23A0710 thực hiện str w1, [x0, #0x20] rồi ret, ghi giá trị truyền vào cùng field.
+[120] IMAGE 19: fig_19.png (853, 349)
+[121] Hình 18. Listing của get_Coin và set_Coin xác nhận đọc và ghi offset 0x20
+[122] Kết quả này xác định vị trí field trong đối tượng PlayerResourceManager. Offset 0x20 không phải số coin, RVA hoặc địa chỉ cố định của một đối tượng khi game chạy. Kiểu undefined4 trong Decompiler chỉ phản ánh việc Ghidra chưa khôi phục tên kiểu cho dữ liệu 4 byte; dnSpy cho biết field là int.
+[123] Hai hàm accessor không chứa phép cộng hoặc lời gọi PlayerPrefs trong đoạn đã xem. Vì vậy, chúng là điểm đối chiếu field, không được kết luận là nơi tính thưởng hoặc nạp dữ liệu ban đầu. Việc nạp coin được tìm trong Start; phép thay đổi số dư được tìm trong StateCoin.
+[124] 6.1. Loại trừ Awake khỏi luồng nạp coin
+[125] Awake tại 0x23A15D0 chỉ có lệnh ret. Đây là bằng chứng native để loại phương thức này khỏi ứng viên trực tiếp đọc hoặc khởi tạo coin trong bản thư viện đang phân tích.
+[126] IMAGE 20: fig_20.png (813, 160)
+[127] Hình 19. Awake của PlayerResourceManager chỉ trả về, không nạp coin
+[129] 6.2. Logic coin khi vào game
+[130] Hàm xác định là FoodSort.PlayerResourceManager.Start, RVA 0x22A15D4, địa chỉ Ghidra 0x23A15D4. Ở dòng 18, hàm gọi UnityEngine.PlayerPrefs.GetInt với khóa _StringLiteral_3130 và giá trị mặc định 100. Dòng 19 ghi kết quả vào param_1 + 0x20, chính là field _coin đã đối chiếu.
+[131] IMAGE 21: fig_21.png (773, 492)
+[132] Hình 20. Start đọc coin từ PlayerPrefs rồi gán vào field _coin
+[133] Luồng giá trị là dữ liệu đã lưu → GetInt → _coin. Nếu khóa tồn tại, số coin được lấy từ lần lưu trước; nếu chưa có khóa, giá trị mặc định là 100. Do đó, không kết luận mọi lần vào game đều nhận lại 100 coin. Các lời gọi GetInt khác ghi vào offset 0x24, 0x28 và 0x2C thuộc các field booster, không gộp chúng vào biến coin.
+[135] 6.3. Đối chiếu khóa lưu và kết luận luồng khởi tạo
+[136] Đi theo _StringLiteral_3130 trong Listing cho thấy chú thích Coin_SandSort ở nhãn StringLiteral_3130. Đây là khóa được truyền vào GetInt trong Start và SetInt trong StateCoin. Việc hai phương thức dùng cùng khóa nối kết bước nạp và bước lưu số dư.
+[137] IMAGE 22: fig_22.png (839, 176)
+[138] Hình 21. Nhãn StringLiteral_3130 mang nội dung Coin_SandSort
+[139] Mã diễn giải tương đương cho phần nạp coin được viết như sau. Đây là cách diễn đạt hành vi đã quan sát, không phải mã nguồn được khôi phục nguyên bản:
+[140] _coin = PlayerPrefs.GetInt("Coin_SandSort", 100);
+[141] Kết luận: Start thực sự nạp hoặc khởi tạo coin; nguồn dữ liệu là PlayerPrefs phía client; giá trị mặc định là 100; đích ghi là field int _coin, offset 0x20. get_Coin/set_Coin xác nhận nơi đọc và ghi field. Awake được loại trừ vì mã native chỉ trả về.
+[142] 7. Logic cập nhật coin sau khi nhận thưởng
+[143] Phần tiếp theo phân biệt nơi thực hiện cộng/trừ số dư với nơi quyết định phần thưởng. PlayerResourceManager.StateCoin nhận lượng coin cần thay đổi; nhánh trong UIWinGame.NextLevel quyết định truyền giá trị 100 và chọn hướng cộng. Phân tích chỉ kết luận nhánh đã quan sát, không áp dụng mặc định cho tất cả nguồn thưởng trong game.
+[145] 7.1. Hàm StateCoin cộng trừ và lưu số dư
+[146] FoodSort.PlayerResourceManager.StateCoin có RVA 0x22A16F8, địa chỉ Ghidra 0x23A16F8. Đối chiếu khai báo dnSpy: param_1 là đối tượng; param_2 tương ứng bool state; param_3 tương ứng int coin. Trong ảnh, tham số state và coin được lưu vào đối tượng phụ trước khi sử dụng, nhưng field số dư vẫn nằm ở param_1 + 0x20.
+[147] Dòng 39 khởi tạo số thay đổi bằng -coin. Dòng 40 - 41 chuyển thành +coin nếu state khác 0. Dòng 43 cộng số thay đổi vào coin hiện tại; dòng 44 ghi lại _coin. Dòng 45 gọi PlayerPrefs.SetInt với khóa _StringLiteral_3130; dòng 46 gọi PlayerPrefs.Save.
+[148] IMAGE 23: fig_23.png (824, 422)
+[149] Hình 22. Nhánh cộng trừ, cập nhật field và lưu coin trong StateCoin
+[150] int change = state ? coin : -coin;_coin = _coin + change;PlayerPrefs.SetInt("Coin_SandSort", _coin);PlayerPrefs.Save();
+[151] Với coin là số dương, state = true làm tăng số dư và state = false làm giảm số dư. Phần mã tiếp theo có RecordLevelCoinChange và TrackWhenMetadataReady, nhưng chưa phân tích đầy đủ cơ chế thống kê; không dùng tên những hàm này để suy ra máy chủ xác thực số dư.
+[153] 7.2. Nhánh thưởng 100 coin trong luồng NextLevel
+[154] UIWinGame.NextLevel tại 0x23B6044, RVA 0x22B6044, chuẩn bị state machine <NextLevel>d__26 và gọi AsyncVoidMethodBuilder.Start. Đoạn nghiệp vụ được quan sát trong <NextLevel>d__26.MoveNext. Trong nhánh này, TryStartClaim phải trả về true trước khi lấy đối tượng PlayerResourceManager và gọi StateCoin.
+[155] Dòng 42 - 43 của ảnh dưới truyền state = 1 và coin = 100. Listing xác nhận mov w1, #0x1 và mov w2, #0x64; 0x64 tương đương 100. Địa chỉ lệnh gọi là 0x23B7804, không được nhầm với địa chỉ bắt đầu NextLevel hoặc MoveNext.
+[156] IMAGE 24: fig_24.png (800, 390)
+[157] Hình 23. MoveNext kiểm tra TryStartClaim rồi gọi StateCoin với lượng thưởng 100
+[159] IMAGE 25: fig_25.png (507, 76)
+[160] Hình 24. Lệnh ARM64 thiết lập tham số và gọi StateCoin tại 0x23B7804
+[161] Hai tham số chuỗi ở lời gọi mang nhãn _StringLiteral_13854 và _StringLiteral_14787; chưa xác định nội dung nên không tự đặt tên nguồn thưởng. Giá trị 100 ở đây là lượng cộng, khác với 100 mặc định khi GetInt chưa tìm thấy khóa trong Start.
+[163] 7.3. Điều kiện bắt đầu nhận thưởng
+[164] FoodSort.UIWinGame.TryStartClaim có địa chỉ Ghidra 0x23B632C, RVA 0x22B632C. Hàm đọc cờ ở offset 0xA8 vào cVar1. Nếu giá trị ban đầu bằng 0, nó đặt cờ thành 1 và thực hiện các thao tác chuẩn bị. Cuối hàm trả về cVar1 == 0, dựa trên giá trị cờ ban đầu.
+[165] IMAGE 26: fig_26.png (691, 579)
+[166] Hình 25. TryStartClaim kiểm tra cờ nhận thưởng và trả về kết quả điều kiện
+[167] Như vậy, cờ ban đầu false cho phép nhánh cộng coin đi tiếp; cờ đang true làm nhánh này bị bỏ qua. Kết luận áp dụng trong trường hợp hàm hoàn tất bình thường; các nhánh gặp đối tượng null có thể đi vào xử lý lỗi. Hai lần gọi liên tiếp khi cờ chưa được reset không đều nhận thưởng.
+[169] 7.4. Đối chiếu tên cờ và nơi đặt lại
+[170] Trong dnSpy, field private bool _isClaimingReward có FieldOffset 0xA8, khớp vị trí TryStartClaim đã đọc. Field _isRewardAdCallbackHandled ở offset 0xA9 là một cờ khác; không gộp hai cờ thành một điều kiện.
+[171] IMAGE 27: fig_27.png (455, 150)
+[172] Hình 26. Field _isClaimingReward ở offset 0xA8 trong UIWinGame
+[173] UIWinGame.OnEnable có RVA 0x22B5B40, địa chỉ Ghidra 0x23B5B40. Trong nhánh UIManager tồn tại, dòng 71 ghi 0 vào offset 0xA8 và dòng 72 gọi BindClaimActions. Điều này cho thấy cờ nhận thưởng được đặt lại khi đi qua nhánh bật giao diện này. Không suy ra cờ chỉ được reset một lần cho mỗi level hoặc đây là toàn bộ cơ chế chống nhận lặp.
+[174] IMAGE 28: fig_28.png (787, 123)
+[175] Hình 27. OnEnable đặt lại cờ _isClaimingReward và gọi BindClaimActions
+[177] 7.5. Tổng hợp luồng và giới hạn chứng minh
+[178] Chuỗi xử lý đã xác định là UIWinGame.NextLevel → phần thực thi <NextLevel>d__26.MoveNext → TryStartClaim → PlayerResourceManager.StateCoin(true, 100, ...) → cập nhật _coin → PlayerPrefs.SetInt("Coin_SandSort", số dư mới) → PlayerPrefs.Save. OnEnable cung cấp bằng chứng đặt lại cờ _isClaimingReward trong nhánh đã quan sát.
+[179] NextLevel không chứa trực tiếp phép cộng vì đây là hàm bất đồng bộ. Việc truy vết sang MoveNext giúp tìm đúng mã nghiệp vụ thay vì kết luận dựa vào phần tạo AsyncVoidMethodBuilder.
+[180] Vị trí | Địa chỉ Ghidra | Ý nghĩa | NextLevel | 0x23B6044 | Khởi chạy luồng bất đồng bộ | TryStartClaim | 0x23B632C | Kiểm tra cờ bắt đầu nhận thưởng | Lời gọi StateCoin | 0x23B7804 | Truyền state = true và coin = 100 | StateCoin | 0x23A16F8 | Cộng/trừ và lưu số dư | OnEnable | 0x23B5B40 | Đặt lại cờ trong nhánh đã xem
+[181] Chưa xác định đầy đủ sự kiện báo thắng hoặc nút cụ thể nào gọi NextLevel. XREF của NextLevel trong ảnh hiện cho thấy tham chiếu dữ liệu, chưa chứng minh lời gọi trực tiếp từ sự kiện hoàn thành level. Do đó, kết luận là tìm được nhánh thưởng trong lớp giao diện thắng UIWinGame, không khẳng định mọi lần thắng đều tự động cộng ngay 100 coin.
+[182] Các ứng viên đã loại trừ hoặc thu hẹp vai trò
+[183] Ứng viên | Kết quả đối chiếu và lý do | PlayerResourceManager.Awake | Chỉ có ret tại 0x23A15D0; loại khỏi nơi trực tiếp nạp hoặc cộng coin. | get_Coin và set_Coin | Chỉ đọc/ghi _coin ở +0x20; không có phép cộng hay lưu PlayerPrefs trong đoạn đã xem. | UIWinGame._coinGain | Có kiểu Transform; là thành phần giao diện, không phải field int chứa số dư. | PlayerResourceManager.Start | Đọc số dư đã lưu hoặc dùng mặc định 100; không phải bằng chứng cộng thưởng sau thắng. | UIWinGame.NextLevel | Giữ lại làm đầu mối nhận thưởng; phần thân chỉ khởi chạy state machine, cần đọc MoveNext.
+[186] 8. Nhận xét an toàn và giới hạn phân tích tĩnh
+[187] 8.1. Kịch bản can thiệp tài nguyên phía client
+[188] Một kịch bản có thể xảy ra là thay đổi dữ liệu lưu cục bộ của khóa Coin_SandSort trước khi game nạp lại. Nếu thay đổi có hiệu lực và không bị cơ chế khác kiểm tra hoặc ghi đè, Start sẽ đọc số đã thay đổi rồi đưa vào _coin. Kịch bản thứ hai là can thiệp lượng thưởng truyền vào StateCoin hoặc thao tác cập nhật số dư, từ đó làm tăng tài nguyên ngoài mức mà nhánh thưởng thông thường quyết định.
+[189] Nhận định có cơ sở từ ba bằng chứng: nguồn đọc là PlayerPrefs; phép cộng diễn ra trong libil2cpp.so phía client; số dư mới được ghi lại cục bộ. Trong bài chỉ xác định khả năng và vị trí liên quan, chưa sửa APK, sửa dữ liệu lưu, chạy bản can thiệp hoặc đo tác động trong game.
+[190] 8.2 Tác động và giới hạn của kết luận
+[191] Tác động dự kiến là số dư và phần hiển thị tài nguyên phía client có thể sai lệch, ảnh hưởng các thao tác tiêu coin hoặc cân bằng game nếu chúng tin vào số dư này. Tuy nhiên, các ảnh không chứng minh rằng server chấp nhận số dư sai, không có xác thực từ xa, hoặc người chơi có thể dùng số coin đó cho mọi chức năng.
+[192] Phân tích tĩnh chưa xác minh trạng thái lúc chạy, dữ liệu PlayerPrefs thực tế, kết quả hiển thị sau thắng, nội dung hai chuỗi mô tả nguồn thưởng hoặc toàn bộ các nhánh thưởng khác. Các hàm thống kê xuất hiện trong StateCoin cũng chưa được khảo sát đầy đủ. Vì vậy, không kết luận đã khai thác thành công hoặc game hoàn toàn không có cơ chế bảo vệ.
+[193] 8.3 Cách giảm phụ thuộc vào dữ liệu do client quyết định
+[194] Với game có tài khoản và máy chủ, nên để máy chủ quản lý số dư có giá trị, kiểm tra điều kiện hoàn thành level và xác định lượng thưởng hợp lệ. Mỗi giao dịch thưởng cần mã nhận diện để tránh xử lý lặp; client gửi yêu cầu và nhận số dư được xác nhận thay vì tự quyết định phần thưởng. Dữ liệu local có thể dùng làm bộ nhớ đệm để hiển thị, sau đó đối chiếu với trạng thái được máy chủ xác nhận.
+[195] Trong chế độ offline, kiểm tra tính toàn vẹn và đối chiếu dữ liệu cục bộ có thể tăng khó khăn cho việc sửa trực tiếp, nhưng vẫn không tạo được mức tin cậy tương đương một nguồn trạng thái độc lập với client. Cờ _isClaimingReward hữu ích để hạn chế thao tác nhận lặp trong luồng giao diện, không phải bằng chứng xác thực số dư từ máy chủ.
+[197] 9. Kết luận
+[198] Bài thực hành đã nhận diện dữ liệu Unity trong APK, chọn Texture2D bottle 1 trong sharedassets0.assets, xem Preview và xuất tài nguyên. Il2CppDumper tạo dữ liệu tra cứu, dnSpy cung cấp cấu trúc lớp và offset, còn Ghidra xác nhận hành vi native. Việc bật Jython và chỉ định runtime giúp ghidra.py gắn tên thành công trên Ghidra 12.1.2.
+[199] Nội dung | Kết quả xác định | Nạp coin khi vào game | PlayerResourceManager.Start, RVA 0x22A15D4, địa chỉ 0x23A15D4; đọc Coin_SandSort, mặc định 100, ghi _coin +0x20. | Cập nhật số dư | StateCoin, RVA 0x22A16F8, địa chỉ 0x23A16F8; cộng/trừ theo state, ghi field rồi lưu PlayerPrefs. | Nhánh thưởng đã xem | NextLevel.MoveNext gọi StateCoin(true, 100, ...) tại 0x23B7804 khi TryStartClaim cho phép. | Điều kiện nhận thưởng | Cờ _isClaimingReward tại +0xA8; được kiểm tra và đặt lại trong các nhánh đã phân tích. | Phần chưa xác định | Đường gọi từ sự kiện hoàn thành level/nút cụ thể đến NextLevel; kiểm chứng động và vai trò server.

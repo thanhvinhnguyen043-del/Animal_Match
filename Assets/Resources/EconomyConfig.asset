@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c858656499808e04294d32f94f5a3f59, type: 3}
+  m_Name: EconomyConfig
+  m_EditorClassIdentifier: 
+  coinsPerWin: 100
+  startingCoins: 0
+  startingHints: 4
+  startingShuffles: 3
+  hintPrice: 75
+  shufflePrice: 100
+  backgrounds:
+  - id: garden
+    displayName: Day Garden
+    price: 0
+    requiredCompletedLevel: 0
+    sprite: {fileID: 21300000, guid: d382d35218f77e246aab0ea18cce8fb0, type: 3}
+  - id: sunset
+    displayName: Sunset Garden
+    price: 2000
+    requiredCompletedLevel: 0
+    sprite: {fileID: 21300000, guid: c09f05d6ad354fc38732d868b0a0ab8c, type: 3}
+  - id: cafe
+    displayName: Cozy Cafe
+    price: 2000
+    requiredCompletedLevel: 0
+    sprite: {fileID: 21300000, guid: d382d35218f77e246aab0ea18cce8fb0, type: 3}
+  - id: winter
+    displayName: Winter Cafe
+    price: 2000
+    requiredCompletedLevel: 10
+    sprite: {fileID: 21300000, guid: 86761ffceb5e10a429e0c2efdf2ee54f, type: 3}
+  - id: tet
+    displayName: Vietnamese Tet Cafe
+    price: 2000
+    requiredCompletedLevel: 20
+    sprite: {fileID: 21300000, guid: d01da84738832bc4b9b5aa4710e66848, type: 3}
+  - id: halloween
+    displayName: Halloween Cafe
+    price: 2000
+    requiredCompletedLevel: 30
+    sprite: {fileID: 21300000, guid: 3c7b5558766037b429d1d5cb79c46ed4, type: 3}
+  - id: beach
+    displayName: Beach Cafe
+    price: 2000
+    requiredCompletedLevel: 40
+    sprite: {fileID: 21300000, guid: a606c83421e3d5a4798c68a4979ce4f0, type: 3}
+  - id: jungle
+    displayName: Jungle Cafe
+    price: 2000
+    requiredCompletedLevel: 50
+    sprite: {fileID: 21300000, guid: e106dab627df3f247a84e68b35cf6232, type: 3}

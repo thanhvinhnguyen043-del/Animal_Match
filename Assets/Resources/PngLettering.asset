@@ -1,0 +1,521 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a271e29ecc7586243b9610ec762058fb, type: 3}
+  m_Name: PngLettering
+  m_EditorClassIdentifier: 
+  atlas: {fileID: 2800000, guid: 1cb6beacccbe39240b36f7544d0b2573, type: 3}
+  glyphs:
+  - character: A
+    uv:
+      serializedVersion: 2
+      x: 0.031307552
+      y: 0.86187845
+      width: 0.14456722
+      height: 0.10428177
+    width: 1.0129032
+    height: 0.9741936
+  - character: B
+    uv:
+      serializedVersion: 2
+      x: 0.19889502
+      y: 0.86187845
+      width: 0.13167587
+      height: 0.10497238
+    width: 0.92258066
+    height: 0.9806452
+  - character: C
+    uv:
+      serializedVersion: 2
+      x: 0.35082874
+      y: 0.86187845
+      width: 0.13351749
+      height: 0.10497238
+    width: 0.9354839
+    height: 0.9806452
+  - character: D
+    uv:
+      serializedVersion: 2
+      x: 0.51473296
+      y: 0.86187845
+      width: 0.1344383
+      height: 0.10497238
+    width: 0.9419355
+    height: 0.9806452
+  - character: E
+    uv:
+      serializedVersion: 2
+      x: 0.6777164
+      y: 0.86187845
+      width: 0.12338858
+      height: 0.10497238
+    width: 0.86451614
+    height: 0.9806452
+  - character: F
+    uv:
+      serializedVersion: 2
+      x: 0.839779
+      y: 0.86187845
+      width: 0.12523021
+      height: 0.10566299
+    width: 0.87741935
+    height: 0.9870968
+  - character: G
+    uv:
+      serializedVersion: 2
+      x: 0.02946593
+      y: 0.73756903
+      width: 0.14548802
+      height: 0.109116025
+    width: 1.0193548
+    height: 1.0193548
+  - character: H
+    uv:
+      serializedVersion: 2
+      x: 0.1970534
+      y: 0.73756903
+      width: 0.1344383
+      height: 0.1070442
+    width: 0.9419355
+    height: 1
+  - character: I
+    uv:
+      serializedVersion: 2
+      x: 0.37937385
+      y: 0.73756903
+      width: 0.07274401
+      height: 0.1070442
+    width: 0.5096774
+    height: 1
+  - character: J
+    uv:
+      serializedVersion: 2
+      x: 0.5101289
+      y: 0.73756903
+      width: 0.12523021
+      height: 0.1070442
+    width: 0.87741935
+    height: 1
+  - character: K
+    uv:
+      serializedVersion: 2
+      x: 0.6694291
+      y: 0.73756903
+      width: 0.14088398
+      height: 0.1070442
+    width: 0.9870968
+    height: 1
+  - character: L
+    uv:
+      serializedVersion: 2
+      x: 0.84622467
+      y: 0.73756903
+      width: 0.12246777
+      height: 0.1070442
+    width: 0.85806453
+    height: 1
+  - character: M
+    uv:
+      serializedVersion: 2
+      x: 0.028545119
+      y: 0.6111878
+      width: 0.15009208
+      height: 0.109116025
+    width: 1.0516129
+    height: 1.0193548
+  - character: N
+    uv:
+      serializedVersion: 2
+      x: 0.19152854
+      y: 0.6111878
+      width: 0.1427256
+      height: 0.10980663
+    width: 1
+    height: 1.0258064
+  - character: O
+    uv:
+      serializedVersion: 2
+      x: 0.34530386
+      y: 0.6111878
+      width: 0.1519337
+      height: 0.10980663
+    width: 1.0645162
+    height: 1.0258064
+  - character: P
+    uv:
+      serializedVersion: 2
+      x: 0.5138122
+      y: 0.6111878
+      width: 0.13812155
+      height: 0.10980663
+    width: 0.9677419
+    height: 1.0258064
+  - character: Q
+    uv:
+      serializedVersion: 2
+      x: 0.664825
+      y: 0.6111878
+      width: 0.14732964
+      height: 0.111187845
+    width: 1.032258
+    height: 1.0387096
+  - character: R
+    uv:
+      serializedVersion: 2
+      x: 0.8333333
+      y: 0.6111878
+      width: 0.13627993
+      height: 0.10980663
+    width: 0.9548387
+    height: 1.0258064
+  - character: S
+    uv:
+      serializedVersion: 2
+      x: 0.031307552
+      y: 0.4910221
+      width: 0.13720074
+      height: 0.10635359
+    width: 0.9612903
+    height: 0.9935484
+  - character: T
+    uv:
+      serializedVersion: 2
+      x: 0.19521178
+      y: 0.4910221
+      width: 0.13720074
+      height: 0.10635359
+    width: 0.9612903
+    height: 0.9935484
+  - character: U
+    uv:
+      serializedVersion: 2
+      x: 0.3489871
+      y: 0.4910221
+      width: 0.13812155
+      height: 0.108425416
+    width: 0.9677419
+    height: 1.0129032
+  - character: V
+    uv:
+      serializedVersion: 2
+      x: 0.50460404
+      y: 0.4910221
+      width: 0.1427256
+      height: 0.10773481
+    width: 1
+    height: 1.0064516
+  - character: W
+    uv:
+      serializedVersion: 2
+      x: 0.65561694
+      y: 0.4910221
+      width: 0.16850829
+      height: 0.1070442
+    width: 1.1806451
+    height: 1
+  - character: X
+    uv:
+      serializedVersion: 2
+      x: 0.8305709
+      y: 0.4910221
+      width: 0.1436464
+      height: 0.1070442
+    width: 1.0064516
+    height: 1
+  - character: Y
+    uv:
+      serializedVersion: 2
+      x: 0.03038674
+      y: 0.3680939
+      width: 0.1427256
+      height: 0.10497238
+    width: 1
+    height: 0.9806452
+  - character: Z
+    uv:
+      serializedVersion: 2
+      x: 0.19521178
+      y: 0.3680939
+      width: 0.13351749
+      height: 0.10497238
+    width: 0.9354839
+    height: 0.9806452
+  - character: 0
+    uv:
+      serializedVersion: 2
+      x: 0.3489871
+      y: 0.3680939
+      width: 0.13904236
+      height: 0.1070442
+    width: 0.9741936
+    height: 1
+  - character: 1
+    uv:
+      serializedVersion: 2
+      x: 0.52302027
+      y: 0.3680939
+      width: 0.09208103
+      height: 0.1070442
+    width: 0.6451613
+    height: 1
+  - character: 2
+    uv:
+      serializedVersion: 2
+      x: 0.6721915
+      y: 0.3680939
+      width: 0.13259669
+      height: 0.10773481
+    width: 0.92903227
+    height: 1.0064516
+  - character: 3
+    uv:
+      serializedVersion: 2
+      x: 0.83609575
+      y: 0.3680939
+      width: 0.13075507
+      height: 0.10773481
+    width: 0.91612905
+    height: 1.0064516
+  - character: 4
+    uv:
+      serializedVersion: 2
+      x: 0.03038674
+      y: 0.24654695
+      width: 0.14456722
+      height: 0.10635359
+    width: 1.0129032
+    height: 0.9935484
+  - character: 5
+    uv:
+      serializedVersion: 2
+      x: 0.1961326
+      y: 0.24654695
+      width: 0.13075507
+      height: 0.10635359
+    width: 0.91612905
+    height: 0.9935484
+  - character: 6
+    uv:
+      serializedVersion: 2
+      x: 0.35174954
+      y: 0.24654695
+      width: 0.1344383
+      height: 0.1070442
+    width: 0.9419355
+    height: 1
+  - character: 7
+    uv:
+      serializedVersion: 2
+      x: 0.51289135
+      y: 0.24654695
+      width: 0.12799263
+      height: 0.10566299
+    width: 0.8967742
+    height: 0.9870968
+  - character: 8
+    uv:
+      serializedVersion: 2
+      x: 0.6694291
+      y: 0.24654695
+      width: 0.13812155
+      height: 0.10773481
+    width: 0.9677419
+    height: 1.0064516
+  - character: 9
+    uv:
+      serializedVersion: 2
+      x: 0.8305709
+      y: 0.24654695
+      width: 0.13996316
+      height: 0.10773481
+    width: 0.9806452
+    height: 1.0064516
+  - character: +
+    uv:
+      serializedVersion: 2
+      x: 0.0359116
+      y: 0.12845305
+      width: 0.13351749
+      height: 0.09530387
+    width: 0.9354839
+    height: 0.89032257
+  - character: ':'
+    uv:
+      serializedVersion: 2
+      x: 0.22744015
+      y: 0.1332873
+      width: 0.06629834
+      height: 0.09461326
+    width: 0.46451613
+    height: 0.88387096
+  - character: '%'
+    uv:
+      serializedVersion: 2
+      x: 0.34162062
+      y: 0.12361878
+      width: 0.15745856
+      height: 0.109116025
+    width: 1.1032258
+    height: 1.0193548
+  - character: '!'
+    uv:
+      serializedVersion: 2
+      x: 0.5414365
+      y: 0.12361878
+      width: 0.06906077
+      height: 0.10980663
+    width: 0.48387095
+    height: 1.0258064
+  - character: '?'
+    uv:
+      serializedVersion: 2
+      x: 0.6767956
+      y: 0.12361878
+      width: 0.12246777
+      height: 0.110497236
+    width: 0.85806453
+    height: 1.032258
+  - character: .
+    uv:
+      serializedVersion: 2
+      x: 0.8664825
+      y: 0.14502762
+      width: 0.06998158
+      height: 0.053176794
+    width: 0.4903226
+    height: 0.4967742
+  - character: '-'
+    uv:
+      serializedVersion: 2
+      x: 0.041436464
+      y: 0.040745858
+      width: 0.11970534
+      height: 0.04834254
+    width: 0.83870965
+    height: 0.4516129
+  - character: /
+    uv:
+      serializedVersion: 2
+      x: 0.20810314
+      y: 0.019337017
+      width: 0.10220995
+      height: 0.10151934
+    width: 0.716129
+    height: 0.9483871
+  - character: (
+    uv:
+      serializedVersion: 2
+      x: 0.37108657
+      y: 0.019337017
+      width: 0.08103131
+      height: 0.10428177
+    width: 0.56774193
+    height: 0.9741936
+  - character: )
+    uv:
+      serializedVersion: 2
+      x: 0.5377532
+      y: 0.019337017
+      width: 0.07918969
+      height: 0.10428177
+    width: 0.5548387
+    height: 0.9741936
+  - character: "\xD7"
+    uv:
+      serializedVersion: 2
+      x: 0.6777164
+      y: 0.020718232
+      width: 0.12062615
+      height: 0.10290055
+    width: 0.8451613
+    height: 0.9612903
+  - character: "\u2022"
+    uv:
+      serializedVersion: 2
+      x: 0.86187845
+      y: 0.035220996
+      width: 0.07918969
+      height: 0.06077348
+    width: 0.5548387
+    height: 0.56774193
+  words:
+  - text: SHUFFLE
+    sprite: {fileID: 21300000, guid: 0fdd9e7367d25904a80932265760b34c, type: 3}
+  - text: HINT
+    sprite: {fileID: 21300000, guid: e7e1f734ffdfb6d4a897cfb8764529f3, type: 3}
+  - text: RESTART
+    sprite: {fileID: 21300000, guid: e45fdf699193283448d26b434a5c8111, type: 3}
+  - text: NEXT LEVEL
+    sprite: {fileID: 21300000, guid: e1824bd3587c3b94782eb86f8a6e21af, type: 3}
+  - text: HOME
+    sprite: {fileID: 21300000, guid: 6dd2eaf8aee3f2842a2f5cc5a7074705, type: 3}
+  - text: OVERALL AUDIO
+    sprite: {fileID: 21300000, guid: 145a1e8c48afac74b837d2ad27ca6c8e, type: 3}
+  - text: MUSIC
+    sprite: {fileID: 21300000, guid: 995c5978ae68ace468277ac365fa6ff5, type: 3}
+  - text: SFX
+    sprite: {fileID: 21300000, guid: c7db2d0bd44ac5145a4657c0a1036f73, type: 3}
+  - text: 'RETURN
+
+      HOME'
+    sprite: {fileID: 21300000, guid: 86448b84bae83e24b9822b44705259fa, type: 3}
+  - text: 'RESTART
+
+      LEVEL'
+    sprite: {fileID: 21300000, guid: 7d6fc5aa68acf8248ad8fd00855a2150, type: 3}
+  - text: 'SELECT
+
+      LEVEL'
+    sprite: {fileID: 21300000, guid: 4c7e0fe0a86d21c46b80c925da5d40f5, type: 3}
+  - text: PLAY
+    sprite: {fileID: 21300000, guid: c4baabc2305d31a4dbf7372600b72e92, type: 3}
+  - text: SHOP
+    sprite: {fileID: 21300000, guid: 87a2f9d00259e744aaa33141ed707350, type: 3}
+  - text: ANIMAL MATCH
+    sprite: {fileID: 21300000, guid: 9b65b084d5dcc654db7ac934ff2d8d06, type: 3}
+  - text: BACK
+    sprite: {fileID: 21300000, guid: 7d5fd1a84eb935d4abdac90312d32206, type: 3}
+  - text: SELECT LEVEL
+    sprite: {fileID: 21300000, guid: 36ae171c70861de4dba040b3f4ae5787, type: 3}
+  - text: DAY GARDEN
+    sprite: {fileID: 21300000, guid: 1d29b2745efdf06498697e5a5df6e6ba, type: 3}
+  - text: "ONE-TIME PURCHASE \u2022 KEEP FOREVER"
+    sprite: {fileID: 21300000, guid: fde721c8246f6c148aaf817d992c1b5b, type: 3}
+  - text: EQUIPPED
+    sprite: {fileID: 21300000, guid: d797ce7bfe0804e479c9d1731b0ece21, type: 3}
+  - text: SUNSET GARDEN
+    sprite: {fileID: 21300000, guid: c371117a86da2dc4c9d29f2b95a1a5c3, type: 3}
+  - text: COZY CAFE
+    sprite: {fileID: 21300000, guid: 30ee4e6b58ba1154ea3335217ccde580, type: 3}
+  - text: WINTER CAFE
+    sprite: {fileID: 21300000, guid: 4fab5724ca6d3df49b51148ab5bdf27a, type: 3}
+  - text: VIETNAMESE TET CAFE
+    sprite: {fileID: 21300000, guid: 6f95c3bfa1a6cf943bbbfd9b6433c6b5, type: 3}
+  - text: HALLOWEEN CAFE
+    sprite: {fileID: 21300000, guid: ead0bc0c4bccc524582771375c744bb2, type: 3}
+  - text: BEACH CAFE
+    sprite: {fileID: 21300000, guid: 86a890d25fb82ed4ab2a6ab7a212cade, type: 3}
+  - text: JUNGLE CAFE
+    sprite: {fileID: 21300000, guid: 383d60b7dcedc7f4ca5686999e577204, type: 3}
+  - text: OWNED
+    sprite: {fileID: 21300000, guid: 399b03b0af0102e4680772e0950a7d69, type: 3}
+  - text: USE
+    sprite: {fileID: 21300000, guid: eae1455d7b9bee5489e2506a7a994e43, type: 3}
+  - text: TRY AGAIN!
+    sprite: {fileID: 21300000, guid: 7040f8cf8ce1ec1489c575f40b537251, type: 3}
+  - text: SETTINGS
+    sprite: {fileID: 21300000, guid: a474fb50931fce14fa7a17ba9522a46c, type: 3}
+  - text: RESTART LEVEL
+    sprite: {fileID: 21300000, guid: c602402deba41c04da536a6fb97ef8c0, type: 3}
+  - text: RETURN HOME
+    sprite: {fileID: 21300000, guid: c1825d4f41a66034dbc5bebfdeef38fc, type: 3}
+  - text: PERMANENT BACKGROUND
+    sprite: {fileID: 21300000, guid: 25011656dffcd0a40848abb28bdafaa8, type: 3}

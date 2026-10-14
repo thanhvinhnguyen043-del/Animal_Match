@@ -12,7 +12,14 @@ public class GridManager : MonoBehaviour
 {   
     private static bool isDOTweenInitialized = false;
 
-    private Dictionary<int, List<AnimalTile>> hintCache = new Dictionary<int, List<AnimalTile>>();
+    public GameManager Session { get; private set; }
+    public LevelReward LastReward { get; private set; }
+    private BoardLogic boardLogic;
+    private GameHudView hudView;
+    private GameAudioFeedback audioFeedback;
+    private Coroutine boardCheckCoroutine;
+    private int boardRevision;
+    private TileColliderInput tileInput;
     public static GridManager Instance;
 
     [Header("Gravity Settings")]
@@ -36,9 +43,9 @@ public class GridManager : MonoBehaviour
     [Header("Score & Combo")]
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI comboText;
-    public int score = 0;
-    public int combo = 0;
-    public float comboTimer = 0f;
+    public int score => Session ? Session.Score : 0;
+    public int combo => Session ? Session.Combo : 0;
+    public float comboTimer => Session ? Session.ComboTimer : 0;
     public float comboDuration = 3f;
 
     public AnimalTile[,] gridArray;
@@ -50,15 +57,16 @@ public class GridManager : MonoBehaviour
     public GameObject gameOverPanel;
     public Button btnNextLevel;
     public GameObject levelOneWinBanner;
-    private bool hasWonLevel;
+    private bool hasWonLevel => Session && Session.State == GameState.Win;
     public TextMeshProUGUI textTitle;
     public TextMeshProUGUI textFinalScore;
+    public TextMeshProUGUI rewardText;
+    public GameObject winTrophy;
 
     [Header("Boosters")]
     public Button btnShuffle;
     public Button btnHint;
     private bool isBoosterCooldown = false;
-
 
     private AnimalTile hintedTile1;
     private AnimalTile hintedTile2;
@@ -67,8 +75,8 @@ public class GridManager : MonoBehaviour
     public Slider timeSlider;
     public float maxTime = 60f;
     public float timeBonusPerMatch = 2f;
-    private float currentTime;
-    private bool isGameOver = false;
+    public float currentTime => Session ? Session.TimeRemaining : 0;
+    private bool isGameOver => !Session || Session.State != GameState.Playing;
     private int totalTilesRemaining = 0;
 
     [Header("Effects")]
@@ -84,11 +92,14 @@ public class GridManager : MonoBehaviour
     public EventReference winSound;
     public EventReference loseSound;
 
-    
-
     void Awake()
     {
         Instance = this;
+        Session = GetComponent<GameManager>();
+        if (!Session) Session = gameObject.AddComponent<GameManager>();
+        Session.GameEnded += HandleGameEnded;
+        hudView = new GameHudView(Session, this);
+        audioFeedback = new GameAudioFeedback(Session, this);
         if (btnNextLevel != null) btnNextLevel.gameObject.SetActive(false);
     }
     void Start()
@@ -103,10 +114,9 @@ public class GridManager : MonoBehaviour
         }
         GenerateGrid();
         WarmUpSystem();
-        isGameOver = true;
+        Session.ShowMenu();
         
     }
-
 
     private void WarmUpSystem()
     {
@@ -116,7 +126,6 @@ public class GridManager : MonoBehaviour
             DOTween.Init();
             isDOTweenInitialized = true;
         }
-
 
         AnimalTile dummy1 = new GameObject("Dummy1").AddComponent<AnimalTile>();
         AnimalTile dummy2 = new GameObject("Dummy2").AddComponent<AnimalTile>();
@@ -129,55 +138,18 @@ public class GridManager : MonoBehaviour
         Destroy(dummy1.gameObject);
         Destroy(dummy2.gameObject);
     }
-    void Update()
-    {
-        if (isGameOver) return;
 
-
-        if (currentTime > 0)
-        {
-            currentTime -= Time.deltaTime;
-            if (timeSlider != null) timeSlider.value = currentTime / maxTime;
-
-            if (currentTime <= 0)
-            {
-                currentTime = 0;
-                GameOver(false);
-            }
-        }
-
-
-        if (comboTimer > 0)
-        {
-            comboTimer -= Time.deltaTime;
-            if (comboTimer <= 0)
-            {
-                combo = 0;
-                UpdateScoreUI();
-            }
-        }
-    }
-
-    private void UpdateScoreUI()
-    {
-        if (scoreText != null) scoreText.text = $"Điểm: {score}";
-        if (comboText != null) {
-            if (combo > 1) comboText.text = $"Combo: x{combo}!";
-            else comboText.text = "";
-        }
-    }
-
-    public void GenerateGrid()
+    public bool GenerateGrid()
     {
         if (levelDatabase == null) levelDatabase = Resources.Load<LevelDatabase>("LevelDatabase");
         List<LevelCell> layout;
         if (levelDatabase != null)
         {
             if (levelDatabase.levels == null || levelIndex < 0 || levelIndex >= levelDatabase.levels.Count)
-            { Debug.LogError("Level index khong hop le."); isGameOver = true; return; }
+            { Debug.LogError("Level index khong hop le."); Session.ShowMenu(); return false; }
             var level = levelDatabase.levels[levelIndex];
             if (level == null || !level.Validate(levelDatabase.animalSprites.Length, out string error))
-            { Debug.LogError("Level khong hop le. Kiem tra Tools > Level Database."); isGameOver = true; return; }
+            { Debug.LogError("Level khong hop le. Kiem tra Tools > Level Database."); Session.ShowMenu(); return false; }
             columns = level.columns; rows = level.rows; tileSize = level.tileSize;
             maxTime = level.timeLimit; timeBonusPerMatch = level.timeBonus;
             currentGravity = level.gravity; animalSprites = levelDatabase.animalSprites;
@@ -188,17 +160,19 @@ public class GridManager : MonoBehaviour
         {
             var fallback = new LevelDefinition { columns = columns, rows = rows, animalKinds = animalSprites.Length };
             if (!fallback.Validate(animalSprites.Length, out string error))
-            { Debug.LogError(error); isGameOver = true; return; }
+            { Debug.LogError(error); Session.ShowMenu(); return false; }
             layout = fallback.Generate(animalSprites.Length, Random.Range(0, int.MaxValue));
         }
         if (tilePrefab == null || boardContainer == null)
-        { Debug.LogError("Thieu tilePrefab hoac boardContainer."); isGameOver = true; return; }
+        { Debug.LogError("Thieu tilePrefab hoac boardContainer."); Session.ShowMenu(); return false; }
         int totalTiles = 0;
 
         gridArray = new AnimalTile[columns, rows];
+        if(!tileInput) tileInput=boardContainer.GetComponent<TileColliderInput>();
+        if(!tileInput) tileInput=boardContainer.gameObject.AddComponent<TileColliderInput>();
+        tileInput.Configure(this,columns*rows,new Vector2(columns+1,rows+1)*tileSize);
         float startX = -(columns / 2f * tileSize) + (tileSize / 2f);
         float startY = (rows / 2f * tileSize) - (tileSize / 2f);
-
 
         for (int x = 0; x < columns; x++)
         {
@@ -215,14 +189,14 @@ public class GridManager : MonoBehaviour
                 int assignedID = cell.animalID;
                 AnimalTile tileScript = newTile.GetComponent<AnimalTile>();
                 tileScript.SetupTile(assignedID, animalSprites[assignedID], x, y, cell.state);
+                tileScript.ConfigureColliderInput(tileInput);
                 gridArray[x, y] = tileScript;
 
             }
         }
         totalTilesRemaining = totalTiles;
-        currentTime = maxTime;
-        if (timeSlider != null) timeSlider.value = 1;
-        isGameOver = false;
+        boardRevision++;
+        return true;
     }
 
     public void SelectTile(AnimalTile clickedTile)
@@ -231,7 +205,7 @@ public class GridManager : MonoBehaviour
 
         if (clickedTile.currentState == TileState.Hidden || clickedTile.currentState == TileState.Barrier) 
             return; 
-        RuntimeManager.PlayOneShot(sfxClick);
+        Session.NotifyTileSelected();
         ClearHint();
 
         if (firstSelectedTile == clickedTile)
@@ -260,45 +234,24 @@ public class GridManager : MonoBehaviour
                 return;
             }
         }
-        RuntimeManager.PlayOneShot(sfxError);
+        Session.NotifyInvalidMatch();
         tile1.SetHighlight(false);
         tile2.SetHighlight(false);
         firstSelectedTile = null;
         secondSelectedTile = null;
     }
 
-
     private void ProcessMatch(AnimalTile t1, AnimalTile t2)
     {
-        combo++;
-        comboTimer = comboDuration;
-        int matchScore = 100 * combo;
-        score += matchScore;
-        UpdateScoreUI();
-        RuntimeManager.PlayOneShot(sfxMatch);
-        Vector2 spawnPos = t1.rect.anchoredPosition;
-
-
-        SpawnFloatingText(spawnPos, "+" + matchScore, Color.white);
-
-        
-        if (combo > 0 && combo % 5 == 0)
-        {
-            currentTime += timeBonusPerMatch;
-            if (currentTime > maxTime) currentTime = maxTime;
-            SpawnFloatingText(spawnPos + new Vector2(0, 40), "+" + timeBonusPerMatch + " GIÂY!", Color.yellow);
-            RuntimeManager.PlayOneShot(sfxCombo);
-
-        
-        }
+        if (isGameOver || !t1 || !t2) return;
+        boardRevision++;
+        Session.RecordMatch(t1.rect.anchoredPosition);
 
         int x1 = t1.gridX, y1 = t1.gridY;
         int x2 = t2.gridX, y2 = t2.gridY;
 
-
         BreakTile(t1);
         BreakTile(t2);
-
 
         BreakNeighborBarriers(x1, y1);
         BreakNeighborBarriers(x2, y2);
@@ -310,25 +263,25 @@ public class GridManager : MonoBehaviour
 
         ApplyGravity();
         if (totalTilesRemaining <= 0) GameOver(true);
+        else ScheduleBoardCheck();
     }
-
 
     private void BreakTile(AnimalTile t)
     {
         if (t.currentState == TileState.Ice)
         {
             t.SetState(TileState.Normal);
-            if (!sfxWaterBreak.IsNull) RuntimeManager.PlayOneShot(sfxWaterBreak);
+            Session.NotifyTileBroken(TileState.Ice);
         }
         else
         {
             gridArray[t.gridX, t.gridY] = null;
             totalTilesRemaining--;
+            t.DisableColliderInput();
             t.rect.DOKill();
             Destroy(t.gameObject);
         }
     }
-
 
     private void BreakNeighborBarriers(int x, int y)
     {
@@ -344,207 +297,39 @@ public class GridManager : MonoBehaviour
                 if (neighbor != null && neighbor.currentState == TileState.Barrier)
                 {
                     neighbor.SetState(TileState.Normal);
-                    if (!sfxStoneBreak.IsNull) RuntimeManager.PlayOneShot(sfxStoneBreak);
+                    Session.NotifyTileBroken(TileState.Barrier);
                     
                 }
             }
         }
     }
 
-
     private bool FindPath(AnimalTile t1, AnimalTile t2)
     {
-        int x1 = t1.gridX, y1 = t1.gridY;
-        int x2 = t2.gridX, y2 = t2.gridY;
-
-
-        if (x1 == x2 && CheckLine(x1, y1, x2, y2)) return true;
-        if (y1 == y2 && CheckLine(x1, y1, x2, y2)) return true;
-
-
-        if (IsEmpty(x1, y2) && CheckLine(x1, y1, x1, y2) && CheckLine(x1, y2, x2, y2)) return true;
-        if (IsEmpty(x2, y1) && CheckLine(x1, y1, x2, y1) && CheckLine(x2, y1, x2, y2)) return true;
-
-
-        for (int x = x1 + 1; x <= columns; x++) {
-            if (!IsEmpty(x, y1)) break; 
-
-            if (IsEmpty(x, y2) && CheckLine(x, y1, x, y2) && CheckLine(x, y2, x2, y2)) return true;
-        }
-        for (int x = x1 - 1; x >= -1; x--) {
-            if (!IsEmpty(x, y1)) break;
-            if (IsEmpty(x, y2) && CheckLine(x, y1, x, y2) && CheckLine(x, y2, x2, y2)) return true;
-        }
-        
-
-        for (int y = y1 + 1; y <= rows; y++) {
-            if (!IsEmpty(x1, y)) break;
-            if (IsEmpty(x2, y) && CheckLine(x1, y, x2, y) && CheckLine(x2, y, x2, y2)) return true;
-        }
-        for (int y = y1 - 1; y >= -1; y--) {
-            if (!IsEmpty(x1, y)) break;
-            if (IsEmpty(x2, y) && CheckLine(x1, y, x2, y) && CheckLine(x2, y, x2, y2)) return true;
-        }
-
-        return false;
+        if (!t1 || !t2 || gridArray == null) return false;
+        CaptureBoard();
+        return boardLogic.CanMatch(new Vector2Int(t1.gridX,t1.gridY),new Vector2Int(t2.gridX,t2.gridY));
     }
-
-    private bool CheckLine(int x1, int y1, int x2, int y2)
-    {
-
-        if (x1 == x2 && y1 == y2) return true;
-
-        if (x1 == x2)
-        {
-            int step = (y1 < y2) ? 1 : -1;
-            for (int y = y1 + step; y != y2; y += step)
-            {
-                if (!IsEmpty(x1, y)) return false; 
-            }
-            return true;
-        }
-        else if (y1 == y2)
-        {
-            int step = (x1 < x2) ? 1 : -1;
-            for (int x = x1 + step; x != x2; x += step)
-            {
-                if (!IsEmpty(x, y1)) return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private bool IsEmpty(int x, int y)
-    {
-
-        if (x < 0 || x >= columns || y < 0 || y >= rows) 
-            return true;
-
-
-        return gridArray[x, y] == null || gridArray[x, y].currentState == TileState.Hidden;
-    }
-
-
 
     private void ApplyGravity()
     {
-        if (currentGravity == GravityDirection.None) return;
-
-        List<AnimalTile> movedTiles = new List<AnimalTile>(); 
-        float startX = -(columns / 2f * tileSize) + (tileSize / 2f);
-        float startY = (rows / 2f * tileSize) - (tileSize / 2f);
-
-        if (currentGravity == GravityDirection.Down)
+        CaptureBoard();
+        var moves=boardLogic.ApplyGravity(currentGravity);
+        var movedTiles=new List<AnimalTile>();
+        foreach(var move in moves)
         {
-            for (int x = 0; x < columns; x++)
-            {
-                int emptyY = rows - 1; 
-                for (int y = rows - 1; y >= 0; y--)
-                {
-                    AnimalTile tile = gridArray[x, y];
-                    if (tile != null)
-                    {
-
-                        if (tile.currentState == TileState.Ice || tile.currentState == TileState.Barrier) emptyY = y - 1;
-                        else if (y < emptyY)
-                        {
-                            gridArray[x, emptyY] = tile;
-                            gridArray[x, y] = null;
-                            tile.gridY = emptyY;
-                            tile.rect.DOKill();
-                            tile.rect.DOAnchorPosY(startY - (emptyY * tileSize), fallTime).SetEase(Ease.OutBounce);
-                            movedTiles.Add(tile);
-                            emptyY--;
-                        }
-                        else emptyY--;
-                    }
-                }
-            }
+            var tile=gridArray[move.from.x,move.from.y];
+            gridArray[move.to.x,move.to.y]=tile;
+            gridArray[move.from.x,move.from.y]=null;
+            tile.gridX=move.to.x; tile.gridY=move.to.y;
+            tile.rect.DOKill();
+            tile.rect.DOAnchorPos(TilePosition(move.to),fallTime).SetEase(Ease.OutBounce);
+            movedTiles.Add(tile);
         }
-        else if (currentGravity == GravityDirection.Up)
+        if(movedTiles.Count>0)
         {
-            for (int x = 0; x < columns; x++)
-            {
-                int emptyY = 0; 
-                for (int y = 0; y < rows; y++)
-                {
-                    AnimalTile tile = gridArray[x, y];
-                    if (tile != null)
-                    {
-                        if (tile.currentState == TileState.Ice || tile.currentState == TileState.Barrier) emptyY = y + 1;
-                        else if (y > emptyY)
-                        {
-                            gridArray[x, emptyY] = tile;
-                            gridArray[x, y] = null;
-                            tile.gridY = emptyY;
-                            tile.rect.DOKill();
-                            tile.rect.DOAnchorPosY(startY - (emptyY * tileSize), fallTime).SetEase(Ease.OutBounce);
-                            movedTiles.Add(tile);
-                            emptyY++;
-                        }
-                        else emptyY++;
-                    }
-                }
-            }
-        }
-        else if (currentGravity == GravityDirection.Left)
-        {
-            for (int y = 0; y < rows; y++) 
-            {
-                int emptyX = 0; 
-                for (int x = 0; x < columns; x++)
-                {
-                    AnimalTile tile = gridArray[x, y];
-                    if (tile != null)
-                    {
-                        if (tile.currentState == TileState.Ice || tile.currentState == TileState.Barrier) emptyX = x + 1;
-                        else if (x > emptyX)
-                        {
-                            gridArray[emptyX, y] = tile;
-                            gridArray[x, y] = null;
-                            tile.gridX = emptyX;
-                            tile.rect.DOKill();
-                            tile.rect.DOAnchorPosX(startX + (emptyX * tileSize), fallTime).SetEase(Ease.OutBounce);
-                            movedTiles.Add(tile);
-                            emptyX++;
-                        }
-                        else emptyX++;
-                    }
-                }
-            }
-        }
-        else if (currentGravity == GravityDirection.Right)
-        {
-            for (int y = 0; y < rows; y++) 
-            {
-                int emptyX = columns - 1; 
-                for (int x = columns - 1; x >= 0; x--)
-                {
-                    AnimalTile tile = gridArray[x, y];
-                    if (tile != null)
-                    {
-                        if (tile.currentState == TileState.Ice || tile.currentState == TileState.Barrier) emptyX = x - 1;
-                        else if (x < emptyX)
-                        {
-                            gridArray[emptyX, y] = tile;
-                            gridArray[x, y] = null;
-                            tile.gridX = emptyX;
-                            tile.rect.DOKill();
-                            tile.rect.DOAnchorPosX(startX + (emptyX * tileSize), fallTime).SetEase(Ease.OutBounce);
-                            movedTiles.Add(tile);
-                            emptyX--;
-                        }
-                        else emptyX--;
-                    }
-                }
-            }
-        }
-
-        if (movedTiles.Count > 0)
-        {
-            if (autoChainCoroutine != null) StopCoroutine(autoChainCoroutine);
-            autoChainCoroutine = StartCoroutine(CheckAutoChainCoroutine(movedTiles, fallTime + 0.1f));
+            if(autoChainCoroutine!=null) StopCoroutine(autoChainCoroutine);
+            autoChainCoroutine=StartCoroutine(CheckAutoChainCoroutine(movedTiles,fallTime+.1f));
         }
     }
 
@@ -558,7 +343,6 @@ public class GridManager : MonoBehaviour
         {
             if (tile == null || tile.gameObject == null) continue;
 
-
             if (tile.currentState == TileState.Barrier || tile.currentState == TileState.Hidden) continue;
 
             Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
@@ -570,7 +354,6 @@ public class GridManager : MonoBehaviour
                 if (neighborX >= 0 && neighborX < columns && neighborY >= 0 && neighborY < rows)
                 {
                     AnimalTile neighbor = gridArray[neighborX, neighborY];
-
 
                     if (neighbor != null && neighbor != tile && 
                         neighbor.currentState != TileState.Hidden && 
@@ -589,122 +372,67 @@ public class GridManager : MonoBehaviour
 
     public void ShuffleBoard()
     {
-        if (isGameOver || isBoosterCooldown) return;
+        if(isGameOver || isBoosterCooldown) return;
+        var tiles=new List<AnimalTile>();
+        var positions=new List<Vector2Int>();
+        foreach(var tile in gridArray)
+            if(tile) { tiles.Add(tile); positions.Add(new Vector2Int(tile.gridX,tile.gridY)); }
+        if(tiles.Count<2) { CheckBoardAvailability(); return; }
+        if(!EconomyStore.TryUseBooster(BoosterType.Shuffle))
+        {
+            Session.Notify("No shuffles left. Buy more in the shop from the menu.");
+            return;
+        }
         StartCoroutine(BoosterCooldownRoutine());
-        
         ClearHint();
-        Debug.Log("Kích hoạt Đảo Lưới!");
-
-
-        List<AnimalTile> activeTiles = new List<AnimalTile>();
-        List<Vector2Int> activePositions = new List<Vector2Int>();
-
-        for (int x = 0; x < columns; x++)
+        if(autoChainCoroutine!=null) { StopCoroutine(autoChainCoroutine); autoChainCoroutine=null; }
+        for(int attempt=0;attempt<30;attempt++)
         {
-            for (int y = 0; y < rows; y++)
+            for(int i=0;i<positions.Count;i++)
             {
-                if (gridArray[x, y] != null)
-                {
-                    activeTiles.Add(gridArray[x, y]);
-                    activePositions.Add(new Vector2Int(x, y));
-                }
+                int other=Random.Range(i,positions.Count);
+                var temp=positions[i]; positions[i]=positions[other]; positions[other]=temp;
             }
+            System.Array.Clear(gridArray,0,gridArray.Length);
+            for(int i=0;i<tiles.Count;i++)
+            {
+                var tile=tiles[i]; var pos=positions[i];
+                tile.gridX=pos.x; tile.gridY=pos.y; gridArray[pos.x,pos.y]=tile;
+            }
+            CaptureBoard();
+            if(boardLogic.TryFindPair(out _,out _)) break;
         }
-
-
-        for (int i = 0; i < activePositions.Count; i++)
+        foreach(var tile in tiles)
         {
-            Vector2Int temp = activePositions[i];
-            int randomIndex = Random.Range(i, activePositions.Count);
-            activePositions[i] = activePositions[randomIndex];
-            activePositions[randomIndex] = temp;
-        }
-
-
-        System.Array.Clear(gridArray, 0, gridArray.Length);
-
-
-        float startX = -(columns / 2f * tileSize) + (tileSize / 2f);
-        float startY = (rows / 2f * tileSize) - (tileSize / 2f);
-
-
-        for (int i = 0; i < activeTiles.Count; i++)
-        {
-            AnimalTile tile = activeTiles[i];
-            Vector2Int newPos = activePositions[i];
-
-
-            tile.gridX = newPos.x;
-            tile.gridY = newPos.y;
-            gridArray[newPos.x, newPos.y] = tile;
-
-
-            float targetX = startX + (newPos.x * tileSize);
-            float targetY = startY - (newPos.y * tileSize);
             tile.rect.DOKill();
-            tile.rect.DOAnchorPos(new Vector2(targetX, targetY), 0.5f).SetEase(Ease.InOutQuad);
+            tile.rect.DOAnchorPos(TilePosition(new Vector2Int(tile.gridX,tile.gridY)),.5f).SetEase(Ease.InOutQuad);
         }
-
-
-        if (firstSelectedTile != null)
-        {
-            firstSelectedTile.SetHighlight(false);
-            firstSelectedTile = null;
-        }
+        if(firstSelectedTile) firstSelectedTile.SetHighlight(false);
+        firstSelectedTile=secondSelectedTile=null;
+        boardRevision++;
+        ScheduleBoardCheck();
     }
+
     public void ShowHint()
     {
-        if (isGameOver || isBoosterCooldown) return;
+        if(isGameOver || isBoosterCooldown) return;
+        CaptureBoard();
+        bool available=boardLogic.TryFindPair(out var first,out var second);
+        Session.SetBoardAvailability(available);
+        if(!available) return;
+        if(!EconomyStore.TryUseBooster(BoosterType.Hint))
+        {
+            Session.Notify("No hints left. Buy more in the shop from the menu.");
+            return;
+        }
         StartCoroutine(BoosterCooldownRoutine());
-        
         ClearHint();
-
-        foreach (var list in hintCache.Values) list.Clear();
-
-        for (int x = 0; x < columns; x++)
-        {
-            for (int y = 0; y < rows; y++)
-            {
-                AnimalTile tile = gridArray[x, y];
-                if (tile != null && tile.currentState != TileState.Hidden && tile.currentState != TileState.Barrier)
-                {
-                    if (!hintCache.ContainsKey(tile.animalID))
-                        hintCache[tile.animalID] = new List<AnimalTile>();
-                    
-                    hintCache[tile.animalID].Add(tile);
-                }
-            }
-        }
-
-
-        foreach (var kvp in hintCache)
-        {
-            List<AnimalTile> tiles = kvp.Value;
-            if (tiles.Count < 2) continue;
-
-            for (int i = 0; i < tiles.Count - 1; i++)
-            {
-                for (int j = i + 1; j < tiles.Count; j++)
-                {
-                    if (FindPath(tiles[i], tiles[j]))
-                    {
-
-                        hintedTile1 = tiles[i];
-                        hintedTile2 = tiles[j];
-
-                        tiles[i].rect.DOKill();
-                        tiles[j].rect.DOKill();
-                        
-                        tiles[i].rect.DOPunchScale(new Vector3(0.3f, 0.3f, 0.3f), 1f, 5);
-                        tiles[j].rect.DOPunchScale(new Vector3(0.3f, 0.3f, 0.3f), 1f, 5);
-                        
-                        tiles[i].SetHighlight(true);
-                        tiles[j].SetHighlight(true);
-                        return; 
-                    }
-                }
-            }
-        }
+        hintedTile1=gridArray[first.x,first.y]; hintedTile2=gridArray[second.x,second.y];
+        hintedTile1.rect.DOKill(); hintedTile2.rect.DOKill();
+        hintedTile1.rect.localScale=hintedTile2.rect.localScale=Vector3.one;
+        hintedTile1.rect.DOPunchScale(new Vector3(.3f,.3f,.3f),1,5);
+        hintedTile2.rect.DOPunchScale(new Vector3(.3f,.3f,.3f),1,5);
+        hintedTile1.SetHighlight(true); hintedTile2.SetHighlight(true);
     }
 
     private void ClearHint()
@@ -717,11 +445,9 @@ public class GridManager : MonoBehaviour
         hintedTile2 = null;
     }
 
-
     private System.Collections.IEnumerator BoosterCooldownRoutine()
     {
         isBoosterCooldown = true;
-        
 
         if (btnShuffle != null) btnShuffle.interactable = false;
         if (btnHint != null) btnHint.interactable = false;
@@ -729,74 +455,30 @@ public class GridManager : MonoBehaviour
         yield return new WaitForSeconds(1.0f); 
         
         isBoosterCooldown = false;
-        
 
         if (btnShuffle != null) btnShuffle.interactable = true;
         if (btnHint != null) btnHint.interactable = true;
     }
     private void GameOver(bool isWin)
     {
-        if (isGameOver) return;
-        isGameOver = true;
-        hasWonLevel = isWin;
-        var ui = FindObjectOfType<UIManager>();
-        if (ui != null) ui.StopGameplayMusic();
-        var resultSound = isWin ? winSound : loseSound;
-        if (!resultSound.IsNull) RuntimeManager.PlayOneShot(resultSound);
-        if (isWin && levelDatabase != null && levelDatabase.levels != null)
-            LevelProgress.Won(levelIndex, levelDatabase.levels.Count);
-        if (btnNextLevel != null)
-            btnNextLevel.gameObject.SetActive(isWin && HasNextLevel());
-        bool showLevelOneBanner = isWin && levelIndex == 0 && levelOneWinBanner != null;
-        if (levelOneWinBanner != null) levelOneWinBanner.SetActive(showLevelOneBanner);
-        if (textTitle != null) textTitle.gameObject.SetActive(!showLevelOneBanner);
-        
-
-        if (btnShuffle != null) btnShuffle.interactable = false;
-        if (btnHint != null) btnHint.interactable = false;
-
-
-        if (gameOverPanel != null) gameOverPanel.SetActive(true);
-
-
-        if (isWin)
-        {
-            textTitle.text = "LEVEL " + (levelIndex + 1) + "\nCOMPLETED!";
-            textTitle.color = Color.white;
-        }
-        else
-        {
-            textTitle.text = "THỬ LẠI!";
-            textTitle.color = Color.white;
-        }
-
-        if (textFinalScore != null)
-        {
-            textFinalScore.text = "ĐIỂM: " + score;
-        }
+        Session.Finish(isWin);
     }
-    private void SpawnFloatingText(Vector2 startPos, string text, Color color)
+
+    private void HandleGameEnded(bool won)
     {
-        if (floatingTextPrefab == null) return;
-
-
-        GameObject floatingObj = Instantiate(floatingTextPrefab, boardContainer);
-        RectTransform rect = floatingObj.GetComponent<RectTransform>();
-        rect.anchoredPosition = startPos;
-
-        TextMeshProUGUI tmp = floatingObj.GetComponent<TextMeshProUGUI>();
-        tmp.text = text;
-        tmp.color = color;
-
-
-        rect.DOAnchorPosY(startPos.y + 100f, 1f).SetEase(Ease.OutCirc);
-        tmp.DOFade(0, 1f).OnComplete(() => Destroy(floatingObj));
+        if(won && levelDatabase && levelDatabase.levels!=null)
+        {
+            LevelProgress.Won(levelIndex,levelDatabase.levels.Count);
+            var level=levelDatabase.levels[levelIndex];
+            LastReward=EconomyStore.RewardWin(level.hintReward,level.shuffleReward);
+        }
+        StopAllCoroutines();
+        autoChainCoroutine=boardCheckCoroutine=null;
     }
-
 
     public void PlayUIButtonSound()
     {
-        RuntimeManager.PlayOneShot(sfxClick);
+        Session.NotifyTileSelected();
     }
 
     public bool SelectLevel(int index)
@@ -811,13 +493,15 @@ public class GridManager : MonoBehaviour
 
     public void PauseGameplay()
     {
-        isGameOver = true;
-        hasWonLevel = false;
+        Session.ShowMenu();
+        StopAllCoroutines();
+        autoChainCoroutine=boardCheckCoroutine=null;
+        isBoosterCooldown=false;
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (btnNextLevel != null) btnNextLevel.gameObject.SetActive(false);
     }
 
-    private bool HasNextLevel()
+    public bool HasNextLevel()
     {
         return levelDatabase != null && levelDatabase.levels != null &&
             levelIndex >= 0 && levelIndex + 1 < levelDatabase.levels.Count;
@@ -838,15 +522,15 @@ public class GridManager : MonoBehaviour
 
     public void RestartGame()
     {
-        hasWonLevel = false;
+        LastReward=default;
         if (btnNextLevel != null) btnNextLevel.gameObject.SetActive(false);
 
         DOTween.KillAll();
         StopAllCoroutines(); autoChainCoroutine = null;
         isBoosterCooldown = false;
         firstSelectedTile = null; secondSelectedTile = null;
-        hintCache.Clear(); 
-
+        boardCheckCoroutine = null;
+        boardRevision++;
 
         if (gridArray != null)
         {
@@ -856,6 +540,7 @@ public class GridManager : MonoBehaviour
                 {
                     if (gridArray[x, y] != null)
                     {
+                        gridArray[x, y].DisableColliderInput();
                         Destroy(gridArray[x, y].gameObject);
                         gridArray[x, y] = null;
                     }
@@ -864,33 +549,74 @@ public class GridManager : MonoBehaviour
             System.Array.Clear(gridArray, 0, gridArray.Length);
         }
 
-
-        score = 0;
-        combo = 0;
-        comboTimer = 0;
-        UpdateScoreUI();
-
-
         ClearHint();
-
 
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (btnShuffle != null) btnShuffle.interactable = true;
         if (btnHint != null) btnHint.interactable = true;
 
-
-        GenerateGrid();
-        if (!isGameOver)
+        Session.ShowMenu();
+        if(GenerateGrid())
         {
             LevelProgress.Started(levelIndex);
-            var ui = FindObjectOfType<UIManager>();
-            if (ui != null)
-            {
-                ui.RefreshLevelLabel(levelIndex);
-                if (ui.screen == GameScreen.Gameplay) GameSession.SelectLevel(levelIndex);
-                ui.PlayGameplayMusic();
-            }
+            var ui=FindObjectOfType<UIManager>();
+            if(ui && ui.screen==GameScreen.Gameplay) GameSession.SelectLevel(levelIndex);
+            Session.BeginLevel(maxTime,timeBonusPerMatch,comboDuration);
+            ScheduleBoardCheck();
         }
     }
-    
+
+    public void SetPaused(bool paused)
+    {
+        if(paused) Session.Pause(); else Session.Resume();
+    }
+
+
+    private Vector2 TilePosition(Vector2Int position)
+    {
+        return new Vector2(-(columns/2f*tileSize)+tileSize/2f+position.x*tileSize,
+            rows/2f*tileSize-tileSize/2f-position.y*tileSize);
+    }
+
+    private void CaptureBoard()
+    {
+        int width=gridArray.GetLength(0), height=gridArray.GetLength(1);
+        if(boardLogic==null || boardLogic.Columns!=width || boardLogic.Rows!=height)
+            boardLogic=new BoardLogic(width,height);
+        for(int x=0;x<width;x++)
+            for(int y=0;y<height;y++)
+            {
+                var tile=gridArray[x,y];
+                boardLogic.SetCell(x,y,tile ? new BoardCell { occupied=true,animalID=tile.animalID,state=tile.currentState } : default);
+            }
+    }
+
+    public bool CheckBoardAvailability()
+    {
+        if(gridArray==null || Session.State!=GameState.Playing) return true;
+        CaptureBoard();
+        bool available=boardLogic.TryFindPair(out _,out _);
+        Session.SetBoardAvailability(available);
+        return available;
+    }
+
+    private void ScheduleBoardCheck()
+    {
+        if(boardCheckCoroutine!=null) StopCoroutine(boardCheckCoroutine);
+        boardCheckCoroutine=StartCoroutine(CheckBoardAfterMovement(boardRevision));
+    }
+
+    private System.Collections.IEnumerator CheckBoardAfterMovement(int revision)
+    {
+        yield return new WaitForSeconds(Mathf.Max(fallTime,.5f)+.15f);
+        boardCheckCoroutine=null;
+        if(revision==boardRevision && autoChainCoroutine==null && !isGameOver) CheckBoardAvailability();
+    }
+
+    private void OnDestroy()
+    {
+        if(Session) Session.GameEnded-=HandleGameEnded;
+        hudView?.Dispose(); audioFeedback?.Dispose();
+        if(Instance==this) Instance=null;
+    }
 }

@@ -1,0 +1,219 @@
+{
+  "reference": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\Báo cáo BentoLoop làm rõ phần 5 6 7.docx",
+  "reference_sha256": "b0fef46d9d882946a540315d76d95b28d80ddf5f20a8b86b0c82e9de3293d5d8",
+  "output": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\Báo cáo BentoLoop tối ưu nội dung.docx",
+  "figures": [
+    {
+      "number": 1,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report\\figure-01.png",
+      "crop": [
+        0,
+        0,
+        692,
+        477
+      ],
+      "caption": "Chọn BentoLoop.apk và sử dụng Decompile trong APK Easy Tool",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-01.png"
+    },
+    {
+      "number": 2,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report\\figure-04.png",
+      "crop": [
+        0,
+        0,
+        664,
+        241
+      ],
+      "caption": "Khai báo LicenseVerifier và RVA của VerifyLicense trong dump.cs",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-02.png"
+    },
+    {
+      "number": 3,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-08.png",
+      "crop": [
+        0,
+        0,
+        846,
+        183
+      ],
+      "caption": "VerifyLicense xử lý đầu vào và so sánh với StringLiteral_2770",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-03.png"
+    },
+    {
+      "number": 4,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-09.png",
+      "crop": [
+        0,
+        0,
+        848,
+        371
+      ],
+      "caption": "Các nhánh cuối VerifyLicense trả về 1 khi thành công và 0 khi thất bại",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-04.png"
+    },
+    {
+      "number": 5,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-10.png",
+      "crop": [
+        0,
+        107,
+        898,
+        236
+      ],
+      "caption": "StringLiteral_2770 tại 044fce70 chứa BENTO-EASY-2025",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-05.png"
+    },
+    {
+      "number": 6,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-11.png",
+      "crop": [
+        0,
+        0,
+        560,
+        74
+      ],
+      "caption": "stringliteral.json ghi cùng key với address 0x43FCE70",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-06.png"
+    },
+    {
+      "number": 7,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-12.png",
+      "crop": [
+        0,
+        0,
+        481,
+        384
+      ],
+      "caption": "APK gốc chấp nhận key BENTO-EASY-2025",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-07.png"
+    },
+    {
+      "number": 8,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-13.png",
+      "crop": [
+        0,
+        0,
+        560,
+        650
+      ],
+      "caption": "APK gốc chuyển vào Level 1 sau khi xác nhận key",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-08.png"
+    },
+    {
+      "number": 9,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-14.png",
+      "crop": [
+        0,
+        0,
+        605,
+        60
+      ],
+      "caption": "Hai lệnh đầu VerifyLicense trước khi sửa",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-09.png"
+    },
+    {
+      "number": 10,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-15.png",
+      "crop": [
+        0,
+        0,
+        470,
+        43
+      ],
+      "caption": "Hai lệnh sau khi sửa là mov w0, #0x1 và ret",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-10.png"
+    },
+    {
+      "number": 11,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-16.png",
+      "crop": [
+        0,
+        0,
+        669,
+        152
+      ],
+      "caption": "Decompiler của VerifyLicense sau sửa chỉ còn return 1",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-11.png"
+    },
+    {
+      "number": 12,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-17.png",
+      "crop": [
+        0,
+        0,
+        316,
+        200
+      ],
+      "caption": "Xuất chương trình với định dạng Original File",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-12.png"
+    },
+    {
+      "number": 13,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-18.png",
+      "crop": [
+        0,
+        0,
+        327,
+        201
+      ],
+      "caption": "Bật Export User Byte Modifications để đưa byte đã sửa vào file xuất",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-13.png"
+    },
+    {
+      "number": 14,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_expanded\\figure-20.png",
+      "crop": [
+        101,
+        0,
+        754,
+        295
+      ],
+      "caption": "Thay libil2cpp.so trong thư mục arm64-v8a",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-14.png"
+    },
+    {
+      "number": 15,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_final\\figure-21.png",
+      "crop": [
+        0,
+        0,
+        687,
+        600
+      ],
+      "caption": "APK Easy Tool báo Sign successful sau khi build và ký",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-15.png"
+    },
+    {
+      "number": 16,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_final\\figure-22.png",
+      "crop": [
+        0,
+        0,
+        783,
+        172
+      ],
+      "caption": "BentoLoop.apk được tạo trong thư mục 2 Recompiled APKs",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-16.png"
+    },
+    {
+      "number": 17,
+      "source": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_final\\figure-23.png",
+      "crop": [
+        0,
+        0,
+        507,
+        384
+      ],
+      "caption": "APK đã sửa báo kích hoạt thành công với chuỗi vinh123",
+      "file": "C:\\Users\\ADMIN\\Downloads\\My project (1)\\report_work\\bento_report_optimized\\figure-17.png"
+    }
+  ],
+  "main_sections": 6,
+  "sdk_removed": true,
+  "render_pending": false,
+  "verified_pages": 11,
+  "all_pages_visually_inspected": true,
+  "captions_verified": true,
+  "source_unchanged": true,
+  "output_sha256": "39939fed51f1d978f4c80a60baaecc53af6397ee7d8950e043b192d7cc685dea"
+}

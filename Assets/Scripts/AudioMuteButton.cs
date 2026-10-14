@@ -9,6 +9,8 @@ public class AudioMuteButton : MonoBehaviour
     public AudioChannel channel;
     public Image background;
     public TextMeshProUGUI stateText;
+    public Sprite onSprite;
+    public Sprite offSprite;
     public Color onColor = new Color(.25f, .95f, .5f);
     public Color offColor = new Color(1f, .3f, .36f);
 
@@ -30,7 +32,12 @@ public class AudioMuteButton : MonoBehaviour
     public void Refresh()
     {
         bool muted = AudioSettingsUI.IsMuted(channel);
-        if (background != null) background.color = muted ? offColor : onColor;
+        if (background != null)
+        {
+            var sprite=muted ? offSprite : onSprite;
+            if(sprite) { background.sprite=sprite; background.color=Color.white; }
+            else background.color=muted ? offColor : onColor;
+        }
         if (stateText != null) stateText.text = muted ? "OFF" : "ON";
     }
 }

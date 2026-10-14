@@ -21,7 +21,6 @@ public class UIManager : MonoBehaviour
     public RectTransform gameplayPanel;
 
     [Header("Settings")]
-    public float tweenDuration = 0.5f;
     public Button settingsRestartButton;
     public TextMeshProUGUI gameplayLevelText;
     private bool gameplayActive;
@@ -58,26 +57,30 @@ public class UIManager : MonoBehaviour
         settingsPanel.gameObject.SetActive(true);
         settingsOpen = true;
         if (settingsRestartButton != null) settingsRestartButton.interactable = gameplayActive;
-        if (gameplayActive) Time.timeScale = 0;
+        if (gameplayActive)
+        {
+            var grid = FindObjectOfType<GridManager>();
+            if (grid) grid.SetPaused(true);
+            Time.timeScale = 0;
+        }
         settingsPanel.SetAsLastSibling();
-        settingsPanel.DOKill();
-        settingsPanel.DOAnchorPosX(0, tweenDuration).SetEase(Ease.OutBack).SetUpdate(true);
+        settingsPanel.anchoredPosition = Vector2.zero;
     }
 
     public void CloseSettings()
     {
         settingsOpen = false;
         Time.timeScale = 1;
-        settingsPanel.DOKill();
-        settingsPanel.DOAnchorPosX(SettingsHiddenX, tweenDuration).SetEase(Ease.OutBack).SetUpdate(true)
-            .OnComplete(() => settingsPanel.gameObject.SetActive(false));
+        var grid = FindObjectOfType<GridManager>();
+        if (grid) grid.SetPaused(false);
+        settingsPanel.anchoredPosition = new Vector2(SettingsHiddenX, 0);
+        settingsPanel.gameObject.SetActive(false);
     }
 
     private void HideSettingsImmediately()
     {
         settingsOpen = false;
         Time.timeScale = 1;
-        settingsPanel.DOKill();
         settingsPanel.anchoredPosition = new Vector2(SettingsHiddenX, 0);
         settingsPanel.gameObject.SetActive(false);
     }
@@ -105,14 +108,18 @@ public class UIManager : MonoBehaviour
     {
         var selection = levelSelectPanel.GetComponent<LevelSelectionUI>();
         if (selection != null) selection.Refresh();
-        mainMenuPanel.DOAnchorPosX(1920, tweenDuration).SetEase(Ease.OutBack);
-        levelSelectPanel.DOAnchorPosX(0, tweenDuration).SetEase(Ease.OutBack);
+        var grid = FindObjectOfType<GridManager>();
+        if (grid) grid.Session.ShowLevelSelect();
+        mainMenuPanel.anchoredPosition = new Vector2(1920, 0);
+        levelSelectPanel.anchoredPosition = Vector2.zero;
     }
 
     public void CloseLevelSelect()
     {
-        levelSelectPanel.DOAnchorPosX(-1920, tweenDuration).SetEase(Ease.OutBack);
-        mainMenuPanel.DOAnchorPosX(0, tweenDuration).SetEase(Ease.OutBack);
+        var grid = FindObjectOfType<GridManager>();
+        if (grid) grid.Session.ShowMenu();
+        levelSelectPanel.anchoredPosition = new Vector2(-1920, 0);
+        mainMenuPanel.anchoredPosition = Vector2.zero;
     }
 
 
@@ -136,11 +143,11 @@ public class UIManager : MonoBehaviour
         FindObjectOfType<GridManager>().RestartGame();
 
 
-        levelSelectPanel.DOAnchorPosX(-1920, tweenDuration).SetEase(Ease.OutBack);
-        mainMenuPanel.DOAnchorPosX(-1920, tweenDuration).SetEase(Ease.OutBack);
+        levelSelectPanel.anchoredPosition = new Vector2(-1920, 0);
+        mainMenuPanel.anchoredPosition = new Vector2(-1920, 0);
         
 
-        gameplayPanel.DOAnchorPosY(0, tweenDuration).SetEase(Ease.OutBack);
+        gameplayPanel.anchoredPosition = Vector2.zero;
 
 
     }
@@ -178,8 +185,8 @@ public class UIManager : MonoBehaviour
         gameplayActive = false;
         var grid = FindObjectOfType<GridManager>();
         if (grid != null) grid.PauseGameplay();
-        gameplayPanel.DOAnchorPosY(1080, tweenDuration).SetEase(Ease.InBack);
-        mainMenuPanel.DOAnchorPosX(0, tweenDuration).SetEase(Ease.OutBack);
+        gameplayPanel.anchoredPosition = new Vector2(0, 1080);
+        mainMenuPanel.anchoredPosition = Vector2.zero;
         PlayMusic(bgmMenu);
     }
 

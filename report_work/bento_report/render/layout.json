@@ -1,0 +1,69 @@
+{
+  "pages": 14,
+  "positions": [
+    {
+      "text": "Hình 1. APK Easy Tool chọn BentoLoop.apk và báo Decompile successful",
+      "page": 4
+    },
+    {
+      "text": "Hình 2. Thư mục BentoLoop sau Decompile có lib, assets và apktool.yml",
+      "page": 5
+    },
+    {
+      "text": "Hình 3. libil2cpp.so trong thư mục ARM64 của BentoLoop",
+      "page": 5
+    },
+    {
+      "text": "Hình 4. Khai báo LicenseVerifier, mảng EncryptedBytes và RVA của các phương thức trong dump.cs",
+      "page": 6
+    },
+    {
+      "text": "Hình 5. Hộp Import nhận dạng libil2cpp.so là ELF ARM64",
+      "page": 7
+    },
+    {
+      "text": "Hình 6. Thông tin kiến trúc và mã nhận diện thư viện trong Import Results Summary",
+      "page": 7
+    },
+    {
+      "text": "Hình 7. Memory Map xác nhận Image Base 0x100000 và các vùng bộ nhớ",
+      "page": 8
+    },
+    {
+      "text": "Hình 8. Chọn script.json của Bento làm đầu vào cho script gắn tên",
+      "page": 8
+    },
+    {
+      "text": "Hình 9. VerifyLicense chuẩn hóa đầu vào rồi so sánh với StringLiteral_2770",
+      "page": 9
+    },
+    {
+      "text": "Hình 10. Nhánh so sánh khớp dẫn đến giá trị trả về 1 trong VerifyLicense",
+      "page": 9
+    },
+    {
+      "text": "Hình 11. Vòng lặp trong CheckTransformedLicense đối chiếu ký tự bằng phép XOR",
+      "page": 10
+    },
+    {
+      "text": "Hình 12. Hàm .cctor tạo mảng 30 byte và gọi RuntimeHelpers.InitializeArray",
+      "page": 11
+    },
+    {
+      "text": "Hình 13. StringLiteral_2770 tại 0x044FCE70 có nội dung BENTO-EASY-2025",
+      "page": 11
+    },
+    {
+      "text": "Hình 14. Mục value và address của key trong stringliteral.json",
+      "page": 11
+    },
+    {
+      "text": "Hình 15. Nhập BENTO-EASY-2025 vào màn hình kiểm tra license của APK gốc",
+      "page": 12
+    },
+    {
+      "text": "Hình 16. Bento Loop vào Level 1 sau khi xác nhận license",
+      "page": 13
+    }
+  ]
+}

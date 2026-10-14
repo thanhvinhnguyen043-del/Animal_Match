@@ -83,7 +83,9 @@ public class LevelSelectionUI : MonoBehaviour
         {
             buttons[i].interactable = i <= unlocked;
             var label = buttons[i].GetComponentInChildren<TextMeshProUGUI>(true);
-            if (label) label.text = "LEVEL " + (i + 1) + (i > unlocked ? "\nLOCKED" : "");
+            var lockIcon=buttons[i].transform.Find("LevelLockIcon");
+            if(lockIcon) lockIcon.gameObject.SetActive(i>unlocked);
+            if (label) label.text = "LEVEL " + (i + 1) + (i > unlocked && !lockIcon ? "\nLOCKED" : "");
         }
 
         Canvas.ForceUpdateCanvases();

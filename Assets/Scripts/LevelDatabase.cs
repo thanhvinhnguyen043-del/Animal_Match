@@ -22,6 +22,8 @@ public class LevelDefinition
     public float tileSize = 110;
     public float timeLimit = 60;
     public float timeBonus = 2;
+    [Min(0)] public int hintReward;
+    [Min(0)] public int shuffleReward;
     public GravityDirection gravity = GravityDirection.Down;
     [Min(1)] public int animalKinds = 6;
     public int seed = 1;

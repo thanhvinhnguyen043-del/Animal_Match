@@ -61,12 +61,13 @@ public class LevelDatabaseWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Them level"))
         {
-            Edit(); database.levels.Add(new LevelDefinition { name = "Level " + (database.levels.Count + 1) });
+            Edit(); database.levels.Add(new LevelDefinition { id=System.Guid.NewGuid().ToString("N"),name = "Level " + (database.levels.Count + 1) });
             selected = database.levels.Count - 1; Save();
         }
         if (database.levels.Count > 0 && GUILayout.Button("Nhan ban"))
         {
             Edit(); database.levels.Add(JsonUtility.FromJson<LevelDefinition>(JsonUtility.ToJson(database.levels[Mathf.Clamp(selected, 0, database.levels.Count - 1)])));
+            database.levels[database.levels.Count-1].id=System.Guid.NewGuid().ToString("N");
             selected = database.levels.Count - 1; Save();
         }
         if (database.levels.Count > 0 && GUILayout.Button("Xoa level"))
@@ -88,6 +89,12 @@ public class LevelDatabaseWindow : EditorWindow
         level.tileSize = EditorGUILayout.FloatField("Co o", level.tileSize);
         level.timeLimit = EditorGUILayout.FloatField("Thoi gian (giay)", level.timeLimit);
         level.timeBonus = EditorGUILayout.FloatField("Thuong combo (giay)", level.timeBonus);
+        if(level.challenge==null) level.challenge=new LevelChallenge();
+        level.challenge.timeRemainingFraction=EditorGUILayout.Slider("2 sao: ti le thoi gian con",level.challenge.timeRemainingFraction,.05f,.9f);
+        level.challenge.goal=(StarGoal)EditorGUILayout.EnumPopup("3 sao: muc tieu",level.challenge.goal);
+        level.challenge.turnLimit=Mathf.Max(1,EditorGUILayout.IntField("3 sao: gioi han luot noi",level.challenge.turnLimit));
+        if(level.challenge.goal==StarGoal.Combo || level.challenge.goal==StarGoal.Automatic)
+            level.challenge.comboTarget=Mathf.Max(2,EditorGUILayout.IntField("Combo muc tieu",level.challenge.comboTarget));
         level.hintReward = Mathf.Max(0,EditorGUILayout.IntField("Thuong goi y khi thang",level.hintReward));
         level.shuffleReward = Mathf.Max(0,EditorGUILayout.IntField("Thuong dao ban khi thang",level.shuffleReward));
         level.gravity = (GravityDirection)EditorGUILayout.EnumPopup("Trong luc", level.gravity);

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -11,15 +10,25 @@ public enum GravityDirection { None, Down, Up, Left, Right }
 public class GridManager : MonoBehaviour
 {   
     private static bool isDOTweenInitialized = false;
+    private static readonly Vector2Int[] NeighborDirections =
+        { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
 
     public GameManager Session { get; private set; }
     public LevelReward LastReward { get; private set; }
+    public LevelRunResult LastResult {get;private set;}
+    private ProgressTracker progressTracker;
+    private int initialWater,initialStone;
     private BoardLogic boardLogic;
     private GameHudView hudView;
     private GameAudioFeedback audioFeedback;
     private Coroutine boardCheckCoroutine;
     private int boardRevision;
     private TileColliderInput tileInput;
+    private MatchPathGraphic matchPath;
+    private Coroutine matchPathCoroutine;
+    private readonly List<Vector2Int> matchPoints=new List<Vector2Int>(4);
+    private float boardMovingUntil;
+    private bool BoardBusy => Session.IsResolvingMatch || Time.time<boardMovingUntil;
     public static GridManager Instance;
 
     [Header("Gravity Settings")]
@@ -98,6 +107,8 @@ public class GridManager : MonoBehaviour
         Session = GetComponent<GameManager>();
         if (!Session) Session = gameObject.AddComponent<GameManager>();
         Session.GameEnded += HandleGameEnded;
+        Session.StateChanged += HandleMatchPathState;
+        progressTracker=new ProgressTracker(this);
         hudView = new GameHudView(Session, this);
         audioFeedback = new GameAudioFeedback(Session, this);
         if (btnNextLevel != null) btnNextLevel.gameObject.SetActive(false);
@@ -120,23 +131,12 @@ public class GridManager : MonoBehaviour
 
     private void WarmUpSystem()
     {
-
         if (!isDOTweenInitialized)
         {
             DOTween.Init();
             isDOTweenInitialized = true;
         }
-
-        AnimalTile dummy1 = new GameObject("Dummy1").AddComponent<AnimalTile>();
-        AnimalTile dummy2 = new GameObject("Dummy2").AddComponent<AnimalTile>();
-        
-        dummy1.gridX = -2; dummy1.gridY = -2; 
-        dummy2.gridX = -2; dummy2.gridY = -2;
-        
-        FindPath(dummy1, dummy2);
-        
-        Destroy(dummy1.gameObject);
-        Destroy(dummy2.gameObject);
+        if (gridArray != null) CaptureBoard();
     }
 
     public bool GenerateGrid()
@@ -166,13 +166,22 @@ public class GridManager : MonoBehaviour
         if (tilePrefab == null || boardContainer == null)
         { Debug.LogError("Thieu tilePrefab hoac boardContainer."); Session.ShowMenu(); return false; }
         int totalTiles = 0;
+        initialWater=initialStone=0;
 
         gridArray = new AnimalTile[columns, rows];
         if(!tileInput) tileInput=boardContainer.GetComponent<TileColliderInput>();
         if(!tileInput) tileInput=boardContainer.gameObject.AddComponent<TileColliderInput>();
         tileInput.Configure(this,columns*rows,new Vector2(columns+1,rows+1)*tileSize);
-        float startX = -(columns / 2f * tileSize) + (tileSize / 2f);
-        float startY = (rows / 2f * tileSize) - (tileSize / 2f);
+        if(!matchPath)
+        {
+            var effect=new GameObject("MatchPath",typeof(RectTransform),typeof(CanvasRenderer),typeof(MatchPathGraphic));
+            effect.transform.SetParent(boardContainer,false);
+            matchPath=effect.GetComponent<MatchPathGraphic>();
+            matchPath.raycastTarget=false;matchPath.maskable=false;
+            matchPath.rectTransform.anchorMin=matchPath.rectTransform.anchorMax=boardContainer.pivot;
+            matchPath.rectTransform.pivot=new Vector2(.5f,.5f);
+        }
+        matchPath.rectTransform.sizeDelta=new Vector2(columns+2,rows+2)*tileSize;
 
         for (int x = 0; x < columns; x++)
         {
@@ -180,11 +189,13 @@ public class GridManager : MonoBehaviour
             {
                 LevelCell cell = layout[x + y * columns];
                 if (cell.empty) continue;
+                if(cell.state==TileState.Ice) initialWater++;
+                if(cell.state==TileState.Barrier) initialStone++;
                 totalTiles++;
                 GameObject newTile = Instantiate(tilePrefab, boardContainer);
                 newTile.name = $"Tile_{x}_{y}";
                 RectTransform rect = newTile.GetComponent<RectTransform>();
-                rect.anchoredPosition = new Vector2(startX + (x * tileSize), startY - (y * tileSize));
+                rect.anchoredPosition = TilePosition(new Vector2Int(x, y));
 
                 int assignedID = cell.animalID;
                 AnimalTile tileScript = newTile.GetComponent<AnimalTile>();
@@ -201,10 +212,9 @@ public class GridManager : MonoBehaviour
 
     public void SelectTile(AnimalTile clickedTile)
     {
-        if (isGameOver) return;
+        if (isGameOver || BoardBusy || !clickedTile) return;
 
-        if (clickedTile.currentState == TileState.Hidden || clickedTile.currentState == TileState.Barrier) 
-            return; 
+        if (!clickedTile.IsSelectable) return;
         Session.NotifyTileSelected();
         ClearHint();
 
@@ -224,24 +234,70 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    private void CheckMatch(AnimalTile tile1, AnimalTile tile2)
+    private void ClearSelection()
     {
-        if (tile1.animalID == tile2.animalID)
-        {
-            if (FindPath(tile1, tile2))
-            {
-                ProcessMatch(tile1, tile2);
-                return;
-            }
-        }
-        Session.NotifyInvalidMatch();
-        tile1.SetHighlight(false);
-        tile2.SetHighlight(false);
-        firstSelectedTile = null;
-        secondSelectedTile = null;
+        if (firstSelectedTile) firstSelectedTile.SetHighlight(false);
+        if (secondSelectedTile) secondSelectedTile.SetHighlight(false);
+        firstSelectedTile = secondSelectedTile = null;
     }
 
-    private void ProcessMatch(AnimalTile t1, AnimalTile t2)
+    private void CheckMatch(AnimalTile tile1, AnimalTile tile2)
+    {
+        if (ProcessMatch(tile1,tile2)) return;
+        Session.NotifyInvalidMatch();
+        ClearSelection();
+    }
+
+    private bool ProcessMatch(AnimalTile t1,AnimalTile t2)
+    {
+        if(isGameOver || BoardBusy || !FindPath(t1,t2)) return false;
+        if(matchPathCoroutine!=null) StopCoroutine(matchPathCoroutine);
+        if(autoChainCoroutine!=null) {StopCoroutine(autoChainCoroutine);autoChainCoroutine=null;}
+        Session.IsResolvingMatch=true;
+        matchPath.ShowPath(matchPoints,TilePosition(Vector2Int.zero),tileSize,columns,rows);
+        matchPathCoroutine=StartCoroutine(ShowMatchPath(t1,t2));
+        return true;
+    }
+
+    private System.Collections.IEnumerator ShowMatchPath(AnimalTile first,AnimalTile second)
+    {
+        float elapsed=0;
+        while(elapsed<.14f)
+        {
+            yield return null;
+            if(Session.State==GameState.Playing) elapsed+=Time.deltaTime;
+        }
+        Session.IsResolvingMatch=false;
+        CompleteMatch(first,second);
+        if(isGameOver) yield break;
+        elapsed=0;
+        while(elapsed<.14f)
+        {
+            yield return null;
+            if(Session.State!=GameState.Playing) continue;
+            elapsed+=Time.deltaTime;
+            matchPath.canvasRenderer.SetAlpha(1-Mathf.Clamp01(elapsed/.14f));
+        }
+        matchPath.ClearPath();matchPathCoroutine=null;
+    }
+
+    private void ClearMatchPath()
+    {
+        if(matchPathCoroutine!=null) StopCoroutine(matchPathCoroutine);
+        matchPathCoroutine=null;
+        if(Session) Session.IsResolvingMatch=false;
+        if(matchPath) matchPath.ClearPath();
+        ClearSelection();
+    }
+
+    private void HandleMatchPathState(GameState state)
+    {
+        if(state==GameState.Paused) {if(matchPath) matchPath.canvasRenderer.SetAlpha(0);return;}
+        if(state==GameState.Playing) {if(matchPath) matchPath.canvasRenderer.SetAlpha(1);return;}
+        ClearMatchPath();
+    }
+
+    private void CompleteMatch(AnimalTile t1, AnimalTile t2)
     {
         if (isGameOver || !t1 || !t2) return;
         boardRevision++;
@@ -256,10 +312,7 @@ public class GridManager : MonoBehaviour
         BreakNeighborBarriers(x1, y1);
         BreakNeighborBarriers(x2, y2);
 
-        if (firstSelectedTile != null) firstSelectedTile.SetHighlight(false);
-        if (secondSelectedTile != null) secondSelectedTile.SetHighlight(false);
-        firstSelectedTile = null;
-        secondSelectedTile = null;
+        ClearSelection();
 
         ApplyGravity();
         if (totalTilesRemaining <= 0) GameOver(true);
@@ -277,30 +330,28 @@ public class GridManager : MonoBehaviour
         {
             gridArray[t.gridX, t.gridY] = null;
             totalTilesRemaining--;
-            t.DisableColliderInput();
-            t.rect.DOKill();
-            Destroy(t.gameObject);
+            DestroyTile(t);
         }
     }
 
+    private void DestroyTile(AnimalTile tile)
+    {
+        tile.DisableColliderInput();
+        tile.rect.DOKill();
+        Destroy(tile.gameObject);
+    }
+
+    private AnimalTile TileAt(int x, int y) =>
+        x >= 0 && x < columns && y >= 0 && y < rows ? gridArray[x, y] : null;
+
     private void BreakNeighborBarriers(int x, int y)
     {
-        Vector2Int[] dirs = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
-        foreach (var dir in dirs)
+        foreach (var direction in NeighborDirections)
         {
-            int nx = x + dir.x;
-            int ny = y + dir.y;
-
-            if (nx >= 0 && nx < columns && ny >= 0 && ny < rows)
-            {
-                AnimalTile neighbor = gridArray[nx, ny];
-                if (neighbor != null && neighbor.currentState == TileState.Barrier)
-                {
-                    neighbor.SetState(TileState.Normal);
-                    Session.NotifyTileBroken(TileState.Barrier);
-                    
-                }
-            }
+            var neighbor = TileAt(x + direction.x, y + direction.y);
+            if (!neighbor || neighbor.currentState != TileState.Barrier) continue;
+            neighbor.SetState(TileState.Normal);
+            Session.NotifyTileBroken(TileState.Barrier);
         }
     }
 
@@ -308,7 +359,7 @@ public class GridManager : MonoBehaviour
     {
         if (!t1 || !t2 || gridArray == null) return false;
         CaptureBoard();
-        return boardLogic.CanMatch(new Vector2Int(t1.gridX,t1.gridY),new Vector2Int(t2.gridX,t2.gridY));
+        return boardLogic.TryGetMatchPath(new Vector2Int(t1.gridX,t1.gridY),new Vector2Int(t2.gridX,t2.gridY),matchPoints);
     }
 
     private void ApplyGravity()
@@ -328,6 +379,7 @@ public class GridManager : MonoBehaviour
         }
         if(movedTiles.Count>0)
         {
+            boardMovingUntil=Time.time+fallTime;
             if(autoChainCoroutine!=null) StopCoroutine(autoChainCoroutine);
             autoChainCoroutine=StartCoroutine(CheckAutoChainCoroutine(movedTiles,fallTime+.1f));
         }
@@ -338,52 +390,28 @@ public class GridManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         autoChainCoroutine = null;
         if (isGameOver) yield break;
-
-        foreach (AnimalTile tile in movedTiles)
+        foreach (var tile in movedTiles)
         {
-            if (tile == null || tile.gameObject == null) continue;
-
-            if (tile.currentState == TileState.Barrier || tile.currentState == TileState.Hidden) continue;
-
-            Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
-            foreach (Vector2Int dir in directions)
+            if (!tile || !tile.IsSelectable) continue;
+            foreach (var direction in NeighborDirections)
             {
-                int neighborX = tile.gridX + dir.x;
-                int neighborY = tile.gridY + dir.y;
-
-                if (neighborX >= 0 && neighborX < columns && neighborY >= 0 && neighborY < rows)
-                {
-                    AnimalTile neighbor = gridArray[neighborX, neighborY];
-
-                    if (neighbor != null && neighbor != tile && 
-                        neighbor.currentState != TileState.Hidden && 
-                        neighbor.currentState != TileState.Barrier)
-                    {
-                        if (neighbor.animalID == tile.animalID)
-                        {
-                            ProcessMatch(tile, neighbor);
-                            yield break; 
-                        }
-                    }
-                }
+                var neighbor = TileAt(tile.gridX + direction.x, tile.gridY + direction.y);
+                if (!neighbor || neighbor == tile || !neighbor.IsSelectable || neighbor.animalID != tile.animalID) continue;
+                if(ProcessMatch(tile,neighbor)) yield break;
             }
         }
     }
 
     public void ShuffleBoard()
     {
-        if(isGameOver || isBoosterCooldown) return;
+        if(isGameOver || isBoosterCooldown || BoardBusy) return;
+        ClearMatchPath();
         var tiles=new List<AnimalTile>();
         var positions=new List<Vector2Int>();
         foreach(var tile in gridArray)
             if(tile) { tiles.Add(tile); positions.Add(new Vector2Int(tile.gridX,tile.gridY)); }
         if(tiles.Count<2) { CheckBoardAvailability(); return; }
-        if(!EconomyStore.TryUseBooster(BoosterType.Shuffle))
-        {
-            Session.Notify("No shuffles left. Buy more in the shop from the menu.");
-            return;
-        }
-        StartCoroutine(BoosterCooldownRoutine());
+        if (!TryStartBooster(BoosterType.Shuffle)) return;
         ClearHint();
         if(autoChainCoroutine!=null) { StopCoroutine(autoChainCoroutine); autoChainCoroutine=null; }
         for(int attempt=0;attempt<30;attempt++)
@@ -407,32 +435,50 @@ public class GridManager : MonoBehaviour
             tile.rect.DOKill();
             tile.rect.DOAnchorPos(TilePosition(new Vector2Int(tile.gridX,tile.gridY)),.5f).SetEase(Ease.InOutQuad);
         }
-        if(firstSelectedTile) firstSelectedTile.SetHighlight(false);
-        firstSelectedTile=secondSelectedTile=null;
+        boardMovingUntil=Time.time+.5f;
+        ClearSelection();
         boardRevision++;
         ScheduleBoardCheck();
     }
 
     public void ShowHint()
     {
-        if(isGameOver || isBoosterCooldown) return;
+        if(isGameOver || isBoosterCooldown || BoardBusy) return;
         CaptureBoard();
         bool available=boardLogic.TryFindPair(out var first,out var second);
         Session.SetBoardAvailability(available);
         if(!available) return;
-        if(!EconomyStore.TryUseBooster(BoosterType.Hint))
-        {
-            Session.Notify("No hints left. Buy more in the shop from the menu.");
-            return;
-        }
-        StartCoroutine(BoosterCooldownRoutine());
+        if (!TryStartBooster(BoosterType.Hint)) return;
         ClearHint();
         hintedTile1=gridArray[first.x,first.y]; hintedTile2=gridArray[second.x,second.y];
-        hintedTile1.rect.DOKill(); hintedTile2.rect.DOKill();
-        hintedTile1.rect.localScale=hintedTile2.rect.localScale=Vector3.one;
-        hintedTile1.rect.DOPunchScale(new Vector3(.3f,.3f,.3f),1,5);
-        hintedTile2.rect.DOPunchScale(new Vector3(.3f,.3f,.3f),1,5);
-        hintedTile1.SetHighlight(true); hintedTile2.SetHighlight(true);
+        HighlightHint(hintedTile1);
+        HighlightHint(hintedTile2);
+    }
+
+    private static void HighlightHint(AnimalTile tile)
+    {
+        tile.rect.DOKill();
+        tile.rect.localScale = Vector3.one;
+        tile.rect.DOPunchScale(new Vector3(.3f,.3f,.3f),1,5);
+        tile.SetHighlight(true);
+    }
+
+    private bool TryStartBooster(BoosterType booster)
+    {
+        if (!EconomyStore.TryUseBooster(booster))
+        {
+            string stock = booster == BoosterType.Hint ? "hints" : "shuffles";
+            Session.Notify("No " + stock + " left. Buy more in the shop from the menu.");
+            return false;
+        }
+        StartCoroutine(BoosterCooldownRoutine());
+        return true;
+    }
+
+    private void SetBoostersInteractable(bool value)
+    {
+        if (btnShuffle) btnShuffle.interactable = value;
+        if (btnHint) btnHint.interactable = value;
     }
 
     private void ClearHint()
@@ -449,15 +495,13 @@ public class GridManager : MonoBehaviour
     {
         isBoosterCooldown = true;
 
-        if (btnShuffle != null) btnShuffle.interactable = false;
-        if (btnHint != null) btnHint.interactable = false;
+        SetBoostersInteractable(false);
         
         yield return new WaitForSeconds(1.0f); 
         
         isBoosterCooldown = false;
 
-        if (btnShuffle != null) btnShuffle.interactable = true;
-        if (btnHint != null) btnHint.interactable = true;
+        SetBoostersInteractable(true);
     }
     private void GameOver(bool isWin)
     {
@@ -466,6 +510,7 @@ public class GridManager : MonoBehaviour
 
     private void HandleGameEnded(bool won)
     {
+        LastResult=progressTracker.Finish(won);
         if(won && levelDatabase && levelDatabase.levels!=null)
         {
             LevelProgress.Won(levelIndex,levelDatabase.levels.Count);
@@ -522,6 +567,8 @@ public class GridManager : MonoBehaviour
 
     public void RestartGame()
     {
+        progressTracker.Flush();LastResult=default;
+        ClearMatchPath();boardMovingUntil=0;
         LastReward=default;
         if (btnNextLevel != null) btnNextLevel.gameObject.SetActive(false);
 
@@ -534,26 +581,15 @@ public class GridManager : MonoBehaviour
 
         if (gridArray != null)
         {
-            for (int x = 0; x < gridArray.GetLength(0); x++)
-            {
-                for (int y = 0; y < gridArray.GetLength(1); y++)
-                {
-                    if (gridArray[x, y] != null)
-                    {
-                        gridArray[x, y].DisableColliderInput();
-                        Destroy(gridArray[x, y].gameObject);
-                        gridArray[x, y] = null;
-                    }
-                }
-            }
+            foreach (var tile in gridArray)
+                if (tile) DestroyTile(tile);
             System.Array.Clear(gridArray, 0, gridArray.Length);
         }
 
         ClearHint();
 
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (btnShuffle != null) btnShuffle.interactable = true;
-        if (btnHint != null) btnHint.interactable = true;
+        SetBoostersInteractable(true);
 
         Session.ShowMenu();
         if(GenerateGrid())
@@ -561,7 +597,8 @@ public class GridManager : MonoBehaviour
             LevelProgress.Started(levelIndex);
             var ui=FindObjectOfType<UIManager>();
             if(ui && ui.screen==GameScreen.Gameplay) GameSession.SelectLevel(levelIndex);
-            Session.BeginLevel(maxTime,timeBonusPerMatch,comboDuration);
+            var challenge=levelDatabase && levelIndex<levelDatabase.levels.Count ? levelDatabase.levels[levelIndex].challenge : null;
+            Session.BeginLevel(maxTime,timeBonusPerMatch,comboDuration,challenge,initialWater,initialStone);
             ScheduleBoardCheck();
         }
     }
@@ -615,8 +652,13 @@ public class GridManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if(Session) Session.GameEnded-=HandleGameEnded;
+        progressTracker?.Dispose();
+        if(Session) {Session.GameEnded-=HandleGameEnded;Session.StateChanged-=HandleMatchPathState;}
         hudView?.Dispose(); audioFeedback?.Dispose();
         if(Instance==this) Instance=null;
     }
+
+    private void OnDisable() {ClearMatchPath();}
+    private void OnApplicationPause(bool paused) {if(paused) progressTracker?.Flush();}
+    private void OnApplicationQuit() {progressTracker?.Flush();}
 }

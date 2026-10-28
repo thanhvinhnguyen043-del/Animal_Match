@@ -9,6 +9,7 @@ public class ShopBackground
     [Min(0)] public int price;
     [Min(0)] public int requiredCompletedLevel;
     public Sprite sprite;
+    public Sprite baseSprite;
 }
 
 [CreateAssetMenu(fileName="EconomyConfig",menuName="Game/Economy Config")]
@@ -21,4 +22,7 @@ public class EconomyConfig : ScriptableObject
     [Min(1)] public int hintPrice=75;
     [Min(1)] public int shufflePrice=100;
     public ShopBackground[] backgrounds=new ShopBackground[0];
+    public DecorationItem[] decorations=new DecorationItem[0];
+    public DecorationSlotAnchor[] decorationSlots=new DecorationSlotAnchor[0];
+    public DailyReward[] dailyRewards=DailyRewardSchedule.CreateDefaults();
 }

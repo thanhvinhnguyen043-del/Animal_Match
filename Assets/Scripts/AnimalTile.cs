@@ -21,8 +21,8 @@ public class AnimalTile : MonoBehaviour
     [Header("Collider Input")]
     public BoxCollider2D hitCollider;
     private TileColliderInput colliderInput;
-    public bool CanReceiveColliderClick => isActiveAndEnabled && hitCollider && hitCollider.enabled &&
-        currentState!=TileState.Hidden && currentState!=TileState.Barrier;
+    public bool IsSelectable => currentState != TileState.Hidden && currentState != TileState.Barrier;
+    public bool CanReceiveColliderClick => isActiveAndEnabled && hitCollider && hitCollider.enabled && IsSelectable;
     
     [HideInInspector] public RectTransform rect;
 
@@ -50,7 +50,7 @@ public class AnimalTile : MonoBehaviour
         
 
         if (barrierOverlay) barrierOverlay.SetActive(currentState == TileState.Barrier); 
-        if(hitCollider) hitCollider.enabled=currentState!=TileState.Hidden && currentState!=TileState.Barrier;
+        if(hitCollider) hitCollider.enabled=IsSelectable;
     }
 
     public void SetHighlight(bool isOn)

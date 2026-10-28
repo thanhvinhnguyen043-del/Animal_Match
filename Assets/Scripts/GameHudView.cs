@@ -84,7 +84,7 @@ public sealed class GameHudView : IDisposable
     {
         if(grid.winTrophy) grid.winTrophy.SetActive(won);
         if(grid.btnNextLevel) grid.btnNextLevel.gameObject.SetActive(won && grid.HasNextLevel());
-        bool banner=won && grid.levelIndex==0 && grid.levelOneWinBanner;
+        bool banner=won && grid.levelIndex==0 && grid.levelOneWinBanner && !GameTypography.UseText;
         if(grid.levelOneWinBanner) grid.levelOneWinBanner.SetActive(banner);
         if(grid.textTitle)
         {

@@ -24,18 +24,33 @@ public class ShopUI : MonoBehaviour
     public TextMeshProUGUI statusText;
     public TextMeshProUGUI hintPriceText;
     public TextMeshProUGUI shufflePriceText;
-    public TextMeshProUGUI gardenButtonText;
-    public TextMeshProUGUI sunsetButtonText;
+    [HideInInspector] public TextMeshProUGUI gardenButtonText;
+    [HideInInspector] public TextMeshProUGUI sunsetButtonText;
     public Button hintBuyButton;
     public Button shuffleBuyButton;
-    public Button gardenButton;
-    public Button sunsetButton;
+    [HideInInspector] public Button gardenButton;
+    [HideInInspector] public Button sunsetButton;
     public Image[] backgroundTargets;
     public RectTransform mainMenuPanel;
     public ShopBackgroundCard[] backgroundCards;
     public ScrollRect productScroll;
     public Sprite buyIcon;
     public Sprite useIcon;
+    public GameObject boosterPage;
+    public GameObject[] backgroundPages;
+    public Image boosterTab;
+    public Image backgroundTab;
+    public Sprite selectedTabSprite;
+    public Sprite otherTabSprite;
+    public Button previousPageButton;
+    public Button nextPageButton;
+    public TextMeshProUGUI backgroundPageText;
+    public GameObject decorationPage;
+    public Image decorationTab;
+    public DecorationStudio decorations;
+    private int backgroundPage;
+    private bool showingBackgrounds;
+    private bool showingDecorations;
     public bool IsOpen => panel && panel.activeSelf;
 
     private void Awake()
@@ -63,6 +78,7 @@ public class ShopUI : MonoBehaviour
         var canvas=panel.GetComponent<Canvas>();
         if(canvas) { canvas.overrideSorting=true; canvas.sortingOrder=200; }
         Refresh();
+        ShowBoosters();
         if(productScroll) { productScroll.StopMovement(); productScroll.verticalNormalizedPosition=1; }
         if(statusText) statusText.text="";
     }
@@ -77,18 +93,52 @@ public class ShopUI : MonoBehaviour
         }
         if(GridManager.Instance && GridManager.Instance.Session) GridManager.Instance.Session.CloseShop();
     }
-    public void BuyHint()
+    public void BuyHint() => BuyBooster(BoosterType.Hint);
+    public void BuyShuffle() => BuyBooster(BoosterType.Shuffle);
+    public void ShowBoosters() { showingBackgrounds=false;showingDecorations=false; RefreshPages(); }
+    public void ShowBackgrounds() { showingBackgrounds=true;showingDecorations=false; backgroundPage=0; RefreshPages(); }
+    public void ShowDecorations() {showingBackgrounds=false;showingDecorations=true;backgroundPage=0;RefreshPages();}
+    public void NextBackgroundPage() { backgroundPage++; RefreshPages(); }
+    public void PreviousBackgroundPage() { backgroundPage--; RefreshPages(); }
+    private void RefreshPages()
     {
-        EconomyStore.TryBuyBooster(BoosterType.Hint,out var message);
+        if(!boosterPage) return;
+        boosterPage.SetActive(!showingBackgrounds && !showingDecorations);
+        if(decorationPage) decorationPage.SetActive(showingDecorations);
+        int pageCount=showingDecorations && decorations ? decorations.ShopPageCount : (backgroundPages==null ? 0 : backgroundPages.Length);
+        backgroundPage=Mathf.Clamp(backgroundPage,0,Mathf.Max(0,pageCount-1));
+        if(backgroundPages!=null)
+        {
+            for(int i=0;i<backgroundPages.Length;i++)
+                if(backgroundPages[i]) backgroundPages[i].SetActive(showingBackgrounds && i==backgroundPage);
+        }
+        if(boosterTab) boosterTab.sprite=showingBackgrounds || showingDecorations ? otherTabSprite : selectedTabSprite;
+        if(backgroundTab) backgroundTab.sprite=showingBackgrounds ? selectedTabSprite : otherTabSprite;
+        if(decorationTab) decorationTab.sprite=showingDecorations ? selectedTabSprite : otherTabSprite;
+        if(showingDecorations && decorations) decorations.ShowShopPage(backgroundPage);
+        if(previousPageButton)
+        {
+            previousPageButton.gameObject.SetActive(showingBackgrounds || showingDecorations);
+            previousPageButton.interactable=backgroundPage>0;
+        }
+        if(nextPageButton)
+        {
+            nextPageButton.gameObject.SetActive(showingBackgrounds || showingDecorations);
+            nextPageButton.interactable=backgroundPage<pageCount-1;
+        }
+        if(backgroundPageText)
+        {
+            backgroundPageText.gameObject.SetActive(showingBackgrounds || showingDecorations);
+            backgroundPageText.text=(backgroundPage+1)+" / "+pageCount;
+        }
+    }
+    private void BuyBooster(BoosterType booster)
+    {
+        EconomyStore.TryBuyBooster(booster,out var message);
         if(statusText) statusText.text=message;
     }
-    public void BuyShuffle()
-    {
-        EconomyStore.TryBuyBooster(BoosterType.Shuffle,out var message);
-        if(statusText) statusText.text=message;
-    }
-    public void SelectGarden() { SelectBackground("garden"); }
-    public void SelectSunset() { SelectBackground("sunset"); }
+    public void SelectGarden() { SelectBackground(EconomyStore.DefaultBackgroundId); }
+    public void SelectSunset() { SelectBackground("japan"); }
     private void SelectBackground(string id)
     {
         var inventory=EconomyStore.Inventory;
@@ -110,8 +160,8 @@ public class ShopUI : MonoBehaviour
         if(shuffleCount) shuffleCount.text=inventory.shuffles.ToString();
         if(shopStock) shopStock.text="Inventory: "+inventory.hints+" hints  •  "+inventory.shuffles+" shuffles";
         int hintPrice=Mathf.Max(1,config ? config.hintPrice : 75), shufflePrice=Mathf.Max(1,config ? config.shufflePrice : 100);
-        if(hintPriceText) hintPriceText.text="BUY • "+hintPrice+" COIN";
-        if(shufflePriceText) shufflePriceText.text="BUY • "+shufflePrice+" COIN";
+        if(hintPriceText) hintPriceText.text=boosterPage ? "BUY "+hintPrice : "BUY • "+hintPrice+" COIN";
+        if(shufflePriceText) shufflePriceText.text=boosterPage ? "BUY "+shufflePrice : "BUY • "+shufflePrice+" COIN";
         if(hintBuyButton) hintBuyButton.interactable=inventory.coins>=hintPrice;
         if(shuffleBuyButton) shuffleBuyButton.interactable=inventory.coins>=shufflePrice;
         if(backgroundCards!=null && backgroundCards.Length>0)
@@ -119,13 +169,13 @@ public class ShopUI : MonoBehaviour
             foreach(var card in backgroundCards)
             {
                 if(card==null) continue;
-                UpdateBackgroundButton(card.id,card.button,card.buttonText,inventory);
                 var item=EconomyStore.FindBackground(card.id);
+                UpdateBackgroundButton(card.id,card.button,card.buttonText,inventory,item);
                 bool locked=item!=null && !inventory.ownedBackgrounds.Contains(card.id) && !EconomyStore.IsBackgroundUnlocked(item);
-                if(card.description) card.description.text=locked ? "Complete level "+item.requiredCompletedLevel+" to unlock purchase" : inventory.ownedBackgrounds.Contains(card.id) ? "Owned" : "Permanent background";
+                if(card.description) card.description.text=locked ? (boosterPage ? "Unlock to buy" : "Complete level "+item.requiredCompletedLevel+" to unlock purchase") : card.id==EconomyStore.DefaultBackgroundId ? "Included" : inventory.ownedBackgrounds.Contains(card.id) ? "Owned" : "Permanent background";
                 if(card.preview)
                 {
-                    if(item!=null && item.sprite) card.preview.sprite=item.sprite;
+                    if(item!=null && item.sprite) card.preview.sprite=item.baseSprite ? item.baseSprite : item.sprite;
                     card.preview.color=locked ? new Color(.55f,.55f,.55f,1) : Color.white;
                 }
                 if(card.lockIcon) card.lockIcon.SetActive(locked);
@@ -138,25 +188,26 @@ public class ShopUI : MonoBehaviour
         }
         else
         {
-            UpdateBackgroundButton("garden",gardenButton,gardenButtonText,inventory);
-            UpdateBackgroundButton("sunset",sunsetButton,sunsetButtonText,inventory);
+            UpdateBackgroundButton(EconomyStore.DefaultBackgroundId,gardenButton,gardenButtonText,inventory);
+            UpdateBackgroundButton("japan",sunsetButton,sunsetButtonText,inventory);
         }
         var selected=EconomyStore.FindBackground(inventory.selectedBackground);
         if(selected!=null && selected.sprite)
         {
             if(backgroundTargets!=null)
-                foreach(var image in backgroundTargets) if(image) image.sprite=selected.sprite;
+                foreach(var image in backgroundTargets) if(image) image.sprite=selected.baseSprite ? selected.baseSprite : selected.sprite;
             var shopBackground=panel ? panel.GetComponent<Image>() : null;
-            if(shopBackground) shopBackground.sprite=selected.sprite;
+            if(shopBackground) shopBackground.sprite=selected.baseSprite ? selected.baseSprite : selected.sprite;
         }
     }
-    private void UpdateBackgroundButton(string id,Button button,TextMeshProUGUI label,PlayerInventory inventory)
+    private void UpdateBackgroundButton(string id,Button button,TextMeshProUGUI label,PlayerInventory inventory,ShopBackground item=null)
     {
-        var item=EconomyStore.FindBackground(id);
+        if(item==null) item=EconomyStore.FindBackground(id);
         bool owned=inventory.ownedBackgrounds.Contains(id), selected=inventory.selectedBackground==id;
         int price=item==null ? 0 : Mathf.Max(0,item.price);
         bool unlocked=owned || EconomyStore.IsBackgroundUnlocked(item);
         if(label) label.text=!unlocked && item!=null ? "LOCKED • LEVEL "+item.requiredCompletedLevel : selected ? "EQUIPPED" : owned ? "USE" : "BUY • "+price+" COIN";
+        if(label && boosterPage) label.text=!unlocked && item!=null ? "LEVEL "+item.requiredCompletedLevel : selected ? "EQUIPPED" : owned ? "USE" : "BUY "+price.ToString("N0");
         if(button) button.interactable=item!=null && !selected && unlocked && (owned || inventory.coins>=price);
     }
     private void OnDestroy()

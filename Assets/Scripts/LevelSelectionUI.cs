@@ -7,8 +7,10 @@ public class LevelSelectionUI : MonoBehaviour
     public RectTransform content;
     public Button levelButtonTemplate;
     public UIManager ui;
+    public bool compactTiles;
     private Button[] buttons;
     private ScrollRect scroll;
+    private StarRatingGraphic[] stars;
 
     private void Awake()
     {
@@ -57,6 +59,11 @@ public class LevelSelectionUI : MonoBehaviour
         var database = Resources.Load<LevelDatabase>("LevelDatabase");
         if (database == null || database.levels == null) return;
         int count = database.levels.Count;
+        if(compactTiles)
+        {
+            var footer=transform.Find("LevelPage");
+            if(footer) footer.GetComponent<TextMeshProUGUI>().text=count+" LEVELS"+(count>10 ? " - SCROLL" : "");
+        }
         if (buttons == null || buttons.Length != count)
         {
             if (buttons != null)
@@ -66,6 +73,7 @@ public class LevelSelectionUI : MonoBehaviour
                     Destroy(old.gameObject);
                 }
             buttons = new Button[count];
+            stars=new StarRatingGraphic[count];
             for (int i = 0; i < count; i++)
             {
                 int index = i;
@@ -76,16 +84,38 @@ public class LevelSelectionUI : MonoBehaviour
 
                 button.gameObject.SetActive(true);
                 buttons[i] = button;
+                stars[i]=button.GetComponentInChildren<StarRatingGraphic>(true);
             }
         }
         int unlocked = LevelProgress.HighestUnlocked(count);
+        var career=EconomyStore.Inventory.career;
         for (int i = 0; i < count; i++)
         {
             buttons[i].interactable = i <= unlocked;
+            if(stars[i])
+            {
+                var record=CareerStore.Record(career,CareerStore.LevelId(i,database));
+                stars[i].SetStars(record==null ? 0 : record.stars);stars[i].gameObject.SetActive(i<=unlocked);
+            }
             var label = buttons[i].GetComponentInChildren<TextMeshProUGUI>(true);
             var lockIcon=buttons[i].transform.Find("LevelLockIcon");
             if(lockIcon) lockIcon.gameObject.SetActive(i>unlocked);
             if (label) label.text = "LEVEL " + (i + 1) + (i > unlocked && !lockIcon ? "\nLOCKED" : "");
+            if(compactTiles && label)
+            {
+                bool locked=i>unlocked;
+                label.text=(i+1).ToString();
+                label.fontSize=locked ? 29 : 76;
+                label.rectTransform.anchoredPosition=new Vector2(0,locked ? -144 : -66);
+                label.rectTransform.sizeDelta=new Vector2(172,locked ? 38 : 95);
+                var status=buttons[i].transform.Find("LevelStatus");
+                if(status)
+                {
+                    status.gameObject.SetActive(!locked);
+                    status.GetComponent<TextMeshProUGUI>().text=i==LevelProgress.Latest(count) ? "PLAY" : "OPEN";
+                }
+                buttons[i].GetComponent<Image>().color=locked ? new Color(.93f,.88f,.8f) : i==LevelProgress.Latest(count) ? new Color(.87f,.94f,.72f) : new Color(1,.98f,.91f);
+            }
         }
 
         Canvas.ForceUpdateCanvases();

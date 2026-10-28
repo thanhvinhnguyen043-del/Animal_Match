@@ -13,7 +13,10 @@ public class UIManager : MonoBehaviour
     public GameScreen screen = GameScreen.Combined;
     public string mainMenuScene = "MainMenu";
     public string gameplayScene = "Gameplay";
+    public LoadingUI loading;
     private bool changingScene;
+    private GridManager grid;
+    private GridManager Grid => grid ? grid : grid = FindObjectOfType<GridManager>();
     [Header("UI Panels")]
     public RectTransform mainMenuPanel;
     public RectTransform settingsPanel;
@@ -39,16 +42,13 @@ public class UIManager : MonoBehaviour
         settingsPanel.anchoredPosition = new Vector2(SettingsHiddenX, 0);
         settingsPanel.gameObject.SetActive(false);
         if (levelSelectPanel != null) levelSelectPanel.anchoredPosition = new Vector2(-1920, 0);
-        
 
         if (gameplayPanel != null)
             gameplayPanel.anchoredPosition = screen == GameScreen.Gameplay ? Vector2.zero : new Vector2(0, 1080);
 
-
         gameplayActive = screen == GameScreen.Gameplay;
         if (!gameplayActive) PlayMusic(bgmMenu);
     }
-
 
     public void OpenSettings()
     {
@@ -56,11 +56,14 @@ public class UIManager : MonoBehaviour
             settingsPanel.anchoredPosition = new Vector2(SettingsHiddenX, 0);
         settingsPanel.gameObject.SetActive(true);
         settingsOpen = true;
-        if (settingsRestartButton != null) settingsRestartButton.interactable = gameplayActive;
+        if (settingsRestartButton != null)
+        {
+            settingsRestartButton.gameObject.SetActive(gameplayActive);
+            settingsRestartButton.interactable = gameplayActive;
+        }
         if (gameplayActive)
         {
-            var grid = FindObjectOfType<GridManager>();
-            if (grid) grid.SetPaused(true);
+            if (Grid) Grid.SetPaused(true);
             Time.timeScale = 0;
         }
         settingsPanel.SetAsLastSibling();
@@ -69,12 +72,8 @@ public class UIManager : MonoBehaviour
 
     public void CloseSettings()
     {
-        settingsOpen = false;
-        Time.timeScale = 1;
-        var grid = FindObjectOfType<GridManager>();
-        if (grid) grid.SetPaused(false);
-        settingsPanel.anchoredPosition = new Vector2(SettingsHiddenX, 0);
-        settingsPanel.gameObject.SetActive(false);
+        HideSettingsImmediately();
+        if (Grid) Grid.SetPaused(false);
     }
 
     private void HideSettingsImmediately()
@@ -89,8 +88,7 @@ public class UIManager : MonoBehaviour
     {
         if (!gameplayActive) return;
         HideSettingsImmediately();
-        var grid = FindObjectOfType<GridManager>();
-        if (grid != null) grid.RestartGame();
+        if (Grid) Grid.RestartGame();
     }
 
     public void ReturnHomeFromSettings()
@@ -108,20 +106,17 @@ public class UIManager : MonoBehaviour
     {
         var selection = levelSelectPanel.GetComponent<LevelSelectionUI>();
         if (selection != null) selection.Refresh();
-        var grid = FindObjectOfType<GridManager>();
-        if (grid) grid.Session.ShowLevelSelect();
+        if (Grid) Grid.Session.ShowLevelSelect();
         mainMenuPanel.anchoredPosition = new Vector2(1920, 0);
         levelSelectPanel.anchoredPosition = Vector2.zero;
     }
 
     public void CloseLevelSelect()
     {
-        var grid = FindObjectOfType<GridManager>();
-        if (grid) grid.Session.ShowMenu();
+        if (Grid) Grid.Session.ShowMenu();
         levelSelectPanel.anchoredPosition = new Vector2(-1920, 0);
         mainMenuPanel.anchoredPosition = Vector2.zero;
     }
-
 
     public void PlayLatestLevel()
     {
@@ -132,6 +127,11 @@ public class UIManager : MonoBehaviour
 
     public void StartGameplay()
     {
+        PlayLatestLevel();
+    }
+
+    private void EnterGameplayImmediately()
+    {
         if (screen != GameScreen.Combined)
         {
             PlayLatestLevel();
@@ -140,22 +140,18 @@ public class UIManager : MonoBehaviour
         HideSettingsImmediately();
         gameplayActive = true;
 
-        FindObjectOfType<GridManager>().RestartGame();
-
+        Grid.RestartGame();
 
         levelSelectPanel.anchoredPosition = new Vector2(-1920, 0);
         mainMenuPanel.anchoredPosition = new Vector2(-1920, 0);
-        
 
         gameplayPanel.anchoredPosition = Vector2.zero;
 
-
     }
-
-
 
     public void StartLevel(int index)
     {
+        if(loading && loading.IsBusy) return;
         var database = Resources.Load<LevelDatabase>("LevelDatabase");
         if (database == null || database.levels == null || index < 0 || index >= database.levels.Count ||
             index > LevelProgress.HighestUnlocked(database.levels.Count) || database.levels[index] == null ||
@@ -164,14 +160,19 @@ public class UIManager : MonoBehaviour
             Debug.LogError("Level chua hop le. Kiem tra Tools > Level Database.");
             return;
         }
+        if(loading && loading.isActiveAndEnabled) {loading.LoadLevel(index);return;}
+        StartLevelImmediately(index);
+    }
+
+    internal void StartLevelImmediately(int index)
+    {
         if (screen != GameScreen.Combined)
         {
             GameSession.SelectLevel(index);
             ChangeScene(gameplayScene);
             return;
         }
-        var grid = FindObjectOfType<GridManager>();
-        if (grid != null && grid.SelectLevel(index)) StartGameplay();
+        if (Grid && Grid.SelectLevel(index)) EnterGameplayImmediately();
     }
 
     public void BackToMenuFromGame()
@@ -183,8 +184,7 @@ public class UIManager : MonoBehaviour
         }
         HideSettingsImmediately();
         gameplayActive = false;
-        var grid = FindObjectOfType<GridManager>();
-        if (grid != null) grid.PauseGameplay();
+        if (Grid) Grid.PauseGameplay();
         gameplayPanel.anchoredPosition = new Vector2(0, 1080);
         mainMenuPanel.anchoredPosition = Vector2.zero;
         PlayMusic(bgmMenu);
@@ -195,10 +195,12 @@ public class UIManager : MonoBehaviour
         PlayMusic(bgmGameplay);
     }
 
-    public void StopGameplayMusic()
+    public void StopGameplayMusic() => StopMusic(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
+    private void StopMusic(FMOD.Studio.STOP_MODE mode)
     {
         if (!currentBGM.isValid()) return;
-        currentBGM.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+        currentBGM.stop(mode);
         currentBGM.release();
         currentBGM.clearHandle();
     }
@@ -225,17 +227,10 @@ public class UIManager : MonoBehaviour
         SceneManager.LoadScene(name);
     }
 
-
     private void PlayMusic(EventReference newMusic)
     {
 
-        if (currentBGM.isValid())
-        {
-            currentBGM.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
-            currentBGM.release();
-            currentBGM.clearHandle();
-        }
-
+        StopMusic(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
 
         if (!newMusic.IsNull)
         {

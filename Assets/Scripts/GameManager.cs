@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public enum GameState { Menu, LevelSelect, Playing, Paused, Win, Lose, Shop }
+public enum GameState { Menu, LevelSelect, Playing, Paused, Win, Lose, Shop, Decorating, DailyRewards, Loading, Achievements }
 
 [DisallowMultipleComponent]
 public class GameManager : MonoBehaviour
@@ -14,6 +14,19 @@ public class GameManager : MonoBehaviour
     public float TimeRemaining { get; private set; }
     public float TimeLimit { get; private set; }
     public bool HasAvailablePair { get; private set; }=true;
+    public bool IsResolvingMatch { get; internal set; }
+    public int Moves {get;private set;}
+    public int PeakCombo {get;private set;}
+    public int WaterBroken {get;private set;}
+    public int StoneBroken {get;private set;}
+    public int InitialWater {get;private set;}
+    public int InitialStone {get;private set;}
+    public float ElapsedSeconds {get;private set;}
+    public LevelChallenge Challenge {get;private set;}=new LevelChallenge();
+    public StarGoal ActiveGoal {get;private set;}
+    public bool GoalAchieved {get;private set;}
+    public bool TimeGoalAchieved => TimeRemaining+.001f>=TimeLimit*Challenge.timeRemainingFraction;
+    public int EarnedStars => 1+(TimeGoalAchieved ? 1 : 0)+(TimeGoalAchieved && GoalAchieved ? 1 : 0);
     private float comboDuration;
     private float timeBonus;
 
@@ -29,9 +42,16 @@ public class GameManager : MonoBehaviour
     public event Action<bool> GameEnded;
     public event Action<string> NoticeRequested;
 
-    public void BeginLevel(float seconds,float bonus,float comboSeconds)
+    public void BeginLevel(float seconds,float bonus,float comboSeconds,LevelChallenge challenge=null,int water=0,int stone=0)
     {
+        Challenge=challenge ?? new LevelChallenge();
+        InitialWater=Mathf.Max(0,water);InitialStone=Mathf.Max(0,stone);
+        ActiveGoal=Challenge.goal;
+        if(ActiveGoal==StarGoal.Automatic) ActiveGoal=water>0 && stone>0 ? StarGoal.WaterAndStone : water>0 ? StarGoal.Water : stone>0 ? StarGoal.Stone : StarGoal.Combo;
+        if(ActiveGoal==StarGoal.Water && water==0 || ActiveGoal==StarGoal.Stone && stone==0 || ActiveGoal==StarGoal.WaterAndStone && water+stone==0) ActiveGoal=StarGoal.Combo;
+        Moves=PeakCombo=WaterBroken=StoneBroken=0;ElapsedSeconds=0;GoalAchieved=false;
         Score=Combo=0;
+        IsResolvingMatch=false;
         ComboTimer=0;
         TimeLimit=TimeRemaining=Mathf.Max(.01f,seconds);
         timeBonus=Mathf.Max(0,bonus);
@@ -47,7 +67,8 @@ public class GameManager : MonoBehaviour
     private void Update() { Advance(Time.deltaTime); }
     public void Advance(float seconds)
     {
-        if(state!=GameState.Playing || seconds<=0) return;
+        if(state!=GameState.Playing || IsResolvingMatch || seconds<=0) return;
+        ElapsedSeconds+=Mathf.Min(seconds,TimeRemaining);
         TimeRemaining=Mathf.Max(0,TimeRemaining-seconds);
         TimeChanged?.Invoke(TimeRemaining,TimeLimit);
         if(TimeRemaining<=0) { Finish(false); return; }
@@ -61,7 +82,9 @@ public class GameManager : MonoBehaviour
     public void RecordMatch(Vector2 position)
     {
         if(state!=GameState.Playing) return;
+        Moves++;
         Combo++;
+        PeakCombo=Mathf.Max(PeakCombo,Combo);CheckStarGoal();
         ComboTimer=comboDuration;
         int added=100*Combo;
         Score+=added;
@@ -76,7 +99,24 @@ public class GameManager : MonoBehaviour
         MatchResolved?.Invoke(added,bonus,position);
     }
 
-    public void NotifyTileBroken(TileState previousState) { TileBroken?.Invoke(previousState); }
+    public void NotifyTileBroken(TileState previousState)
+    {
+        if(state!=GameState.Playing) return;
+        if(previousState==TileState.Ice) WaterBroken++;
+        if(previousState==TileState.Barrier) StoneBroken++;
+        CheckStarGoal();TileBroken?.Invoke(previousState);
+    }
+    private void CheckStarGoal()
+    {
+        if(GoalAchieved || Moves>Mathf.Max(1,Challenge.turnLimit)) return;
+        switch(ActiveGoal)
+        {
+            case StarGoal.Water:GoalAchieved=WaterBroken>=InitialWater;break;
+            case StarGoal.Stone:GoalAchieved=StoneBroken>=InitialStone;break;
+            case StarGoal.WaterAndStone:GoalAchieved=WaterBroken>=InitialWater && StoneBroken>=InitialStone;break;
+            default:GoalAchieved=PeakCombo>=Mathf.Max(2,Challenge.comboTarget);break;
+        }
+    }
     public void NotifyInvalidMatch() { if(state==GameState.Playing) InvalidMatch?.Invoke(); }
     public void NotifyTileSelected() { if(state==GameState.Playing) TileSelected?.Invoke(); }
     public void SetBoardAvailability(bool available)
@@ -94,6 +134,26 @@ public class GameManager : MonoBehaviour
         SetState(GameState.Shop);
     }
     public void CloseShop() { if(state==GameState.Shop) SetState(GameState.Menu); }
+    public bool OpenDecorations()
+    {
+        if(state!=GameState.Menu && state!=GameState.Shop) return false;
+        SetState(GameState.Decorating);return true;
+    }
+    public void CloseDecorations(bool returnToShop) {if(state==GameState.Decorating) SetState(returnToShop ? GameState.Shop : GameState.Menu);}
+    public bool OpenDailyRewards()
+    {
+        if(state!=GameState.Menu) return false;
+        SetState(GameState.DailyRewards);return true;
+    }
+    public void CloseDailyRewards() {if(state==GameState.DailyRewards) SetState(GameState.Menu);}
+    public bool OpenAchievements() {if(state!=GameState.Menu) return false;SetState(GameState.Achievements);return true;}
+    public void CloseAchievements() {if(state==GameState.Achievements) SetState(GameState.Menu);}
+    public bool BeginLoading()
+    {
+        if(state!=GameState.Menu && state!=GameState.LevelSelect) return false;
+        SetState(GameState.Loading);return true;
+    }
+    public void EndLoading(GameState previous) {if(state==GameState.Loading) SetState(previous==GameState.LevelSelect ? GameState.LevelSelect : GameState.Menu);}
     public void Notify(string message) { if(state==GameState.Playing) NoticeRequested?.Invoke(message); }
     public void Finish(bool won)
     {

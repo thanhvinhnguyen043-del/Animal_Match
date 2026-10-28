@@ -15,6 +15,8 @@ public class LevelCell
 [Serializable]
 public class LevelDefinition
 {
+    public string id;
+    public LevelChallenge challenge=new LevelChallenge();
     public string name = "Level 1";
     public LevelLayoutMode mode;
     [Range(2, 20)] public int columns = 10;

@@ -48,7 +48,6 @@ public class AudioSettingsUI : MonoBehaviour
         if (channel == AudioChannel.Master)
         {
 
-
             RuntimeManager.MuteAllEvents(IsMuted(channel));
             return;
         }
@@ -71,28 +70,16 @@ public class AudioSettingsUI : MonoBehaviour
         slider.onValueChanged.AddListener(callback);
     }
 
-    public void SetMaster(float value)
-    {
-        value = Mathf.Clamp01(value);
-        masterBus.setVolume(value);
-        PlayerPrefs.SetFloat("Volume.Master", value);
-        if (masterValueText != null) masterValueText.text = Mathf.RoundToInt(value * 100) + "%";
-    }
+    public void SetMaster(float value) => SetVolume(masterBus, "Volume.Master", masterValueText, value);
+    public void SetMusic(float value) => SetVolume(musicBus, "Volume.Music", musicValueText, value);
+    public void SetSFX(float value) => SetVolume(sfxBus, "Volume.SFX", sfxValueText, value);
 
-    public void SetMusic(float value)
+    private void SetVolume(FMOD.Studio.Bus bus, string key, TextMeshProUGUI label, float value)
     {
         value = Mathf.Clamp01(value);
-        musicBus.setVolume(value);
-        PlayerPrefs.SetFloat("Volume.Music", value);
-        if (musicValueText != null) musicValueText.text = Mathf.RoundToInt(value * 100) + "%";
-    }
-
-    public void SetSFX(float value)
-    {
-        value = Mathf.Clamp01(value);
-        sfxBus.setVolume(value);
-        PlayerPrefs.SetFloat("Volume.SFX", value);
-        if (sfxValueText != null) sfxValueText.text = Mathf.RoundToInt(value * 100) + "%";
+        bus.setVolume(value);
+        PlayerPrefs.SetFloat(key, value);
+        if (label) label.text = Mathf.RoundToInt(value * 100) + "%";
     }
 
     private void OnApplicationPause(bool paused)

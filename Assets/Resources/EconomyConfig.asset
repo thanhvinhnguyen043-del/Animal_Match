@@ -19,43 +19,545 @@ MonoBehaviour:
   hintPrice: 75
   shufflePrice: 100
   backgrounds:
-  - id: garden
-    displayName: Day Garden
+  - id: cafe
+    displayName: Cozy Cafe
     price: 0
     requiredCompletedLevel: 0
     sprite: {fileID: 21300000, guid: d382d35218f77e246aab0ea18cce8fb0, type: 3}
-  - id: sunset
-    displayName: Sunset Garden
+    baseSprite: {fileID: 21300000, guid: deef8b9cb0d6ef64ca32201a0ce63a31, type: 3}
+  - id: japan
+    displayName: Japan Cafe
     price: 2000
     requiredCompletedLevel: 0
-    sprite: {fileID: 21300000, guid: c09f05d6ad354fc38732d868b0a0ab8c, type: 3}
-  - id: cafe
-    displayName: Cozy Cafe
-    price: 2000
-    requiredCompletedLevel: 0
-    sprite: {fileID: 21300000, guid: d382d35218f77e246aab0ea18cce8fb0, type: 3}
+    sprite: {fileID: 21300000, guid: a4f80bd2e648bcb48953cfcf54efb2a1, type: 3}
+    baseSprite: {fileID: 21300000, guid: b6bf82cb8ff4f0d41b2b584dba306546, type: 3}
   - id: winter
     displayName: Winter Cafe
     price: 2000
     requiredCompletedLevel: 10
     sprite: {fileID: 21300000, guid: 86761ffceb5e10a429e0c2efdf2ee54f, type: 3}
+    baseSprite: {fileID: 21300000, guid: 7f78a0fb2dc8ba547a3bed63dbad1b12, type: 3}
   - id: tet
     displayName: Vietnamese Tet Cafe
     price: 2000
     requiredCompletedLevel: 20
     sprite: {fileID: 21300000, guid: d01da84738832bc4b9b5aa4710e66848, type: 3}
+    baseSprite: {fileID: 21300000, guid: d42a382886d171044bf581892eecc470, type: 3}
   - id: halloween
     displayName: Halloween Cafe
     price: 2000
     requiredCompletedLevel: 30
     sprite: {fileID: 21300000, guid: 3c7b5558766037b429d1d5cb79c46ed4, type: 3}
+    baseSprite: {fileID: 21300000, guid: e8865c6db00d74341bf7ed1b808a2d86, type: 3}
   - id: beach
     displayName: Beach Cafe
     price: 2000
     requiredCompletedLevel: 40
     sprite: {fileID: 21300000, guid: a606c83421e3d5a4798c68a4979ce4f0, type: 3}
+    baseSprite: {fileID: 21300000, guid: 6c0817aac7269df41b8426c5c0cd994c, type: 3}
   - id: jungle
     displayName: Jungle Cafe
     price: 2000
     requiredCompletedLevel: 50
     sprite: {fileID: 21300000, guid: e106dab627df3f247a84e68b35cf6232, type: 3}
+    baseSprite: {fileID: 21300000, guid: 6ce6d18079b04c94da8b3cbbc807ba47, type: 3}
+  decorations:
+  - id: cafe_catplant
+    displayName: Cat Planter
+    skin: Cozy
+    price: 400
+    sprite: {fileID: 21300000, guid: baf174d1214964e42b3369fbc8f24a96, type: 3}
+    size: {x: 260, y: 320}
+    slot: 1
+  - id: cafe_catpicture
+    displayName: Cat Portrait
+    skin: Cozy
+    price: 250
+    sprite: {fileID: 21300000, guid: 22be0c49df95e6d41bad4e5c34f79253, type: 3}
+    size: {x: 170, y: 210}
+    slot: 3
+  - id: japan_bonsai
+    displayName: Bonsai
+    skin: Japan
+    price: 400
+    sprite: {fileID: 21300000, guid: 37637eda23f2a2845a4e0da002aeb8d2, type: 3}
+    size: {x: 220, y: 180}
+    slot: 4
+  - id: japan_sakuralantern
+    displayName: Sakura Lantern
+    skin: Japan
+    price: 250
+    sprite: {fileID: 21300000, guid: 3d7c909acc069f643803f9a320cb788b, type: 3}
+    size: {x: 260, y: 320}
+    slot: 2
+  - id: winter_christmastree
+    displayName: Christmas Tree
+    skin: Winter
+    price: 400
+    sprite: {fileID: 21300000, guid: 9b38a420579223244948d5cf1662e139, type: 3}
+    size: {x: 380, y: 530}
+    slot: 1
+  - id: winter_pinegarland
+    displayName: Pine Garland
+    skin: Winter
+    price: 250
+    sprite: {fileID: 21300000, guid: 31b010a924e1c7c428e1f15675b6dc29, type: 3}
+    size: {x: 620, y: 260}
+    slot: 2
+  - id: tet_apricotblossom
+    displayName: Apricot Blossom
+    skin: Tet
+    price: 400
+    sprite: {fileID: 21300000, guid: d73bc3469a64b0444a4d3bc758c89a51, type: 3}
+    size: {x: 380, y: 530}
+    slot: 1
+  - id: tet_redlantern
+    displayName: Red Lantern
+    skin: Tet
+    price: 250
+    sprite: {fileID: 21300000, guid: fe890d464a5f0294695d1ee26528e643, type: 3}
+    size: {x: 260, y: 320}
+    slot: 2
+  - id: halloween_pumpkinlantern
+    displayName: Pumpkin Lantern
+    skin: Halloween
+    price: 400
+    sprite: {fileID: 21300000, guid: 1111b87b5ee31a442acb9b40120e61b6, type: 3}
+    size: {x: 210, y: 190}
+    slot: 6
+  - id: halloween_ghostbatgarland
+    displayName: Ghost Garland
+    skin: Halloween
+    price: 250
+    sprite: {fileID: 21300000, guid: b4f8f3a1f2bde784e87aa09518bbdd54, type: 3}
+    size: {x: 620, y: 260}
+    slot: 2
+  - id: beach_palmplant
+    displayName: Tropical Palm
+    skin: Beach
+    price: 400
+    sprite: {fileID: 21300000, guid: cebfee818d6592e40927701037e3284b, type: 3}
+    size: {x: 260, y: 320}
+    slot: 1
+  - id: beach_surfboard
+    displayName: Surfboard
+    skin: Beach
+    price: 250
+    sprite: {fileID: 21300000, guid: 362d13514ff4eb54b9c203f82935c656, type: 3}
+    size: {x: 200, y: 490}
+    slot: 3
+  - id: jungle_bananaplant
+    displayName: Jungle Plant
+    skin: Jungle
+    price: 400
+    sprite: {fileID: 21300000, guid: 942c0b28a4473f54191ec197ecfe4e13, type: 3}
+    size: {x: 260, y: 320}
+    slot: 1
+  - id: jungle_hangingvine
+    displayName: Hanging Vines
+    skin: Jungle
+    price: 250
+    sprite: {fileID: 21300000, guid: 7bef9cbd5af385548b22712beec9ee87, type: 3}
+    size: {x: 620, y: 260}
+    slot: 2
+  - id: cafe_coffeemachine
+    displayName: Coffee Machine
+    skin: Cozy
+    price: 450
+    sprite: {fileID: 21300000, guid: bedafe4cad0b8a8419860fd7c42e46f0, type: 3}
+    size: {x: 240, y: 240}
+    slot: 4
+  - id: cafe_catchair
+    displayName: Cat Chair
+    skin: Cozy
+    price: 350
+    sprite: {fileID: 21300000, guid: 4aeac8c35326ff74eb51f26d1a54f2ec, type: 3}
+    size: {x: 230, y: 260}
+    slot: 7
+  - id: japan_luckycat
+    displayName: Lucky Cat
+    skin: Japan
+    price: 300
+    sprite: {fileID: 21300000, guid: 4007612317a0918479523f416732f06d, type: 3}
+    size: {x: 190, y: 230}
+    slot: 4
+  - id: japan_teaset
+    displayName: Tea Set
+    skin: Japan
+    price: 350
+    sprite: {fileID: 21300000, guid: 31feb1bcb7b46b14ca6fad69d95898d2, type: 3}
+    size: {x: 300, y: 190}
+    slot: 5
+  - id: winter_giftboxes
+    displayName: Holiday Gifts
+    skin: Winter
+    price: 300
+    sprite: {fileID: 21300000, guid: ea3b21325c952c641b4597979273dfb0, type: 3}
+    size: {x: 280, y: 220}
+    slot: 6
+  - id: winter_tablelamp
+    displayName: Warm Table Lamp
+    skin: Winter
+    price: 350
+    sprite: {fileID: 21300000, guid: 8fec63f840520c4408aadc97db79a986, type: 3}
+    size: {x: 170, y: 310}
+    slot: 4
+  - id: tet_chungcakes
+    displayName: Chung Cakes
+    skin: Tet
+    price: 300
+    sprite: {fileID: 21300000, guid: cb87d9969ecfbcc409506f0019bfa1c1, type: 3}
+    size: {x: 280, y: 260}
+    slot: 6
+  - id: tet_tettray
+    displayName: Tet Treat Tray
+    skin: Tet
+    price: 350
+    sprite: {fileID: 21300000, guid: 1997a4c2ab4876647b107191d2d4687b, type: 3}
+    size: {x: 300, y: 200}
+    slot: 5
+  - id: halloween_witchhat
+    displayName: Witch Hat
+    skin: Halloween
+    price: 250
+    sprite: {fileID: 21300000, guid: 02f3c4486f0113c48b4ed0c2502b08ff, type: 3}
+    size: {x: 230, y: 210}
+    slot: 8
+  - id: halloween_candybowl
+    displayName: Candy Bowl
+    skin: Halloween
+    price: 300
+    sprite: {fileID: 21300000, guid: f8cf4179e682aa849b5c82d2b388e30d, type: 3}
+    size: {x: 230, y: 200}
+    slot: 5
+  - id: beach_coconutdrink
+    displayName: Coconut Drink
+    skin: Beach
+    price: 250
+    sprite: {fileID: 21300000, guid: 2573cca0dcb72a742a7358502ecfb6e0, type: 3}
+    size: {x: 180, y: 190}
+    slot: 5
+  - id: beach_strawhat
+    displayName: Beach Straw Hat
+    skin: Beach
+    price: 250
+    sprite: {fileID: 21300000, guid: dfb85c595d2c5a74183ffee602195412, type: 3}
+    size: {x: 220, y: 170}
+    slot: 8
+  - id: jungle_fern
+    displayName: Forest Fern
+    skin: Jungle
+    price: 350
+    sprite: {fileID: 21300000, guid: b9d5c4ca05f9b3c459bf1af2368b4cd1, type: 3}
+    size: {x: 320, y: 300}
+    slot: 1
+  - id: jungle_fruitbowl
+    displayName: Tropical Fruit Bowl
+    skin: Jungle
+    price: 300
+    sprite: {fileID: 21300000, guid: bfcfd76c2d92b4d47bd23e3942fcbc49, type: 3}
+    size: {x: 260, y: 200}
+    slot: 5
+  decorationSlots:
+  - backgroundId: cafe
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: cafe
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: cafe
+    slot: 3
+    position: {x: 0.82, y: 0.7}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 190, y: 240}
+  - backgroundId: cafe
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: cafe
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: cafe
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: cafe
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: cafe
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: japan
+    slot: 1
+    position: {x: 0.28, y: 0.25}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: japan
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: japan
+    slot: 3
+    position: {x: 0.19, y: 0.87}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: japan
+    slot: 4
+    position: {x: 0.15, y: 0.425}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: japan
+    slot: 5
+    position: {x: 0.935, y: 0.38}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: japan
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: japan
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: japan
+    slot: 8
+    position: {x: 0.13, y: 0.23}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: winter
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: winter
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: winter
+    slot: 3
+    position: {x: 0.94, y: 0.6}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: winter
+    slot: 4
+    position: {x: 0.155, y: 0.425}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: winter
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: winter
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: winter
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: winter
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: tet
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: tet
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: tet
+    slot: 3
+    position: {x: 0.27, y: 0.87}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: tet
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: tet
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: tet
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: tet
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: tet
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: halloween
+    slot: 1
+    position: {x: 0.33, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: halloween
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: halloween
+    slot: 3
+    position: {x: 0.94, y: 0.6}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: halloween
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: halloween
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: halloween
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: halloween
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: halloween
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: beach
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: beach
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: beach
+    slot: 3
+    position: {x: 0.94, y: 0.6}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: beach
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: beach
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: beach
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: beach
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: beach
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: jungle
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: jungle
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: jungle
+    slot: 3
+    position: {x: 0.27, y: 0.87}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: jungle
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: jungle
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: jungle
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: jungle
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: jungle
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  dailyRewards:
+  - coins: 100
+    hints: 0
+    shuffles: 0
+  - coins: 0
+    hints: 1
+    shuffles: 0
+  - coins: 150
+    hints: 0
+    shuffles: 0
+  - coins: 0
+    hints: 0
+    shuffles: 1
+  - coins: 200
+    hints: 0
+    shuffles: 0
+  - coins: 0
+    hints: 1
+    shuffles: 1
+  - coins: 500
+    hints: 2
+    shuffles: 2

@@ -31,14 +31,15 @@ public static class DefaultBackgroundSync
         var config=Resources.Load<EconomyConfig>("EconomyConfig");
         if(!config || config.backgrounds==null) return;
         foreach(var item in config.backgrounds)
-            if(item!=null && item.id=="garden")
+            if(item!=null && item.id==EconomyStore.DefaultBackgroundId)
             {
-                if(item.sprite!=sprite)
+                if((item.baseSprite ? item.baseSprite : item.sprite)!=sprite)
                 {
                     Undo.RecordObject(config,"Change default game background");
-                    item.sprite=sprite;EditorUtility.SetDirty(config);AssetDatabase.SaveAssets();
+                    if(item.baseSprite) item.baseSprite=sprite;else item.sprite=sprite;
+                    EditorUtility.SetDirty(config);AssetDatabase.SaveAssets();
                 }
-                EconomyStore.TryEquipBackground("garden");
+                EconomyStore.TryEquipBackground(EconomyStore.DefaultBackgroundId);
                 break;
             }
     }

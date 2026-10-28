@@ -1,0 +1,158 @@
+{
+  "items": [
+    {
+      "id": "cafe_coffeemachine",
+      "displayName": "Coffee Machine",
+      "skin": "Cozy",
+      "price": 450,
+      "size": {
+        "x": 240,
+        "y": 240
+      },
+      "path": "Assets/Art/Decorations/Cozy/CoffeeMachine.png"
+    },
+    {
+      "id": "cafe_catchair",
+      "displayName": "Cat Chair",
+      "skin": "Cozy",
+      "price": 350,
+      "size": {
+        "x": 230,
+        "y": 260
+      },
+      "path": "Assets/Art/Decorations/Cozy/CatChair.png"
+    },
+    {
+      "id": "japan_luckycat",
+      "displayName": "Lucky Cat",
+      "skin": "Japan",
+      "price": 300,
+      "size": {
+        "x": 190,
+        "y": 230
+      },
+      "path": "Assets/Art/Decorations/Japan/LuckyCat.png"
+    },
+    {
+      "id": "japan_teaset",
+      "displayName": "Tea Set",
+      "skin": "Japan",
+      "price": 350,
+      "size": {
+        "x": 300,
+        "y": 190
+      },
+      "path": "Assets/Art/Decorations/Japan/TeaSet.png"
+    },
+    {
+      "id": "winter_giftboxes",
+      "displayName": "Holiday Gifts",
+      "skin": "Winter",
+      "price": 300,
+      "size": {
+        "x": 280,
+        "y": 220
+      },
+      "path": "Assets/Art/Decorations/Winter/GiftBoxes.png"
+    },
+    {
+      "id": "winter_tablelamp",
+      "displayName": "Warm Table Lamp",
+      "skin": "Winter",
+      "price": 350,
+      "size": {
+        "x": 170,
+        "y": 310
+      },
+      "path": "Assets/Art/Decorations/Winter/TableLamp.png"
+    },
+    {
+      "id": "tet_chungcakes",
+      "displayName": "Chung Cakes",
+      "skin": "Tet",
+      "price": 300,
+      "size": {
+        "x": 280,
+        "y": 260
+      },
+      "path": "Assets/Art/Decorations/Tet/ChungCakes.png"
+    },
+    {
+      "id": "tet_tettray",
+      "displayName": "Tet Treat Tray",
+      "skin": "Tet",
+      "price": 350,
+      "size": {
+        "x": 300,
+        "y": 200
+      },
+      "path": "Assets/Art/Decorations/Tet/TetTray.png"
+    },
+    {
+      "id": "halloween_witchhat",
+      "displayName": "Witch Hat",
+      "skin": "Halloween",
+      "price": 250,
+      "size": {
+        "x": 230,
+        "y": 210
+      },
+      "path": "Assets/Art/Decorations/Halloween/WitchHat.png"
+    },
+    {
+      "id": "halloween_candybowl",
+      "displayName": "Candy Bowl",
+      "skin": "Halloween",
+      "price": 300,
+      "size": {
+        "x": 230,
+        "y": 200
+      },
+      "path": "Assets/Art/Decorations/Halloween/CandyBowl.png"
+    },
+    {
+      "id": "beach_coconutdrink",
+      "displayName": "Coconut Drink",
+      "skin": "Beach",
+      "price": 250,
+      "size": {
+        "x": 180,
+        "y": 190
+      },
+      "path": "Assets/Art/Decorations/Beach/CoconutDrink.png"
+    },
+    {
+      "id": "beach_strawhat",
+      "displayName": "Beach Straw Hat",
+      "skin": "Beach",
+      "price": 250,
+      "size": {
+        "x": 220,
+        "y": 170
+      },
+      "path": "Assets/Art/Decorations/Beach/StrawHat.png"
+    },
+    {
+      "id": "jungle_fern",
+      "displayName": "Forest Fern",
+      "skin": "Jungle",
+      "price": 350,
+      "size": {
+        "x": 320,
+        "y": 300
+      },
+      "path": "Assets/Art/Decorations/Jungle/Fern.png"
+    },
+    {
+      "id": "jungle_fruitbowl",
+      "displayName": "Tropical Fruit Bowl",
+      "skin": "Jungle",
+      "price": 300,
+      "size": {
+        "x": 260,
+        "y": 200
+      },
+      "path": "Assets/Art/Decorations/Jungle/FruitBowl.png"
+    }
+  ]
+}

@@ -26,12 +26,15 @@ public sealed class BoardLogic
     public BoardCell GetCell(int x, int y) => cells[x, y];
     private bool Inside(Vector2Int p) => p.x >= 0 && p.x < Columns && p.y >= 0 && p.y < Rows;
 
-    public bool CanMatch(Vector2Int a, Vector2Int b)
+    public bool CanMatch(Vector2Int a, Vector2Int b) => TryGetMatchPath(a,b,null);
+
+    public bool TryGetMatchPath(Vector2Int a, Vector2Int b, List<Vector2Int> path)
     {
+        path?.Clear();
         if (a == b || !Inside(a) || !Inside(b)) return false;
         var first = cells[a.x,a.y];
         var second = cells[b.x,b.y];
-        return first.Selectable && second.Selectable && first.animalID == second.animalID && HasPath(a,b);
+        return first.Selectable && second.Selectable && first.animalID == second.animalID && FindPath(a,b,path);
     }
 
     public bool TryFindPair(out Vector2Int first, out Vector2Int second)
@@ -50,35 +53,59 @@ public sealed class BoardLogic
         return false;
     }
 
-    public bool HasPath(Vector2Int first, Vector2Int second)
+    public bool HasPath(Vector2Int first, Vector2Int second) => FindPath(first,second,null);
+
+    private bool FindPath(Vector2Int first, Vector2Int second, List<Vector2Int> path)
     {
         int x1=first.x, y1=first.y, x2=second.x, y2=second.y;
-        if (first == second) return false;
-        if (x1 == x2 && CheckLine(x1,y1,x2,y2)) return true;
-        if (y1 == y2 && CheckLine(x1,y1,x2,y2)) return true;
-        if (IsEmpty(x1,y2) && CheckLine(x1,y1,x1,y2) && CheckLine(x1,y2,x2,y2)) return true;
-        if (IsEmpty(x2,y1) && CheckLine(x1,y1,x2,y1) && CheckLine(x2,y1,x2,y2)) return true;
+        if (first == second || !Inside(first) || !Inside(second)) return false;
+        if (x1 == x2 && CheckLine(x1,y1,x2,y2)) return StorePath(path,first,first,second,second);
+        if (y1 == y2 && CheckLine(x1,y1,x2,y2)) return StorePath(path,first,first,second,second);
+        var corner=new Vector2Int(x1,y2);
+        if (IsEmpty(x1,y2) && CheckLine(x1,y1,x1,y2) && CheckLine(x1,y2,x2,y2)) return StorePath(path,first,corner,corner,second);
+        corner=new Vector2Int(x2,y1);
+        if (IsEmpty(x2,y1) && CheckLine(x1,y1,x2,y1) && CheckLine(x2,y1,x2,y2)) return StorePath(path,first,corner,corner,second);
         for(int x=x1+1; x<=Columns; x++)
         {
             if(!IsEmpty(x,y1)) break;
-            if(IsEmpty(x,y2) && CheckLine(x,y1,x,y2) && CheckLine(x,y2,x2,y2)) return true;
+            if(IsEmpty(x,y2) && CheckLine(x,y1,x,y2) && CheckLine(x,y2,x2,y2))
+                return StorePath(path,first,new Vector2Int(x,y1),new Vector2Int(x,y2),second);
         }
         for(int x=x1-1; x>=-1; x--)
         {
             if(!IsEmpty(x,y1)) break;
-            if(IsEmpty(x,y2) && CheckLine(x,y1,x,y2) && CheckLine(x,y2,x2,y2)) return true;
+            if(IsEmpty(x,y2) && CheckLine(x,y1,x,y2) && CheckLine(x,y2,x2,y2))
+                return StorePath(path,first,new Vector2Int(x,y1),new Vector2Int(x,y2),second);
         }
         for(int y=y1+1; y<=Rows; y++)
         {
             if(!IsEmpty(x1,y)) break;
-            if(IsEmpty(x2,y) && CheckLine(x1,y,x2,y) && CheckLine(x2,y,x2,y2)) return true;
+            if(IsEmpty(x2,y) && CheckLine(x1,y,x2,y) && CheckLine(x2,y,x2,y2))
+                return StorePath(path,first,new Vector2Int(x1,y),new Vector2Int(x2,y),second);
         }
         for(int y=y1-1; y>=-1; y--)
         {
             if(!IsEmpty(x1,y)) break;
-            if(IsEmpty(x2,y) && CheckLine(x1,y,x2,y) && CheckLine(x2,y,x2,y2)) return true;
+            if(IsEmpty(x2,y) && CheckLine(x1,y,x2,y) && CheckLine(x2,y,x2,y2))
+                return StorePath(path,first,new Vector2Int(x1,y),new Vector2Int(x2,y),second);
         }
         return false;
+    }
+
+    private static bool StorePath(List<Vector2Int> path,Vector2Int first,Vector2Int a,Vector2Int b,Vector2Int last)
+    {
+        if(path==null) return true;
+        AddPoint(path,first);AddPoint(path,a);AddPoint(path,b);AddPoint(path,last);
+        return true;
+    }
+
+    private static void AddPoint(List<Vector2Int> path,Vector2Int point)
+    {
+        int count=path.Count;
+        if(count>0 && path[count-1]==point) return;
+        if(count>1 && ((path[count-2].x==point.x && path[count-1].x==point.x) ||
+            (path[count-2].y==point.y && path[count-1].y==point.y))) path[count-1]=point;
+        else path.Add(point);
     }
 
     private bool CheckLine(int x1,int y1,int x2,int y2)

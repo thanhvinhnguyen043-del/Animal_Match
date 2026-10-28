@@ -11,7 +11,12 @@ public class PlayerInventory
     public int hints;
     public int shuffles;
     public List<string> ownedBackgrounds=new List<string>();
-    public string selectedBackground="garden";
+    public string selectedBackground=EconomyStore.DefaultBackgroundId;
+    public List<string> ownedDecorations=new List<string>();
+    public List<RoomLayout> roomLayouts=new List<RoomLayout>();
+    public int dailyRewardsClaimed;
+    public string dailyRewardLastClaimDate;
+    public CareerProgress career=new CareerProgress();
 }
 
 public struct LevelReward
@@ -31,6 +36,7 @@ public struct LevelReward
 public static class EconomyStore
 {
     public const string SaveKey="Economy.Profile.v1";
+    public const string DefaultBackgroundId="cafe";
     public static event Action InventoryChanged;
     public static EconomyConfig Config => Resources.Load<EconomyConfig>("EconomyConfig");
     public static PlayerInventory Inventory => Load();
@@ -50,18 +56,26 @@ public static class EconomyStore
             Sanitize(inventory);
             Save(inventory,false);
         }
-        else Sanitize(inventory);
+        else if(Sanitize(inventory)) Save(inventory,false);
         return inventory;
     }
-    private static void Sanitize(PlayerInventory inventory)
+    private static bool Sanitize(PlayerInventory inventory)
     {
+        bool changed=inventory.coins<0 || inventory.hints<0 || inventory.shuffles<0;
         inventory.coins=Mathf.Max(0,inventory.coins);
         inventory.hints=Mathf.Max(0,inventory.hints);
         inventory.shuffles=Mathf.Max(0,inventory.shuffles);
-        if(inventory.ownedBackgrounds==null) inventory.ownedBackgrounds=new List<string>();
-        if(!inventory.ownedBackgrounds.Contains("garden")) inventory.ownedBackgrounds.Add("garden");
+        if(inventory.ownedBackgrounds==null) { inventory.ownedBackgrounds=new List<string>(); changed=true; }
+        if(inventory.ownedDecorations==null) { inventory.ownedDecorations=new List<string>(); changed=true; }
+        if(inventory.roomLayouts==null) { inventory.roomLayouts=new List<RoomLayout>(); changed=true; }
+        for(int index=inventory.ownedBackgrounds.Count-1;index>=0;index--)
+            if(inventory.ownedBackgrounds[index]=="garden" || inventory.ownedBackgrounds[index]=="sunset")
+            { inventory.ownedBackgrounds.RemoveAt(index); changed=true; }
+        if(!inventory.ownedBackgrounds.Contains(DefaultBackgroundId))
+        { inventory.ownedBackgrounds.Add(DefaultBackgroundId); changed=true; }
         if(!inventory.ownedBackgrounds.Contains(inventory.selectedBackground) || FindBackground(inventory.selectedBackground)==null)
-            inventory.selectedBackground="garden";
+        { inventory.selectedBackground=DefaultBackgroundId; changed=true; }
+        return CareerStore.Sanitize(inventory) || changed;
     }
     private static void Save(PlayerInventory inventory,bool notify=true)
     {
@@ -69,6 +83,12 @@ public static class EconomyStore
         if(notify) InventoryChanged?.Invoke();
     }
     private static int Add(int value,int amount) => (int)Math.Min(int.MaxValue,(long)value+Mathf.Max(0,amount));
+    internal static void AddReward(PlayerInventory inventory,LevelReward reward)
+    {
+        inventory.coins=Add(inventory.coins,reward.coins);inventory.hints=Add(inventory.hints,reward.hints);inventory.shuffles=Add(inventory.shuffles,reward.shuffles);
+    }
+    internal static void UpdateCareer(Action<PlayerInventory> change) {var inventory=Load();change(inventory);Save(inventory);}
+    internal static void UpdateCareer(Func<PlayerInventory,bool> change) {var inventory=Load();if(change(inventory)) Save(inventory);}
 #if UNITY_EDITOR
     public static PlayerInventory AdminAdjustInventory(int coins,int hints,int shuffles)
     {
@@ -84,8 +104,8 @@ public static class EconomyStore
     {
         var inventory=Load();
         inventory.ownedBackgrounds.Clear();
-        inventory.ownedBackgrounds.Add("garden");
-        inventory.selectedBackground="garden";
+        inventory.ownedBackgrounds.Add(DefaultBackgroundId);
+        inventory.selectedBackground=DefaultBackgroundId;
         Save(inventory);
         return inventory;
     }
@@ -114,6 +134,19 @@ public static class EconomyStore
             inventory.shuffles--;
         }
         Save(inventory); return true;
+    }
+    public static DailyRewardStatus DailyStatus => DailyRewardSchedule.Status(Load(),DateTime.Now);
+    public static bool TryClaimDailyReward(out LevelReward reward,out string message) => ClaimDailyReward(DateTime.Now,out reward,out message);
+    private static bool ClaimDailyReward(DateTime now,out LevelReward reward,out string message)
+    {
+        var inventory=Load();var status=DailyRewardSchedule.Status(inventory,now);reward=default;
+        if(!status.canClaim) {message="Today's reward is already collected. Come back on the next day!";return false;}
+        var item=DailyRewardSchedule.Reward(status.day);
+        reward=new LevelReward {coins=Mathf.Max(0,item.coins),hints=Mathf.Max(0,item.hints),shuffles=Mathf.Max(0,item.shuffles)};
+        inventory.coins=Add(inventory.coins,reward.coins);inventory.hints=Add(inventory.hints,reward.hints);inventory.shuffles=Add(inventory.shuffles,reward.shuffles);
+        inventory.dailyRewardsClaimed=status.day;inventory.dailyRewardLastClaimDate=now.ToString(DailyRewardSchedule.DateFormat,System.Globalization.CultureInfo.InvariantCulture);
+        inventory.career.counters.dailyClaims++;
+        Save(inventory);message="Day "+status.day+" collected! "+reward.DisplayText();return true;
     }
     public static bool TryBuyBooster(BoosterType type,out string message)
     {
@@ -154,5 +187,57 @@ public static class EconomyStore
         var inventory=Load(); var item=FindBackground(id);
         if(item==null || !item.sprite || !inventory.ownedBackgrounds.Contains(id)) return false;
         inventory.selectedBackground=id; Save(inventory); return true;
+    }
+    public static DecorationItem FindDecoration(string id)
+    {
+        var config=Config;
+        if(config && config.decorations!=null)
+            foreach(var item in config.decorations) if(item!=null && item.id==id) return item;
+        return null;
+    }
+    public static bool TryBuyDecoration(string id,out string message)
+    {
+        var item=FindDecoration(id);var inventory=Load();
+        if(item==null || !item.sprite) {message="This decoration is unavailable.";return false;}
+        if(inventory.ownedDecorations.Contains(id)) {message="Already in your inventory.";return false;}
+        int cost=Mathf.Max(0,item.price);
+        if(inventory.coins<cost) {message="Not enough coins.";return false;}
+        inventory.coins-=cost;inventory.ownedDecorations.Add(id);Save(inventory);
+        message="Purchased! Open DECORATE to place it.";return true;
+    }
+    public static RoomLayout GetRoomLayout(string backgroundId)
+    {
+        var inventory=Load();var result=new RoomLayout {backgroundId=backgroundId};
+        var saved=inventory.roomLayouts.Find(r=>r!=null && r.backgroundId==backgroundId);
+        if(saved!=null && saved.items!=null)
+            foreach(var item in saved.items)
+            {
+                var definition=item==null ? null : FindDecoration(item.itemId);
+                if(definition==null || definition.slot==DecorationSlot.None || !inventory.ownedDecorations.Contains(item.itemId)) continue;
+                result.items.RemoveAll(p=>FindDecoration(p.itemId).slot==definition.slot);
+                result.items.Add(SlotPlacement(item.itemId,backgroundId));
+            }
+        return result;
+    }
+    public static DecorationPlacement SlotPlacement(string id,string backgroundId)
+    {
+        var definition=FindDecoration(id);var anchor=DecorationSlots.Anchor(backgroundId,definition.slot);
+        return new DecorationPlacement {itemId=id,x=anchor.position.x,y=anchor.position.y,scale=1,flipped=false};
+    }
+    public static bool SaveRoomLayout(RoomLayout layout)
+    {
+        if(layout==null) return false;
+        var inventory=Load();
+        if(!inventory.ownedBackgrounds.Contains(layout.backgroundId) || FindBackground(layout.backgroundId)==null) return false;
+        var clean=new RoomLayout {backgroundId=layout.backgroundId};
+        if(layout.items!=null) foreach(var item in layout.items)
+        {
+            var definition=item==null ? null : FindDecoration(item.itemId);
+            if(definition==null || definition.slot==DecorationSlot.None || !inventory.ownedDecorations.Contains(item.itemId) ||
+                clean.items.Exists(p=>FindDecoration(p.itemId).slot==definition.slot)) return false;
+            clean.items.Add(SlotPlacement(item.itemId,layout.backgroundId));
+        }
+        inventory.roomLayouts.RemoveAll(r=>r!=null && r.backgroundId==layout.backgroundId);
+        inventory.roomLayouts.Add(clean);Save(inventory);return true;
     }
 }

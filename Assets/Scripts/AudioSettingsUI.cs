@@ -20,6 +20,7 @@ public class AudioSettingsUI : MonoBehaviour
 
     private void Start()
     {
+        LoadingVolumeStyle.Apply(this);
         masterBus = RuntimeManager.GetBus("bus:/");
         musicBus = RuntimeManager.GetBus("bus:/Music");
         sfxBus = RuntimeManager.GetBus("bus:/SFX");

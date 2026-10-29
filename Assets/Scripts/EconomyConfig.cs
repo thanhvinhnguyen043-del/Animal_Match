@@ -8,6 +8,7 @@ public class ShopBackground
     public string displayName;
     [Min(0)] public int price;
     [Min(0)] public int requiredCompletedLevel;
+    public bool rewardOnly;
     public Sprite sprite;
     public Sprite baseSprite;
 }
@@ -24,5 +25,7 @@ public class EconomyConfig : ScriptableObject
     public ShopBackground[] backgrounds=new ShopBackground[0];
     public DecorationItem[] decorations=new DecorationItem[0];
     public DecorationSlotAnchor[] decorationSlots=new DecorationSlotAnchor[0];
+    public RoomCollection[] roomCollections=new RoomCollection[0];
+    public RoomRewardDefinition[] roomRewards=new RoomRewardDefinition[0];
     public DailyReward[] dailyRewards=DailyRewardSchedule.CreateDefaults();
 }

@@ -177,7 +177,9 @@ public static class DecorationBuilder
                 if(n==11) items[n].size=new Vector2(200,490);
             }
         }
-        config.decorations=items;EditorUtility.SetDirty(config);RefreshCatalog();
+        var catalogItems=(config.decorations ?? new DecorationItem[0]).ToList();
+        foreach(var item in items) if(!catalogItems.Any(existing=>existing.id==item.id)) catalogItems.Add(item);
+        config.decorations=catalogItems.ToArray();EditorUtility.SetDirty(config);RefreshCatalog();
         var studio=shop.gameObject.AddComponent<DecorationStudio>();studio.shop=shop;shop.decorations=studio;
         var prior=shop.panel.transform.Find("Decorations");if(prior) Object.DestroyImmediate(prior.gameObject);
         var page=Rect(shop.panel.transform,"Decorations",0,0,1920,1080);shop.decorationPage=page.gameObject;

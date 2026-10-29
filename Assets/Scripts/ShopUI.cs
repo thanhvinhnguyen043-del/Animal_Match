@@ -62,6 +62,12 @@ public class ShopUI : MonoBehaviour
                 if(card==null || !card.button) continue;
                 string id=card.id;
                 card.button.onClick.AddListener(()=>SelectBackground(id));
+                if(card.preview)
+                {
+                    card.preview.raycastTarget=true;
+                    var previewButton=card.preview.GetComponent<Button>();if(!previewButton) previewButton=card.preview.gameObject.AddComponent<Button>();
+                    previewButton.targetGraphic=card.preview;previewButton.onClick.AddListener(()=>decorations.preview.OpenBackground(id));
+                }
             }
         if(panel) panel.SetActive(false);
         Refresh();
@@ -73,6 +79,7 @@ public class ShopUI : MonoBehaviour
         session.OpenShop();
         mainMenuPanel.gameObject.SetActive(false);
         panel.SetActive(true);
+        CafePanelStyle.Shop(panel.transform);
         panel.transform.SetAsLastSibling();
         Canvas.ForceUpdateCanvases();
         var canvas=panel.GetComponent<Canvas>();
@@ -85,6 +92,7 @@ public class ShopUI : MonoBehaviour
     public void Close()
     {
         if(!IsOpen) return;
+        if(decorations && decorations.preview) decorations.preview.Close();
         panel.SetActive(false);
         if(mainMenuPanel)
         {
@@ -98,6 +106,7 @@ public class ShopUI : MonoBehaviour
     public void ShowBoosters() { showingBackgrounds=false;showingDecorations=false; RefreshPages(); }
     public void ShowBackgrounds() { showingBackgrounds=true;showingDecorations=false; backgroundPage=0; RefreshPages(); }
     public void ShowDecorations() {showingBackgrounds=false;showingDecorations=true;backgroundPage=0;RefreshPages();}
+    public void ShowAccessoryPage(int page) {showingBackgrounds=false;showingDecorations=true;backgroundPage=page;RefreshPages();}
     public void NextBackgroundPage() { backgroundPage++; RefreshPages(); }
     public void PreviousBackgroundPage() { backgroundPage--; RefreshPages(); }
     private void RefreshPages()
@@ -131,6 +140,7 @@ public class ShopUI : MonoBehaviour
             backgroundPageText.gameObject.SetActive(showingBackgrounds || showingDecorations);
             backgroundPageText.text=(backgroundPage+1)+" / "+pageCount;
         }
+        var sizing=GetComponent<CacaoArtSizing>();if(sizing) sizing.Apply();
     }
     private void BuyBooster(BoosterType booster)
     {
@@ -171,8 +181,10 @@ public class ShopUI : MonoBehaviour
                 if(card==null) continue;
                 var item=EconomyStore.FindBackground(card.id);
                 UpdateBackgroundButton(card.id,card.button,card.buttonText,inventory,item);
-                bool locked=item!=null && !inventory.ownedBackgrounds.Contains(card.id) && !EconomyStore.IsBackgroundUnlocked(item);
+                bool rewardLocked=item!=null && item.rewardOnly && !inventory.ownedBackgrounds.Contains(card.id);
+                bool locked=rewardLocked || item!=null && !inventory.ownedBackgrounds.Contains(card.id) && !EconomyStore.IsBackgroundUnlocked(item);
                 if(card.description) card.description.text=locked ? (boosterPage ? "Unlock to buy" : "Complete level "+item.requiredCompletedLevel+" to unlock purchase") : card.id==EconomyStore.DefaultBackgroundId ? "Included" : inventory.ownedBackgrounds.Contains(card.id) ? "Owned" : "Permanent background";
+                if(card.description && item!=null && item.rewardOnly) card.description.text=inventory.ownedBackgrounds.Contains(card.id) ? "Chapter reward - owned" : RoomProgress.SourceForBackground(card.id);
                 if(card.preview)
                 {
                     if(item!=null && item.sprite) card.preview.sprite=item.baseSprite ? item.baseSprite : item.sprite;
@@ -209,6 +221,11 @@ public class ShopUI : MonoBehaviour
         if(label) label.text=!unlocked && item!=null ? "LOCKED • LEVEL "+item.requiredCompletedLevel : selected ? "EQUIPPED" : owned ? "USE" : "BUY • "+price+" COIN";
         if(label && boosterPage) label.text=!unlocked && item!=null ? "LEVEL "+item.requiredCompletedLevel : selected ? "EQUIPPED" : owned ? "USE" : "BUY "+price.ToString("N0");
         if(button) button.interactable=item!=null && !selected && unlocked && (owned || inventory.coins>=price);
+        if(item!=null && item.rewardOnly && !owned)
+        {
+            if(label) label.text="CHAPTER REWARD";
+            if(button) button.interactable=false;
+        }
     }
     private void OnDestroy()
     {

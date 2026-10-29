@@ -23,44 +23,93 @@ MonoBehaviour:
     displayName: Cozy Cafe
     price: 0
     requiredCompletedLevel: 0
+    rewardOnly: 0
     sprite: {fileID: 21300000, guid: d382d35218f77e246aab0ea18cce8fb0, type: 3}
     baseSprite: {fileID: 21300000, guid: deef8b9cb0d6ef64ca32201a0ce63a31, type: 3}
   - id: japan
     displayName: Japan Cafe
     price: 2000
     requiredCompletedLevel: 0
+    rewardOnly: 1
     sprite: {fileID: 21300000, guid: a4f80bd2e648bcb48953cfcf54efb2a1, type: 3}
     baseSprite: {fileID: 21300000, guid: b6bf82cb8ff4f0d41b2b584dba306546, type: 3}
   - id: winter
     displayName: Winter Cafe
     price: 2000
-    requiredCompletedLevel: 10
+    requiredCompletedLevel: 0
+    rewardOnly: 1
     sprite: {fileID: 21300000, guid: 86761ffceb5e10a429e0c2efdf2ee54f, type: 3}
     baseSprite: {fileID: 21300000, guid: 7f78a0fb2dc8ba547a3bed63dbad1b12, type: 3}
   - id: tet
     displayName: Vietnamese Tet Cafe
     price: 2000
-    requiredCompletedLevel: 20
+    requiredCompletedLevel: 5
+    rewardOnly: 0
     sprite: {fileID: 21300000, guid: d01da84738832bc4b9b5aa4710e66848, type: 3}
     baseSprite: {fileID: 21300000, guid: d42a382886d171044bf581892eecc470, type: 3}
   - id: halloween
     displayName: Halloween Cafe
     price: 2000
-    requiredCompletedLevel: 30
+    requiredCompletedLevel: 10
+    rewardOnly: 0
     sprite: {fileID: 21300000, guid: 3c7b5558766037b429d1d5cb79c46ed4, type: 3}
     baseSprite: {fileID: 21300000, guid: e8865c6db00d74341bf7ed1b808a2d86, type: 3}
   - id: beach
     displayName: Beach Cafe
     price: 2000
-    requiredCompletedLevel: 40
+    requiredCompletedLevel: 15
+    rewardOnly: 0
     sprite: {fileID: 21300000, guid: a606c83421e3d5a4798c68a4979ce4f0, type: 3}
     baseSprite: {fileID: 21300000, guid: 6c0817aac7269df41b8426c5c0cd994c, type: 3}
   - id: jungle
     displayName: Jungle Cafe
     price: 2000
-    requiredCompletedLevel: 50
+    requiredCompletedLevel: 0
+    rewardOnly: 1
     sprite: {fileID: 21300000, guid: e106dab627df3f247a84e68b35cf6232, type: 3}
     baseSprite: {fileID: 21300000, guid: 6ce6d18079b04c94da8b3cbbc807ba47, type: 3}
+  - id: moonlight
+    displayName: Moonlight Cafe
+    price: 2400
+    requiredCompletedLevel: 0
+    rewardOnly: 1
+    sprite: {fileID: 21300000, guid: bc82580853fd02b4ea84d6c9383b0e14, type: 3}
+    baseSprite: {fileID: 21300000, guid: bc82580853fd02b4ea84d6c9383b0e14, type: 3}
+  - id: bakery
+    displayName: Sweet Bakery Cafe
+    price: 2400
+    requiredCompletedLevel: 0
+    rewardOnly: 0
+    sprite: {fileID: 21300000, guid: 39610728781dcfd498a86d6fd3648e4f, type: 3}
+    baseSprite: {fileID: 21300000, guid: 39610728781dcfd498a86d6fd3648e4f, type: 3}
+  - id: aquarium
+    displayName: Aquarium Cafe
+    price: 2400
+    requiredCompletedLevel: 0
+    rewardOnly: 0
+    sprite: {fileID: 21300000, guid: 294519dc341606f4aa05110ea15c89e9, type: 3}
+    baseSprite: {fileID: 21300000, guid: 294519dc341606f4aa05110ea15c89e9, type: 3}
+  - id: greenhouse
+    displayName: Greenhouse Cafe
+    price: 2400
+    requiredCompletedLevel: 0
+    rewardOnly: 0
+    sprite: {fileID: 21300000, guid: 3a47920d28531b143b6699c856cbda32, type: 3}
+    baseSprite: {fileID: 21300000, guid: 3a47920d28531b143b6699c856cbda32, type: 3}
+  - id: magiclibrary
+    displayName: Magic Library Cafe
+    price: 2400
+    requiredCompletedLevel: 0
+    rewardOnly: 0
+    sprite: {fileID: 21300000, guid: 112cac1087fd9e44bb4fd2a6790035ee, type: 3}
+    baseSprite: {fileID: 21300000, guid: 112cac1087fd9e44bb4fd2a6790035ee, type: 3}
+  - id: cloud
+    displayName: Cloud Cafe
+    price: 2400
+    requiredCompletedLevel: 0
+    rewardOnly: 0
+    sprite: {fileID: 21300000, guid: e15912e5c301ab14dbd008ebdf9a4709, type: 3}
+    baseSprite: {fileID: 21300000, guid: e15912e5c301ab14dbd008ebdf9a4709, type: 3}
   decorations:
   - id: cafe_catplant
     displayName: Cat Planter
@@ -69,6 +118,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: baf174d1214964e42b3369fbc8f24a96, type: 3}
     size: {x: 260, y: 320}
     slot: 1
+    rewardOnly: 0
   - id: cafe_catpicture
     displayName: Cat Portrait
     skin: Cozy
@@ -76,6 +126,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 22be0c49df95e6d41bad4e5c34f79253, type: 3}
     size: {x: 170, y: 210}
     slot: 3
+    rewardOnly: 0
   - id: japan_bonsai
     displayName: Bonsai
     skin: Japan
@@ -83,6 +134,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 37637eda23f2a2845a4e0da002aeb8d2, type: 3}
     size: {x: 220, y: 180}
     slot: 4
+    rewardOnly: 0
   - id: japan_sakuralantern
     displayName: Sakura Lantern
     skin: Japan
@@ -90,6 +142,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 3d7c909acc069f643803f9a320cb788b, type: 3}
     size: {x: 260, y: 320}
     slot: 2
+    rewardOnly: 0
   - id: winter_christmastree
     displayName: Christmas Tree
     skin: Winter
@@ -97,6 +150,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 9b38a420579223244948d5cf1662e139, type: 3}
     size: {x: 380, y: 530}
     slot: 1
+    rewardOnly: 0
   - id: winter_pinegarland
     displayName: Pine Garland
     skin: Winter
@@ -104,6 +158,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 31b010a924e1c7c428e1f15675b6dc29, type: 3}
     size: {x: 620, y: 260}
     slot: 2
+    rewardOnly: 0
   - id: tet_apricotblossom
     displayName: Apricot Blossom
     skin: Tet
@@ -111,6 +166,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: d73bc3469a64b0444a4d3bc758c89a51, type: 3}
     size: {x: 380, y: 530}
     slot: 1
+    rewardOnly: 0
   - id: tet_redlantern
     displayName: Red Lantern
     skin: Tet
@@ -118,6 +174,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: fe890d464a5f0294695d1ee26528e643, type: 3}
     size: {x: 260, y: 320}
     slot: 2
+    rewardOnly: 0
   - id: halloween_pumpkinlantern
     displayName: Pumpkin Lantern
     skin: Halloween
@@ -125,6 +182,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 1111b87b5ee31a442acb9b40120e61b6, type: 3}
     size: {x: 210, y: 190}
     slot: 6
+    rewardOnly: 0
   - id: halloween_ghostbatgarland
     displayName: Ghost Garland
     skin: Halloween
@@ -132,6 +190,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: b4f8f3a1f2bde784e87aa09518bbdd54, type: 3}
     size: {x: 620, y: 260}
     slot: 2
+    rewardOnly: 0
   - id: beach_palmplant
     displayName: Tropical Palm
     skin: Beach
@@ -139,6 +198,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: cebfee818d6592e40927701037e3284b, type: 3}
     size: {x: 260, y: 320}
     slot: 1
+    rewardOnly: 0
   - id: beach_surfboard
     displayName: Surfboard
     skin: Beach
@@ -146,6 +206,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 362d13514ff4eb54b9c203f82935c656, type: 3}
     size: {x: 200, y: 490}
     slot: 3
+    rewardOnly: 0
   - id: jungle_bananaplant
     displayName: Jungle Plant
     skin: Jungle
@@ -153,6 +214,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 942c0b28a4473f54191ec197ecfe4e13, type: 3}
     size: {x: 260, y: 320}
     slot: 1
+    rewardOnly: 0
   - id: jungle_hangingvine
     displayName: Hanging Vines
     skin: Jungle
@@ -160,6 +222,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 7bef9cbd5af385548b22712beec9ee87, type: 3}
     size: {x: 620, y: 260}
     slot: 2
+    rewardOnly: 0
   - id: cafe_coffeemachine
     displayName: Coffee Machine
     skin: Cozy
@@ -167,6 +230,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: bedafe4cad0b8a8419860fd7c42e46f0, type: 3}
     size: {x: 240, y: 240}
     slot: 4
+    rewardOnly: 0
   - id: cafe_catchair
     displayName: Cat Chair
     skin: Cozy
@@ -174,6 +238,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 4aeac8c35326ff74eb51f26d1a54f2ec, type: 3}
     size: {x: 230, y: 260}
     slot: 7
+    rewardOnly: 0
   - id: japan_luckycat
     displayName: Lucky Cat
     skin: Japan
@@ -181,6 +246,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 4007612317a0918479523f416732f06d, type: 3}
     size: {x: 190, y: 230}
     slot: 4
+    rewardOnly: 0
   - id: japan_teaset
     displayName: Tea Set
     skin: Japan
@@ -188,6 +254,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 31feb1bcb7b46b14ca6fad69d95898d2, type: 3}
     size: {x: 300, y: 190}
     slot: 5
+    rewardOnly: 0
   - id: winter_giftboxes
     displayName: Holiday Gifts
     skin: Winter
@@ -195,6 +262,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: ea3b21325c952c641b4597979273dfb0, type: 3}
     size: {x: 280, y: 220}
     slot: 6
+    rewardOnly: 0
   - id: winter_tablelamp
     displayName: Warm Table Lamp
     skin: Winter
@@ -202,6 +270,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 8fec63f840520c4408aadc97db79a986, type: 3}
     size: {x: 170, y: 310}
     slot: 4
+    rewardOnly: 0
   - id: tet_chungcakes
     displayName: Chung Cakes
     skin: Tet
@@ -209,6 +278,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: cb87d9969ecfbcc409506f0019bfa1c1, type: 3}
     size: {x: 280, y: 260}
     slot: 6
+    rewardOnly: 0
   - id: tet_tettray
     displayName: Tet Treat Tray
     skin: Tet
@@ -216,6 +286,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 1997a4c2ab4876647b107191d2d4687b, type: 3}
     size: {x: 300, y: 200}
     slot: 5
+    rewardOnly: 0
   - id: halloween_witchhat
     displayName: Witch Hat
     skin: Halloween
@@ -223,6 +294,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 02f3c4486f0113c48b4ed0c2502b08ff, type: 3}
     size: {x: 230, y: 210}
     slot: 8
+    rewardOnly: 0
   - id: halloween_candybowl
     displayName: Candy Bowl
     skin: Halloween
@@ -230,6 +302,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: f8cf4179e682aa849b5c82d2b388e30d, type: 3}
     size: {x: 230, y: 200}
     slot: 5
+    rewardOnly: 0
   - id: beach_coconutdrink
     displayName: Coconut Drink
     skin: Beach
@@ -237,6 +310,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 2573cca0dcb72a742a7358502ecfb6e0, type: 3}
     size: {x: 180, y: 190}
     slot: 5
+    rewardOnly: 0
   - id: beach_strawhat
     displayName: Beach Straw Hat
     skin: Beach
@@ -244,6 +318,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: dfb85c595d2c5a74183ffee602195412, type: 3}
     size: {x: 220, y: 170}
     slot: 8
+    rewardOnly: 0
   - id: jungle_fern
     displayName: Forest Fern
     skin: Jungle
@@ -251,6 +326,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: b9d5c4ca05f9b3c459bf1af2368b4cd1, type: 3}
     size: {x: 320, y: 300}
     slot: 1
+    rewardOnly: 0
   - id: jungle_fruitbowl
     displayName: Tropical Fruit Bowl
     skin: Jungle
@@ -258,6 +334,351 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: bfcfd76c2d92b4d47bd23e3942fcbc49, type: 3}
     size: {x: 260, y: 200}
     slot: 5
+    rewardOnly: 0
+  - id: moonlight_moonflowerplant
+    displayName: Moonflower Planter
+    skin: Moonlight
+    price: 0
+    sprite: {fileID: 21300000, guid: 237239a3ebb62f94e8d19588a20098fd, type: 3}
+    size: {x: 360, y: 470}
+    slot: 1
+    rewardOnly: 1
+  - id: moonlight_starlantern
+    displayName: Moon Lantern
+    skin: Moonlight
+    price: 0
+    sprite: {fileID: 21300000, guid: 96bee28734d7a0a4db39bc0ca7d05739, type: 3}
+    size: {x: 210, y: 400}
+    slot: 2
+    rewardOnly: 1
+  - id: moonlight_mooncatchair
+    displayName: Moon Cat Chair
+    skin: Moonlight
+    price: 0
+    sprite: {fileID: 21300000, guid: 5b2cefaa7ebfe914caa89a5e64cd4624, type: 3}
+    size: {x: 230, y: 260}
+    slot: 7
+    rewardOnly: 1
+  - id: moonlight_telescopetable
+    displayName: Telescope Table
+    skin: Moonlight
+    price: 0
+    sprite: {fileID: 21300000, guid: 9238563ea54612241948941b52134e1f, type: 3}
+    size: {x: 240, y: 260}
+    slot: 4
+    rewardOnly: 1
+  - id: bakery_strawberryplanter
+    displayName: Strawberry Planter
+    skin: Bakery
+    price: 450
+    sprite: {fileID: 21300000, guid: e061e319763e9564ebd82edf4c4066b8, type: 3}
+    size: {x: 350, y: 450}
+    slot: 1
+    rewardOnly: 0
+  - id: bakery_macarongarland
+    displayName: Macaron Garland
+    skin: Bakery
+    price: 350
+    sprite: {fileID: 21300000, guid: 3457a9d8f01da484ca8505889f317d4d, type: 3}
+    size: {x: 620, y: 260}
+    slot: 2
+    rewardOnly: 0
+  - id: bakery_pastrydisplay
+    displayName: Cat Bun Display
+    skin: Bakery
+    price: 450
+    sprite: {fileID: 21300000, guid: 2835c069d6c000049838a945b23d047b, type: 3}
+    size: {x: 300, y: 205}
+    slot: 5
+    rewardOnly: 0
+  - id: bakery_pawcookierug
+    displayName: Paw Cookie Rug
+    skin: Bakery
+    price: 350
+    sprite: {fileID: 21300000, guid: c8764b7475e864e4b8d9e9b0cd5bf552, type: 3}
+    size: {x: 300, y: 170}
+    slot: 6
+    rewardOnly: 0
+  - id: keepsake_firstset
+    displayName: Collector Cat
+    skin: Keepsakes
+    price: 0
+    sprite: {fileID: 21300000, guid: 3a450f4307e6b584f973966d3d01072c, type: 3}
+    size: {x: 160, y: 200}
+    slot: 3
+    rewardOnly: 1
+  - id: keepsake_threesets
+    displayName: Cafe Curator
+    skin: Keepsakes
+    price: 0
+    sprite: {fileID: 21300000, guid: 7af63ef6d581edf47886f9857b29f002, type: 3}
+    size: {x: 180, y: 210}
+    slot: 3
+    rewardOnly: 1
+  - id: keepsake_sevensets
+    displayName: Master Collector
+    skin: Keepsakes
+    price: 0
+    sprite: {fileID: 21300000, guid: 2a99eaa88b1eac44a91517632aff6454, type: 3}
+    size: {x: 180, y: 220}
+    slot: 3
+    rewardOnly: 1
+  - id: aquarium_seaweedplanter
+    displayName: Seaweed Planter
+    skin: Aquarium
+    price: 450
+    sprite: {fileID: 21300000, guid: ac473434152995049b9b6690d595952c, type: 3}
+    size: {x: 350, y: 440}
+    slot: 1
+    rewardOnly: 0
+  - id: aquarium_jellyfishlamp
+    displayName: Jellyfish Lamp
+    skin: Aquarium
+    price: 350
+    sprite: {fileID: 21300000, guid: 73682307cc3a26f4cac782839fe41165, type: 3}
+    size: {x: 300, y: 250}
+    slot: 2
+    rewardOnly: 0
+  - id: aquarium_seahorseplaque
+    displayName: Seahorse Plaque
+    skin: Aquarium
+    price: 300
+    sprite: {fileID: 21300000, guid: 3fa14f9b33acecd4daeff69dcedb9d5d, type: 3}
+    size: {x: 180, y: 210}
+    slot: 3
+    rewardOnly: 0
+  - id: aquarium_shellsidetable
+    displayName: Shell Side Table
+    skin: Aquarium
+    price: 400
+    sprite: {fileID: 21300000, guid: 0c804f82e767ce940af9dc7c8bc414c9, type: 3}
+    size: {x: 240, y: 250}
+    slot: 4
+    rewardOnly: 0
+  - id: aquarium_pearlteapot
+    displayName: Pearl Teapot
+    skin: Aquarium
+    price: 350
+    sprite: {fileID: 21300000, guid: 88ef5aac1139fd14c8dea9db5a6befdd, type: 3}
+    size: {x: 220, y: 200}
+    slot: 5
+    rewardOnly: 0
+  - id: aquarium_shellrug
+    displayName: Shell Rug
+    skin: Aquarium
+    price: 300
+    sprite: {fileID: 21300000, guid: 6d9187851e982234aab0eafcfe9ae9df, type: 3}
+    size: {x: 300, y: 180}
+    slot: 6
+    rewardOnly: 0
+  - id: aquarium_shellchair
+    displayName: Shell Chair
+    skin: Aquarium
+    price: 450
+    sprite: {fileID: 21300000, guid: 7059b95b7beb9344ea57e87572b0a195, type: 3}
+    size: {x: 230, y: 260}
+    slot: 7
+    rewardOnly: 0
+  - id: aquarium_sailorhat
+    displayName: Sailor Hat
+    skin: Aquarium
+    price: 250
+    sprite: {fileID: 21300000, guid: fa3a532387167a745b4eac43b72f37b2, type: 3}
+    size: {x: 180, y: 145}
+    slot: 8
+    rewardOnly: 0
+  - id: greenhouse_bloomplanter
+    displayName: Bloom Planter
+    skin: Greenhouse
+    price: 450
+    sprite: {fileID: 21300000, guid: b0f77f985918dc64685c7096584693c9, type: 3}
+    size: {x: 350, y: 440}
+    slot: 1
+    rewardOnly: 0
+  - id: greenhouse_leafmobile
+    displayName: Leaf Mobile
+    skin: Greenhouse
+    price: 350
+    sprite: {fileID: 21300000, guid: 68a08ca25cde6304da0f3440371d2992, type: 3}
+    size: {x: 300, y: 250}
+    slot: 2
+    rewardOnly: 0
+  - id: greenhouse_butterflyplaque
+    displayName: Butterfly Plaque
+    skin: Greenhouse
+    price: 300
+    sprite: {fileID: 21300000, guid: fad1aca59b6b1704e9037eb5944ab752, type: 3}
+    size: {x: 180, y: 210}
+    slot: 3
+    rewardOnly: 0
+  - id: greenhouse_pottingtable
+    displayName: Potting Table
+    skin: Greenhouse
+    price: 400
+    sprite: {fileID: 21300000, guid: 4ee347ae23dbdf946b0f4457d6dc3194, type: 3}
+    size: {x: 240, y: 250}
+    slot: 4
+    rewardOnly: 0
+  - id: greenhouse_flowerwateringcan
+    displayName: Flower Watering Can
+    skin: Greenhouse
+    price: 350
+    sprite: {fileID: 21300000, guid: c3a8f6859681e7541b1184ce0e2ed2c3, type: 3}
+    size: {x: 220, y: 200}
+    slot: 5
+    rewardOnly: 0
+  - id: greenhouse_leafrug
+    displayName: Leaf Rug
+    skin: Greenhouse
+    price: 300
+    sprite: {fileID: 21300000, guid: 1e950df63f98b4a469a1fce36be97a88, type: 3}
+    size: {x: 300, y: 180}
+    slot: 6
+    rewardOnly: 0
+  - id: greenhouse_gardenchair
+    displayName: Garden Chair
+    skin: Greenhouse
+    price: 450
+    sprite: {fileID: 21300000, guid: e5c4ed009b96dd5489671e7d8e9e0155, type: 3}
+    size: {x: 230, y: 260}
+    slot: 7
+    rewardOnly: 0
+  - id: greenhouse_gardenerhat
+    displayName: Gardener Hat
+    skin: Greenhouse
+    price: 250
+    sprite: {fileID: 21300000, guid: 17edaed30de31fe4da0f80eed7d23f2c, type: 3}
+    size: {x: 180, y: 145}
+    slot: 8
+    rewardOnly: 0
+  - id: magiclibrary_enchantedplanter
+    displayName: Enchanted Planter
+    skin: Magic Library
+    price: 450
+    sprite: {fileID: 21300000, guid: 449f0da4fb7c7ac49a8216292f894674, type: 3}
+    size: {x: 350, y: 440}
+    slot: 1
+    rewardOnly: 0
+  - id: magiclibrary_booklantern
+    displayName: Book Lantern
+    skin: Magic Library
+    price: 350
+    sprite: {fileID: 21300000, guid: 9fc0983297ba9ac4f90d40f960d20dfe, type: 3}
+    size: {x: 300, y: 250}
+    slot: 2
+    rewardOnly: 0
+  - id: magiclibrary_owlplaque
+    displayName: Owl Plaque
+    skin: Magic Library
+    price: 300
+    sprite: {fileID: 21300000, guid: 6d8ed13c90ff8b74f82948a6405e6541, type: 3}
+    size: {x: 180, y: 210}
+    slot: 3
+    rewardOnly: 0
+  - id: magiclibrary_spellbooktable
+    displayName: Spellbook Table
+    skin: Magic Library
+    price: 400
+    sprite: {fileID: 21300000, guid: 0c72e621cbb8c51489ba74fc2f54e5aa, type: 3}
+    size: {x: 240, y: 250}
+    slot: 4
+    rewardOnly: 0
+  - id: magiclibrary_quillstand
+    displayName: Quill Stand
+    skin: Magic Library
+    price: 350
+    sprite: {fileID: 21300000, guid: db9e550a96badbd4da35450bd751a040, type: 3}
+    size: {x: 220, y: 200}
+    slot: 5
+    rewardOnly: 0
+  - id: magiclibrary_spellcirclerug
+    displayName: Spell Circle Rug
+    skin: Magic Library
+    price: 300
+    sprite: {fileID: 21300000, guid: 9e8100584f32d264aa651a83af800689, type: 3}
+    size: {x: 300, y: 180}
+    slot: 6
+    rewardOnly: 0
+  - id: magiclibrary_readingchair
+    displayName: Reading Chair
+    skin: Magic Library
+    price: 450
+    sprite: {fileID: 21300000, guid: 27a11af0df967164680361995552996e, type: 3}
+    size: {x: 230, y: 260}
+    slot: 7
+    rewardOnly: 0
+  - id: magiclibrary_wizardhat
+    displayName: Wizard Hat
+    skin: Magic Library
+    price: 250
+    sprite: {fileID: 21300000, guid: 5405e37aceb128b43bcd39b96b4a7af5, type: 3}
+    size: {x: 180, y: 145}
+    slot: 8
+    rewardOnly: 0
+  - id: cloud_cloudplanter
+    displayName: Cloud Planter
+    skin: Cloud
+    price: 450
+    sprite: {fileID: 21300000, guid: cccf32ae467bd284db95bce09abd6735, type: 3}
+    size: {x: 350, y: 440}
+    slot: 1
+    rewardOnly: 0
+  - id: cloud_cloudmobile
+    displayName: Cloud Mobile
+    skin: Cloud
+    price: 350
+    sprite: {fileID: 21300000, guid: 8ce96ab91ce8b4b48b65f95811116ce1, type: 3}
+    size: {x: 300, y: 250}
+    slot: 2
+    rewardOnly: 0
+  - id: cloud_rainbowplaque
+    displayName: Rainbow Plaque
+    skin: Cloud
+    price: 300
+    sprite: {fileID: 21300000, guid: d5a0304d0cc85b04bbc3d3cdc6116b68, type: 3}
+    size: {x: 180, y: 210}
+    slot: 3
+    rewardOnly: 0
+  - id: cloud_cloudsidetable
+    displayName: Cloud Side Table
+    skin: Cloud
+    price: 400
+    sprite: {fileID: 21300000, guid: dec182dab89bdb74196189aef141327e, type: 3}
+    size: {x: 240, y: 250}
+    slot: 4
+    rewardOnly: 0
+  - id: cloud_cloudteaset
+    displayName: Cloud Tea Set
+    skin: Cloud
+    price: 350
+    sprite: {fileID: 21300000, guid: c8e40cf981f49314983bf8a4d835a5a8, type: 3}
+    size: {x: 220, y: 200}
+    slot: 5
+    rewardOnly: 0
+  - id: cloud_cloudrug
+    displayName: Cloud Rug
+    skin: Cloud
+    price: 300
+    sprite: {fileID: 21300000, guid: 53a6598a732d3a0499a79fc46cc8cb40, type: 3}
+    size: {x: 300, y: 180}
+    slot: 6
+    rewardOnly: 0
+  - id: cloud_cloudchair
+    displayName: Cloud Chair
+    skin: Cloud
+    price: 450
+    sprite: {fileID: 21300000, guid: 4f749a2e2776fb74fa45c321be445058, type: 3}
+    size: {x: 230, y: 260}
+    slot: 7
+    rewardOnly: 0
+  - id: cloud_aviatorcap
+    displayName: Aviator Cap
+    skin: Cloud
+    price: 250
+    sprite: {fileID: 21300000, guid: c5f693b1d735c5f4f96aa4133ef106b6, type: 3}
+    size: {x: 180, y: 145}
+    slot: 8
+    rewardOnly: 0
   decorationSlots:
   - backgroundId: cafe
     slot: 1
@@ -539,6 +960,421 @@ MonoBehaviour:
     position: {x: 0.18, y: 0.26}
     pivot: {x: 0.5, y: 0}
     maxSize: {x: 180, y: 145}
+  - backgroundId: moonlight
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: moonlight
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: moonlight
+    slot: 3
+    position: {x: 0.94, y: 0.6}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: moonlight
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: moonlight
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: moonlight
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: moonlight
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: moonlight
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: bakery
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: bakery
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: bakery
+    slot: 3
+    position: {x: 0.94, y: 0.6}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: bakery
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: bakery
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: bakery
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: bakery
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: bakery
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: aquarium
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: aquarium
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: aquarium
+    slot: 3
+    position: {x: 0.94, y: 0.6}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: aquarium
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: aquarium
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: aquarium
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: aquarium
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: aquarium
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: greenhouse
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: greenhouse
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: greenhouse
+    slot: 3
+    position: {x: 0.94, y: 0.6}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: greenhouse
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: greenhouse
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: greenhouse
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: greenhouse
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: greenhouse
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: magiclibrary
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: magiclibrary
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: magiclibrary
+    slot: 3
+    position: {x: 0.94, y: 0.6}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: magiclibrary
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: magiclibrary
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: magiclibrary
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: magiclibrary
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: magiclibrary
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  - backgroundId: cloud
+    slot: 1
+    position: {x: 0.26, y: 0.33}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 360, y: 470}
+  - backgroundId: cloud
+    slot: 2
+    position: {x: 0.78, y: 0.97}
+    pivot: {x: 0.5, y: 1}
+    maxSize: {x: 600, y: 250}
+  - backgroundId: cloud
+    slot: 3
+    position: {x: 0.94, y: 0.6}
+    pivot: {x: 0.5, y: 0.5}
+    maxSize: {x: 150, y: 170}
+  - backgroundId: cloud
+    slot: 4
+    position: {x: 0.15, y: 0.44}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 240, y: 250}
+  - backgroundId: cloud
+    slot: 5
+    position: {x: 0.935, y: 0.4}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 205}
+  - backgroundId: cloud
+    slot: 6
+    position: {x: 0.36, y: 0.08}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 250, y: 210}
+  - backgroundId: cloud
+    slot: 7
+    position: {x: 0.31, y: 0.055}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 220, y: 250}
+  - backgroundId: cloud
+    slot: 8
+    position: {x: 0.18, y: 0.26}
+    pivot: {x: 0.5, y: 0}
+    maxSize: {x: 180, y: 145}
+  roomCollections:
+  - id: cozy
+    displayName: Cozy Collection
+    itemIds:
+    - cafe_catplant
+    - cafe_catpicture
+    - cafe_coffeemachine
+    - cafe_catchair
+  - id: japan
+    displayName: Japan Collection
+    itemIds:
+    - japan_bonsai
+    - japan_sakuralantern
+    - japan_luckycat
+    - japan_teaset
+  - id: winter
+    displayName: Winter Collection
+    itemIds:
+    - winter_christmastree
+    - winter_pinegarland
+    - winter_giftboxes
+    - winter_tablelamp
+  - id: tet
+    displayName: Tet Collection
+    itemIds:
+    - tet_apricotblossom
+    - tet_redlantern
+    - tet_chungcakes
+    - tet_tettray
+  - id: halloween
+    displayName: Halloween Collection
+    itemIds:
+    - halloween_pumpkinlantern
+    - halloween_ghostbatgarland
+    - halloween_witchhat
+    - halloween_candybowl
+  - id: beach
+    displayName: Beach Collection
+    itemIds:
+    - beach_palmplant
+    - beach_surfboard
+    - beach_coconutdrink
+    - beach_strawhat
+  - id: jungle
+    displayName: Jungle Collection
+    itemIds:
+    - jungle_bananaplant
+    - jungle_hangingvine
+    - jungle_fern
+    - jungle_fruitbowl
+  - id: moonlight
+    displayName: Moonlight Collection
+    itemIds:
+    - moonlight_moonflowerplant
+    - moonlight_starlantern
+    - moonlight_mooncatchair
+    - moonlight_telescopetable
+  - id: bakery
+    displayName: Bakery Collection
+    itemIds:
+    - bakery_strawberryplanter
+    - bakery_macarongarland
+    - bakery_pastrydisplay
+    - bakery_pawcookierug
+  - id: aquarium
+    displayName: Aquarium Collection
+    itemIds:
+    - aquarium_seaweedplanter
+    - aquarium_jellyfishlamp
+    - aquarium_seahorseplaque
+    - aquarium_shellsidetable
+    - aquarium_pearlteapot
+    - aquarium_shellrug
+    - aquarium_shellchair
+    - aquarium_sailorhat
+  - id: greenhouse
+    displayName: Greenhouse Collection
+    itemIds:
+    - greenhouse_bloomplanter
+    - greenhouse_leafmobile
+    - greenhouse_butterflyplaque
+    - greenhouse_pottingtable
+    - greenhouse_flowerwateringcan
+    - greenhouse_leafrug
+    - greenhouse_gardenchair
+    - greenhouse_gardenerhat
+  - id: magic library
+    displayName: Magic Library Collection
+    itemIds:
+    - magiclibrary_enchantedplanter
+    - magiclibrary_booklantern
+    - magiclibrary_owlplaque
+    - magiclibrary_spellbooktable
+    - magiclibrary_quillstand
+    - magiclibrary_spellcirclerug
+    - magiclibrary_readingchair
+    - magiclibrary_wizardhat
+  - id: cloud
+    displayName: Cloud Collection
+    itemIds:
+    - cloud_cloudplanter
+    - cloud_cloudmobile
+    - cloud_rainbowplaque
+    - cloud_cloudsidetable
+    - cloud_cloudteaset
+    - cloud_cloudrug
+    - cloud_cloudchair
+    - cloud_aviatorcap
+  roomRewards:
+  - id: chapter-5
+    title: Japan Cafe
+    backgroundId: japan
+    decorationId: 
+    goal: 0
+    target: 5
+  - id: chapter-10
+    title: Moonlight Cafe
+    backgroundId: moonlight
+    decorationId: 
+    goal: 0
+    target: 10
+  - id: chapter-15
+    title: Winter Cafe
+    backgroundId: winter
+    decorationId: 
+    goal: 0
+    target: 15
+  - id: chapter-20
+    title: Jungle Cafe
+    backgroundId: jungle
+    decorationId: 
+    goal: 0
+    target: 20
+  - id: room-stars-10
+    title: Moonflower Planter
+    backgroundId: 
+    decorationId: moonlight_moonflowerplant
+    goal: 1
+    target: 10
+  - id: room-stars-20
+    title: Moon Lantern
+    backgroundId: 
+    decorationId: moonlight_starlantern
+    goal: 1
+    target: 20
+  - id: room-stars-35
+    title: Moon Cat Chair
+    backgroundId: 
+    decorationId: moonlight_mooncatchair
+    goal: 1
+    target: 35
+  - id: room-stars-50
+    title: Telescope Table
+    backgroundId: 
+    decorationId: moonlight_telescopetable
+    goal: 1
+    target: 50
+  - id: collection-1
+    title: Collector Cat
+    backgroundId: 
+    decorationId: keepsake_firstset
+    goal: 2
+    target: 1
+  - id: collection-3
+    title: Cafe Curator
+    backgroundId: 
+    decorationId: keepsake_threesets
+    goal: 2
+    target: 3
+  - id: collection-7
+    title: Master Collector
+    backgroundId: 
+    decorationId: keepsake_sevensets
+    goal: 2
+    target: 7
   dailyRewards:
   - coins: 100
     hints: 0

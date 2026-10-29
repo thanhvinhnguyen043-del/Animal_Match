@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public enum GameState { Menu, LevelSelect, Playing, Paused, Win, Lose, Shop, Decorating, DailyRewards, Loading, Achievements }
+public enum GameState { Menu, LevelSelect, Playing, Paused, Win, Lose, Shop, Decorating, DailyRewards, Loading, Achievements, RoomRewards, Leaderboard }
 
 [DisallowMultipleComponent]
 public class GameManager : MonoBehaviour
@@ -148,6 +148,10 @@ public class GameManager : MonoBehaviour
     public void CloseDailyRewards() {if(state==GameState.DailyRewards) SetState(GameState.Menu);}
     public bool OpenAchievements() {if(state!=GameState.Menu) return false;SetState(GameState.Achievements);return true;}
     public void CloseAchievements() {if(state==GameState.Achievements) SetState(GameState.Menu);}
+    public bool OpenRoomRewards() {if(state!=GameState.Menu) return false;SetState(GameState.RoomRewards);return true;}
+    public bool OpenLeaderboard() {if(state!=GameState.Menu) return false;SetState(GameState.Leaderboard);return true;}
+    public void CloseLeaderboard() {if(state==GameState.Leaderboard) SetState(GameState.Menu);}
+    public void CloseRoomRewards() {if(state==GameState.RoomRewards) SetState(GameState.Menu);}
     public bool BeginLoading()
     {
         if(state!=GameState.Menu && state!=GameState.LevelSelect) return false;

@@ -888,7 +888,7 @@ PlayerSettings:
   qualitySettingsNames: []
   projectName: My project (1) 2026-09-16_16-48-28
   organizationId: thanhvinhnguyen043
-  cloudEnabled: 0
+  cloudEnabled: 1
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
   platformRequiresReadableAssets: 0

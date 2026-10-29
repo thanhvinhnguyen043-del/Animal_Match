@@ -90,6 +90,8 @@ public static class CacaoUIBuilder
         DailyRewardBuilder.Build();
         LoadingUIBuilder.Build();
         ProgressUIBuilder.Build();
+        RoomProgressBuilder.Build();
+        UIPolishBuilder.Apply();
         controller.pausePanel.SetActive(false);grid.gameOverPanel.SetActive(false);shop.panel.SetActive(false);
         if(!UnityEngine.Object.FindObjectOfType<EventSystem>()) new GameObject("EventSystem",typeof(EventSystem),typeof(StandaloneInputModule));
         Canvas.ForceUpdateCanvases();

@@ -11,9 +11,11 @@ public class LevelSelectionUI : MonoBehaviour
     private Button[] buttons;
     private ScrollRect scroll;
     private StarRatingGraphic[] stars;
+    private Sprite levelBadge;
 
     private void Awake()
     {
+        levelBadge=Resources.Load<Sprite>("MenuIcons/LevelBadge");
         ConfigureScrolling();
     }
 
@@ -83,6 +85,14 @@ public class LevelSelectionUI : MonoBehaviour
                 button.onClick.AddListener(() => ui.StartLevel(index));
 
                 button.gameObject.SetActive(true);
+                if(levelBadge)
+                {
+                    button.GetComponent<Image>().enabled=false;
+                    var outline=button.GetComponent<Outline>();if(outline) outline.enabled=false;
+                    var badge=new GameObject("LevelBadge",typeof(RectTransform),typeof(CanvasRenderer),typeof(Image)).GetComponent<Image>();
+                    badge.transform.SetParent(button.transform,false);GameplayHudStyle.Place(badge.rectTransform,0,0,172,172);
+                    badge.sprite=levelBadge;badge.preserveAspect=true;badge.transform.SetAsFirstSibling();button.targetGraphic=badge;
+                }
                 buttons[i] = button;
                 stars[i]=button.GetComponentInChildren<StarRatingGraphic>(true);
             }
@@ -108,10 +118,20 @@ public class LevelSelectionUI : MonoBehaviour
                 label.fontSize=locked ? 29 : 76;
                 label.rectTransform.anchoredPosition=new Vector2(0,locked ? -144 : -66);
                 label.rectTransform.sizeDelta=new Vector2(172,locked ? 38 : 95);
+                if(levelBadge)
+                {
+                    label.color=new Color(.29f,.135f,.065f);
+                    label.rectTransform.anchoredPosition=new Vector2(0,locked ? -108 : -70);
+                    label.rectTransform.sizeDelta=new Vector2(140,locked ? 38 : 75);
+                    label.fontSize=locked ? 32 : 64;
+                    if(lockIcon) GameplayHudStyle.Place((RectTransform)lockIcon,62,35,48,48);
+                    var badge=buttons[i].transform.Find("LevelBadge").GetComponent<Image>();
+                    badge.color=locked ? new Color(.72f,.69f,.63f) : Color.white;
+                }
                 var status=buttons[i].transform.Find("LevelStatus");
                 if(status)
                 {
-                    status.gameObject.SetActive(!locked);
+                    status.gameObject.SetActive(!locked && !levelBadge);
                     status.GetComponent<TextMeshProUGUI>().text=i==LevelProgress.Latest(count) ? "PLAY" : "OPEN";
                 }
                 buttons[i].GetComponent<Image>().color=locked ? new Color(.93f,.88f,.8f) : i==LevelProgress.Latest(count) ? new Color(.87f,.94f,.72f) : new Color(1,.98f,.91f);

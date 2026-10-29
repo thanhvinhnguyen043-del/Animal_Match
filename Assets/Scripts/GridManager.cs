@@ -87,6 +87,8 @@ public class GridManager : MonoBehaviour
     public float currentTime => Session ? Session.TimeRemaining : 0;
     private bool isGameOver => !Session || Session.State != GameState.Playing;
     private int totalTilesRemaining = 0;
+    private int initialTileCount;
+    public float ClearProgress => initialTileCount>0 ? Mathf.Clamp01(1-totalTilesRemaining/(float)initialTileCount) : 0;
 
     [Header("Effects")]
     public GameObject floatingTextPrefab;
@@ -206,6 +208,7 @@ public class GridManager : MonoBehaviour
             }
         }
         totalTilesRemaining = totalTiles;
+        initialTileCount=totalTiles;
         boardRevision++;
         return true;
     }

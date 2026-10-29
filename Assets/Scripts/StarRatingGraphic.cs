@@ -6,10 +6,27 @@ public sealed class StarRatingGraphic : MaskableGraphic
 {
     [SerializeField,Range(0,3)] private int stars;
     public int Stars => stars;
-    public void SetStars(int value) {stars=Mathf.Clamp(value,0,3);raycastTarget=false;SetVerticesDirty();}
+    private static Sprite starSprite;
+    private Image[] pngStars;
+    protected override void OnEnable() {base.OnEnable();if(Application.isPlaying) UsePngStars();}
+    public void UsePngStars()
+    {
+        if(!starSprite) starSprite=Resources.Load<Sprite>("StarBar/StarGold");
+        if(!starSprite || pngStars!=null) return;
+        pngStars=new Image[3];
+        for(int i=0;i<3;i++)
+        {
+            var existing=transform.Find("StarPNG"+i);
+            var image=existing ? existing.GetComponent<Image>() : new GameObject("StarPNG"+i,typeof(RectTransform),typeof(CanvasRenderer),typeof(Image)).GetComponent<Image>();image.transform.SetParent(transform,false);
+            image.sprite=starSprite;image.preserveAspect=true;image.raycastTarget=false;
+            var rect=image.rectTransform;rect.anchorMin=new Vector2(i/3f,0);rect.anchorMax=new Vector2((i+1)/3f,1);rect.offsetMin=rect.offsetMax=Vector2.zero;pngStars[i]=image;
+        }
+        SetStars(stars);
+    }
+    public void SetStars(int value) {stars=Mathf.Clamp(value,0,3);raycastTarget=false;if(pngStars!=null) for(int i=0;i<3;i++) pngStars[i].color=i<stars ? Color.white : new Color(.48f,.43f,.37f);SetVerticesDirty();}
     protected override void OnPopulateMesh(VertexHelper mesh)
     {
-        mesh.Clear();var rect=rectTransform.rect;
+        mesh.Clear();if(pngStars!=null) return;var rect=rectTransform.rect;
         float radius=Mathf.Min(rect.height*.46f,rect.width/7.2f);
         for(int index=0;index<3;index++)
         {

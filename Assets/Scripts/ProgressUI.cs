@@ -10,7 +10,7 @@ public class AchievementCard
 {
     public GameObject root;
     public TextMeshProUGUI title,description,reward,progress,action;
-    public Image fill;
+    public Image fill,icon;
     public Button button;
     [NonSerialized] public string id;
 }
@@ -33,9 +33,18 @@ public sealed class ProgressUI : MonoBehaviour
     private GameManager game;
     private int page,filter,displayedSecond=-1;
     private bool menuBlocked,oldInteractable,oldRaycasts,goalsDirty;
+    private Image starProgressFill;
+    private float starProgress,targetStarProgress;
+    private readonly Dictionary<AchievementMetric,Sprite> achievementIcons=new Dictionary<AchievementMetric,Sprite>();
     public bool IsOpen=>panel && panel.activeSelf;
     private void Start()
     {
+        PrepareAchievementIcons();
+        PrepareMenuIcons();
+        starProgressFill=GameplayHudStyle.Apply(this);
+        if(!GetComponent<StarGoalTutorialUI>()) gameObject.AddComponent<StarGoalTutorialUI>();
+        if(!GetComponent<LeaderboardUI>()) gameObject.AddComponent<LeaderboardUI>();
+        if(!GetComponent<CacaoArtSizing>()) gameObject.AddComponent<CacaoArtSizing>();
         game=grid.Session;game.StateChanged+=OnState;game.LevelStarted+=OnLevelStarted;game.GameEnded+=OnEnded;
         game.MatchResolved+=OnMatch;game.TileBroken+=OnBroken;game.TimeChanged+=OnTime;
         EconomyStore.InventoryChanged+=Refresh;
@@ -92,6 +101,7 @@ public sealed class ProgressUI : MonoBehaviour
         {
             var card=cards[index];int row=page*cards.Length+index;card.root.SetActive(row<visible.Count);card.id=null;if(row>=visible.Count) continue;
             var item=visible[row];card.id=item.id;int value=AchievementCatalog.Value(item.metric,inventory);bool claimed=career.claimedAchievements.Contains(item.id),complete=value>=item.target;
+            card.icon.sprite=achievementIcons[item.metric];card.icon.enabled=card.icon.sprite;
             card.title.text=item.title;card.description.text=item.description;card.reward.text=RewardText(item.reward);
             card.progress.text=Mathf.Min(value,item.target).ToString("N0")+" / "+item.target.ToString("N0");
             card.fill.rectTransform.anchorMax=new Vector2(Mathf.Clamp01(value/(float)item.target),1);
@@ -101,6 +111,83 @@ public sealed class ProgressUI : MonoBehaviour
         milestoneButton.interactable=chestReady;
         milestoneLabel.text=nextChest==null ? "ALL CHESTS CLAIMED" : chestReady ? "CLAIM BONUS CHEST" : "BONUS CHEST AT "+nextChest.target;
         milestoneProgress.text=nextChest==null ? "All milestones completed!" : career.claimedAchievements.Count+" / "+nextChest.target+" CLAIMED  |  "+RewardText(nextChest.reward);
+    }
+    private void PrepareMenuIcons()
+    {
+        string[] buttons={"AchievementMenuButton","RoomRewardMenuButton","OpenStudio"};
+        string[] sprites={"Achievements","RoomRewards","Inventory"};
+        for(int i=0;i<buttons.Length;i++)
+        {
+            var root=ui.mainMenuPanel.Find(buttons[i]);if(!root) continue;
+            var sprite=Resources.Load<Sprite>("MenuIcons/"+sprites[i]);if(!sprite) continue;
+            var icon=root.GetComponent<Image>();icon.sprite=sprite;icon.type=Image.Type.Simple;
+            icon.preserveAspect=true;icon.color=Color.white;icon.raycastTarget=true;
+            root.GetComponent<Button>().targetGraphic=icon;
+            PlaceCardElement((RectTransform)root,i==2 ? 1695 : 65,i==0 ? 335 : 535,160,160);
+            var child=root.Find("MenuIcon");if(child) child.gameObject.SetActive(false);
+            foreach(Transform element in root)
+            {
+                if(element.GetComponent<TextMeshProUGUI>()) element.gameObject.SetActive(false);
+                if(element.name=="Available" || element.name=="New")
+                    PlaceCardElement((RectTransform)element,120,0,42,42);
+            }
+        }
+        PlaceCardElement(menuStars.rectTransform,35,495,220,40);
+        var shop=ui.mainMenuPanel.Find("Icon__Shop");
+        if(shop) PlaceCardElement((RectTransform)shop,1695,335,160,160);
+        var shopCaption=ui.mainMenuPanel.Find("Text__SHOP");
+        if(shopCaption) PlaceCardElement((RectTransform)shopCaption,1665,495,220,40);
+        var daily=ui.mainMenuPanel.Find("DailyRewardsButton");
+        if(daily)
+        {
+            PlaceCardElement((RectTransform)daily,1695,745,160,205);
+            var gift=daily.Find("Gift");if(gift) PlaceCardElement((RectTransform)gift,0,0,160,160);
+            var caption=daily.Find("Caption");if(caption) PlaceCardElement((RectTransform)caption,-30,164,220,40);
+            var badge=daily.Find("Available");if(badge) PlaceCardElement((RectTransform)badge,120,0,42,42);
+        }
+    }
+    private void PrepareAchievementIcons()
+    {
+        var loaded=new Dictionary<string,Sprite>();
+        foreach(AchievementMetric metric in Enum.GetValues(typeof(AchievementMetric)))
+        {
+            string name;
+            switch(metric)
+            {
+                case AchievementMetric.Stars: case AchievementMetric.PerfectLevels: name="Stars";break;
+                case AchievementMetric.Levels: name="Levels";break;
+                case AchievementMetric.Wins: name="Wins";break;
+                case AchievementMetric.Matches: name="Matches";break;
+                case AchievementMetric.Water: name="Water";break;
+                case AchievementMetric.Stone: name="Stone";break;
+                case AchievementMetric.Decorations: name="Decorations";break;
+                case AchievementMetric.Backgrounds: name="Backgrounds";break;
+                case AchievementMetric.DailyClaims: name="Daily";break;
+                default: name="Combo";break;
+            }
+            if(!loaded.TryGetValue(name,out var sprite)) {sprite=Resources.Load<Sprite>("AchievementIcons/Achievement"+name);loaded.Add(name,sprite);}
+            achievementIcons[metric]=sprite;
+        }
+        foreach(var card in cards)
+        {
+            if(!card.icon)
+            {
+                var image=new GameObject("AchievementIcon",typeof(RectTransform),typeof(CanvasRenderer),typeof(Image));
+                image.transform.SetParent(card.root.transform,false);card.icon=image.GetComponent<Image>();
+            }
+            card.icon.preserveAspect=true;card.icon.raycastTarget=false;
+            PlaceCardElement(card.icon.rectTransform,12,16,112,112);
+            PlaceCardElement(card.title.rectTransform,134,10,385,38);
+            PlaceCardElement(card.description.rectTransform,134,48,385,48);
+            PlaceCardElement(card.reward.rectTransform,134,103,385,28);
+            var track=card.fill.rectTransform.parent as RectTransform;
+            PlaceCardElement(track,134,139,371,10);
+        }
+    }
+    private static void PlaceCardElement(RectTransform rect,float x,float y,float width,float height)
+    {
+        rect.anchorMin=rect.anchorMax=rect.pivot=new Vector2(0,1);
+        rect.anchoredPosition=new Vector2(x,-y);rect.sizeDelta=new Vector2(width,height);
     }
     private static string RewardText(LevelReward reward)
     {
@@ -120,16 +207,26 @@ public sealed class ProgressUI : MonoBehaviour
         if(!IsOpen || game.State!=GameState.Achievements) return;
         if(CareerStore.ClaimMilestone(out var reward)) {notice.text="BONUS CHEST!  "+RewardText(reward);Refresh();}
     }
-    private void OnLevelStarted() {displayedSecond=-1;goalsDirty=false;resultNotice.text="";RefreshGoals();}
+    private void OnLevelStarted() {displayedSecond=-1;goalsDirty=false;starProgress=targetStarProgress=0;goalStars.SetStars(0);resultNotice.text="";RefreshGoals();}
     private void OnMatch(int points,float bonus,Vector2 position) {goalsDirty=true;}
     private void OnBroken(TileState state) {goalsDirty=true;}
-    private void OnTime(float remaining,float limit) {int second=Mathf.CeilToInt(remaining);if(second!=displayedSecond) {displayedSecond=second;goalsDirty=true;}}
-    private void LateUpdate() {if(goalsDirty) {goalsDirty=false;RefreshGoals();}}
+    private void OnTime(float remaining,float limit) {int second=Mathf.CeilToInt(remaining);if(second!=displayedSecond) {displayedSecond=second;goalsDirty=true;var fill=grid.timeSlider.fillRect.GetComponent<Image>();fill.color=remaining/limit<.2f ? new Color(.9f,.31f,.22f) : remaining/limit<.4f ? new Color(.96f,.67f,.23f) : new Color(.43f,.72f,.35f);}}
+    private void LateUpdate()
+    {
+        if(goalsDirty) {goalsDirty=false;RefreshGoals();}
+        if(!starProgressFill) return;
+        starProgress=Mathf.MoveTowards(starProgress,targetStarProgress,Time.unscaledDeltaTime*.65f);
+        if(starProgressFill.type==Image.Type.Filled) starProgressFill.fillAmount=starProgress;
+        else starProgressFill.rectTransform.anchorMax=new Vector2(starProgress,1);
+        starProgressFill.enabled=starProgress>.005f;
+        int lit=Mathf.Clamp(Mathf.FloorToInt(starProgress*3+.001f),0,3);if(goalStars.Stars!=lit) goalStars.SetStars(lit);
+    }
     public static string Clock(float seconds) {int whole=Mathf.Max(0,Mathf.CeilToInt(seconds-.0001f));return (whole/60).ToString("00")+":"+(whole%60).ToString("00");}
     private void RefreshGoals()
     {
         var challenge=game.Challenge;
-        goalStars.SetStars(game.EarnedStars);goalTitle.text="STAR GOALS";
+        goalTitle.text="STAR PROGRESS";
+        targetStarProgress=game.State==GameState.Win ? game.EarnedStars/3f : Mathf.Min(.99f,grid.ClearProgress)*game.EarnedStars/3f;
         timeGoal.text="2 STARS\nFinish with "+Clock(game.TimeLimit*challenge.timeRemainingFraction)+" left";
         timeGoal.color=game.TimeGoalAchieved ? new Color(.36f,.3f,.2f) : new Color(.7f,.3f,.22f);
         string target;

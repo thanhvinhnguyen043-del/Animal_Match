@@ -17,6 +17,8 @@ public class PlayerInventory
     public int dailyRewardsClaimed;
     public string dailyRewardLastClaimDate;
     public CareerProgress career=new CareerProgress();
+    public List<string> unlockedRoomRewards=new List<string>();
+    public List<string> newRoomRewards=new List<string>();
 }
 
 public struct LevelReward
@@ -38,7 +40,8 @@ public static class EconomyStore
     public const string SaveKey="Economy.Profile.v1";
     public const string DefaultBackgroundId="cafe";
     public static event Action InventoryChanged;
-    public static EconomyConfig Config => Resources.Load<EconomyConfig>("EconomyConfig");
+    private static EconomyConfig config;
+    public static EconomyConfig Config => config ? config : config=Resources.Load<EconomyConfig>("EconomyConfig");
     public static PlayerInventory Inventory => Load();
 
     private static PlayerInventory Load()
@@ -75,10 +78,12 @@ public static class EconomyStore
         { inventory.ownedBackgrounds.Add(DefaultBackgroundId); changed=true; }
         if(!inventory.ownedBackgrounds.Contains(inventory.selectedBackground) || FindBackground(inventory.selectedBackground)==null)
         { inventory.selectedBackground=DefaultBackgroundId; changed=true; }
-        return CareerStore.Sanitize(inventory) || changed;
+        changed=CareerStore.Sanitize(inventory) || changed;
+        return RoomProgress.Reconcile(inventory) || changed;
     }
     private static void Save(PlayerInventory inventory,bool notify=true)
     {
+        RoomProgress.Reconcile(inventory);
         PlayerPrefs.SetString(SaveKey,JsonUtility.ToJson(inventory)); PlayerPrefs.Save();
         if(notify) InventoryChanged?.Invoke();
     }
@@ -176,6 +181,7 @@ public static class EconomyStore
         var item=FindBackground(id); var inventory=Load();
         if(item==null || !item.sprite) { message="This background is unavailable."; return false; }
         if(inventory.ownedBackgrounds.Contains(id)) { message="You already own this background."; return false; }
+        if(item.rewardOnly) {message=RoomProgress.SourceForBackground(id);return false;}
         if(!IsBackgroundUnlocked(item)) { message="Complete level "+item.requiredCompletedLevel+" to unlock this background for purchase."; return false; }
         int cost=Mathf.Max(0,item.price);
         if(inventory.coins<cost) { message="Not enough coins to buy this background."; return false; }
@@ -200,6 +206,7 @@ public static class EconomyStore
         var item=FindDecoration(id);var inventory=Load();
         if(item==null || !item.sprite) {message="This decoration is unavailable.";return false;}
         if(inventory.ownedDecorations.Contains(id)) {message="Already in your inventory.";return false;}
+        if(item.rewardOnly) {message=RoomProgress.SourceForDecoration(id);return false;}
         int cost=Mathf.Max(0,item.price);
         if(inventory.coins<cost) {message="Not enough coins.";return false;}
         inventory.coins-=cost;inventory.ownedDecorations.Add(id);Save(inventory);
@@ -207,13 +214,17 @@ public static class EconomyStore
     }
     public static RoomLayout GetRoomLayout(string backgroundId)
     {
-        var inventory=Load();var result=new RoomLayout {backgroundId=backgroundId};
+        return GetRoomLayout(Load(),backgroundId);
+    }
+    public static RoomLayout GetRoomLayout(PlayerInventory inventory,string backgroundId)
+    {
+        var result=new RoomLayout {backgroundId=backgroundId};
         var saved=inventory.roomLayouts.Find(r=>r!=null && r.backgroundId==backgroundId);
         if(saved!=null && saved.items!=null)
             foreach(var item in saved.items)
             {
                 var definition=item==null ? null : FindDecoration(item.itemId);
-                if(definition==null || definition.slot==DecorationSlot.None || !inventory.ownedDecorations.Contains(item.itemId)) continue;
+                if(definition==null || !definition.sprite || definition.slot==DecorationSlot.None || !inventory.ownedDecorations.Contains(item.itemId)) continue;
                 result.items.RemoveAll(p=>FindDecoration(p.itemId).slot==definition.slot);
                 result.items.Add(SlotPlacement(item.itemId,backgroundId));
             }
@@ -226,18 +237,33 @@ public static class EconomyStore
     }
     public static bool SaveRoomLayout(RoomLayout layout)
     {
-        if(layout==null) return false;
+        return layout!=null && SaveDecorationRooms(null,new[]{layout});
+    }
+    public static bool SaveDecorationRooms(string selectedBackground,IEnumerable<RoomLayout> layouts)
+    {
+        if(layouts==null) return false;
         var inventory=Load();
-        if(!inventory.ownedBackgrounds.Contains(layout.backgroundId) || FindBackground(layout.backgroundId)==null) return false;
+        if(selectedBackground!=null && (!inventory.ownedBackgrounds.Contains(selectedBackground) || FindBackground(selectedBackground)==null)) return false;
+        var clean=new List<RoomLayout>();var ids=new HashSet<string>();
+        foreach(var layout in layouts)
+        {
+            var room=CleanRoomLayout(inventory,layout);if(room==null || !ids.Add(room.backgroundId)) return false;clean.Add(room);
+        }
+        foreach(var room in clean) {inventory.roomLayouts.RemoveAll(r=>r!=null && r.backgroundId==room.backgroundId);inventory.roomLayouts.Add(room);}
+        if(selectedBackground!=null) inventory.selectedBackground=selectedBackground;
+        Save(inventory);return true;
+    }
+    private static RoomLayout CleanRoomLayout(PlayerInventory inventory,RoomLayout layout)
+    {
+        if(layout==null || !inventory.ownedBackgrounds.Contains(layout.backgroundId) || FindBackground(layout.backgroundId)==null) return null;
         var clean=new RoomLayout {backgroundId=layout.backgroundId};
         if(layout.items!=null) foreach(var item in layout.items)
         {
             var definition=item==null ? null : FindDecoration(item.itemId);
-            if(definition==null || definition.slot==DecorationSlot.None || !inventory.ownedDecorations.Contains(item.itemId) ||
-                clean.items.Exists(p=>FindDecoration(p.itemId).slot==definition.slot)) return false;
+            if(definition==null || !definition.sprite || definition.slot==DecorationSlot.None || !inventory.ownedDecorations.Contains(item.itemId) ||
+                clean.items.Exists(p=>FindDecoration(p.itemId).slot==definition.slot)) return null;
             clean.items.Add(SlotPlacement(item.itemId,layout.backgroundId));
         }
-        inventory.roomLayouts.RemoveAll(r=>r!=null && r.backgroundId==layout.backgroundId);
-        inventory.roomLayouts.Add(clean);Save(inventory);return true;
+        return clean;
     }
 }

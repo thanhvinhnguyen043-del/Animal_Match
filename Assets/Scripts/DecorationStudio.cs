@@ -23,71 +23,132 @@ public class DecorationStudio : MonoBehaviour
     public Button previous,next,save,remove,clear;
     public Button[] slotButtons=new Button[0];
     public Image slotHighlight;
+    public DecorationPreview preview;
     public DecorationCard[] shopCards,inventoryCards;
+    public GameObject backgroundPanel;
+    public DecorationCard[] backgroundCards=new DecorationCard[0];
+    public Button backgroundPrevious,backgroundNext;
+    public TextMeshProUGUI backgroundPageLabel;
     private readonly List<DecorationItem> owned=new List<DecorationItem>();
+    private readonly List<ShopBackground> ownedRooms=new List<ShopBackground>();
+    private readonly Dictionary<string,RoomLayout> drafts=new Dictionary<string,RoomLayout>();
+    private readonly List<DecorationItem> shopItems=new List<DecorationItem>();
     private readonly Dictionary<string,Image> placed=new Dictionary<string,Image>();
     private RoomLayout draft;
-    private string selected;
+    private string selected,savedBackground;
     private DecorationSlot selectedSlot=DecorationSlot.Plants;
-    private int inventoryPage,shopPage;
+    private int inventoryPage,shopPage,backgroundPage;
     private bool returnToShop,dirty;
     public bool IsOpen => panel && panel.activeSelf;
     public RoomLayout Draft => draft;
     public DecorationSlot ActiveSlot => selectedSlot;
-    public int ShopPageCount => Mathf.Max(1,Mathf.CeilToInt(EconomyStore.Config.decorations.Length/6f));
+    public int ShopPageCount {get {BuildShopList();return Mathf.Max(1,Mathf.CeilToInt(shopItems.Count/6f));}}
     private void Awake()
     {
-        for(int i=0;i<shopCards.Length;i++) {int slot=i;shopCards[i].button.onClick.AddListener(()=>Buy(shopPage*6+slot));}
+        CafePanelStyle.Studio(panel.transform);
+        for(int i=0;i<shopCards.Length;i++) {int slot=i;shopCards[i].button.onClick.AddListener(()=>Preview(shopPage*6+slot));}
         for(int i=0;i<inventoryCards.Length;i++) {int slot=i;inventoryCards[i].button.onClick.AddListener(()=>PlaceOwned(inventoryPage*6+slot));}
         for(int i=0;i<slotButtons.Length;i++) {int slot=i+1;slotButtons[i].onClick.AddListener(()=>SelectSlot(slot));}
+        for(int i=0;i<backgroundCards.Length;i++) {int slot=i;backgroundCards[i].button.onClick.AddListener(()=>ChooseBackground(backgroundPage*backgroundCards.Length+slot));DecorationPreview.BindThumbnail(backgroundCards[i].preview,()=>PreviewBackground(slot));}
         EconomyStore.InventoryChanged+=RefreshInventory;
     }
     public void ShowShopPage(int page) {shopPage=page;RefreshShop();}
-    private void Buy(int index)
+    public void FocusShopItem(string id) {BuildShopList();int index=shopItems.FindIndex(i=>i.id==id);if(index>=0) shop.ShowAccessoryPage(index/6);}
+    private void BuildShopList()
     {
-        var items=EconomyStore.Config.decorations;if(index<0 || index>=items.Length) return;
-        EconomyStore.TryBuyDecoration(items[index].id,out var message);shop.statusText.text=message;
+        shopItems.Clear();foreach(var item in EconomyStore.Config.decorations) if(item!=null && item.sprite) shopItems.Add(item);
+    }
+    private void Preview(int index)
+    {
+        if(index>=0 && index<shopItems.Count && preview) preview.Open(shopItems[index].id);
     }
     private void RefreshShop()
     {
-        var inventory=EconomyStore.Inventory;var items=EconomyStore.Config.decorations;
+        var inventory=EconomyStore.Inventory;BuildShopList();var items=shopItems;
         for(int i=0;i<shopCards.Length;i++)
         {
-            int index=shopPage*6+i;var card=shopCards[i];card.preview.transform.parent.gameObject.SetActive(index<items.Length);
-            if(index>=items.Length) continue;
+            int index=shopPage*6+i;var card=shopCards[i];card.preview.transform.parent.gameObject.SetActive(index<items.Count);
+            if(index>=items.Count) continue;
             var item=items[index];bool has=inventory.ownedDecorations.Contains(item.id);
             card.preview.sprite=item.sprite;card.title.text=item.displayName;card.detail.text=item.skin+" / "+DecorationSlots.Label(item.slot);
-            card.action.text=has ? "OWNED" : "BUY "+item.price;
-            card.button.interactable=!has && inventory.coins>=item.price;
+            card.detail.text=DecorationSlots.Label(item.slot)+" / "+(has ? "OWNED" : item.rewardOnly ? "PLAY REWARD" : item.price.ToString("N0")+" COINS");
+            card.action.text="PREVIEW";
+            card.button.interactable=true;
         }
     }
     public void Open()
     {
+        if(preview) preview.Close();
         var game=GridManager.Instance.Session;returnToShop=game.State==GameState.Shop;
         if(!game.OpenDecorations()) return;
-        draft=EconomyStore.GetRoomLayout(EconomyStore.Inventory.selectedBackground);dirty=false;selected=null;inventoryPage=0;selectedSlot=DecorationSlot.Plants;
+        drafts.Clear();savedBackground=EconomyStore.Inventory.selectedBackground;
+        draft=EconomyStore.GetRoomLayout(savedBackground);drafts.Add(savedBackground,draft);dirty=false;selected=null;inventoryPage=0;selectedSlot=DecorationSlot.Plants;
+        CloseBackgrounds();
         selected=draft.items.Find(p=>EconomyStore.FindDecoration(p.itemId).slot==selectedSlot)?.itemId;
         shop.panel.SetActive(false);shop.mainMenuPanel.gameObject.SetActive(false);
         panel.SetActive(true);panel.transform.SetAsLastSibling();
-        var item=EconomyStore.FindBackground(draft.backgroundId);room.sprite=item.baseSprite ? item.baseSprite : item.sprite;roomName.text=item.displayName;
+        ShowRoom();
         status.text="Choose an area, then equip one item for that area.";RefreshInventory();Render();
     }
     public void Close()
     {
         if(!IsOpen) return;
-        panel.SetActive(false);draft=null;dirty=false;selected=null;
+        CloseBackgrounds();panel.SetActive(false);drafts.Clear();draft=null;dirty=false;selected=null;
         GridManager.Instance.Session.CloseDecorations(returnToShop);
         if(returnToShop) shop.panel.SetActive(true);else shop.mainMenuPanel.gameObject.SetActive(true);
         shop.Refresh();
     }
     public void Save()
     {
-        if(!IsOpen || !EconomyStore.SaveRoomLayout(draft)) return;
-        dirty=false;status.text="Saved! Your room is updated everywhere.";RefreshSelection();
+        if(!IsOpen || draft==null || !EconomyStore.SaveDecorationRooms(draft.backgroundId,drafts.Values)) return;
+        dirty=false;savedBackground=draft.backgroundId;status.text="Saved! Your background and decorations are updated everywhere.";RefreshSelection();
+    }
+    private void ShowRoom()
+    {
+        var item=EconomyStore.FindBackground(draft.backgroundId);room.sprite=item.baseSprite ? item.baseSprite : item.sprite;roomName.text=item.displayName;
+    }
+    public void OpenBackgrounds()
+    {
+        if(!IsOpen || !backgroundPanel) return;
+        backgroundPage=0;backgroundPanel.SetActive(true);backgroundPanel.transform.SetAsLastSibling();RefreshBackgrounds();
+    }
+    public void CloseBackgrounds() {if(backgroundPanel) backgroundPanel.SetActive(false);}
+    public void PreviousBackground() {backgroundPage--;RefreshBackgrounds();}
+    public void NextBackground() {backgroundPage++;RefreshBackgrounds();}
+    private void RefreshBackgrounds()
+    {
+        if(!IsOpen || !backgroundPanel || !backgroundPanel.activeSelf || backgroundCards.Length==0) return;
+        var inventory=EconomyStore.Inventory;ownedRooms.Clear();
+        foreach(var item in EconomyStore.Config.backgrounds) if(item!=null && item.sprite && inventory.ownedBackgrounds.Contains(item.id)) ownedRooms.Add(item);
+        int pages=Mathf.Max(1,Mathf.CeilToInt(ownedRooms.Count/(float)backgroundCards.Length));backgroundPage=Mathf.Clamp(backgroundPage,0,pages-1);
+        for(int i=0;i<backgroundCards.Length;i++)
+        {
+            var card=backgroundCards[i];int index=backgroundPage*backgroundCards.Length+i;card.preview.transform.parent.gameObject.SetActive(index<ownedRooms.Count);
+            if(index>=ownedRooms.Count) continue;var item=ownedRooms[index];bool chosen=item.id==draft.backgroundId;
+            card.preview.sprite=item.baseSprite ? item.baseSprite : item.sprite;card.title.text=item.displayName;
+            card.detail.text=chosen ? "CURRENT PREVIEW" : item.id==inventory.selectedBackground ? "EQUIPPED" : "OWNED";
+            card.action.text=chosen ? "SELECTED" : "CHOOSE";card.button.interactable=!chosen;
+        }
+        backgroundPageLabel.text=ownedRooms.Count+" OWNED  /  "+(backgroundPage+1)+" OF "+pages;
+        backgroundPrevious.interactable=backgroundPage>0;backgroundNext.interactable=backgroundPage<pages-1;
+    }
+    private void ChooseBackground(int index) {if(index>=0 && index<ownedRooms.Count) SelectBackground(ownedRooms[index].id);}
+    private void PreviewBackground(int slot)
+    {
+        int index=backgroundPage*backgroundCards.Length+slot;
+        if(index>=0 && index<ownedRooms.Count && preview) preview.OpenBackground(ownedRooms[index].id);
+    }
+    public void SelectBackground(string id)
+    {
+        var item=EconomyStore.FindBackground(id);
+        if(!IsOpen || draft==null || item==null || !item.sprite || !EconomyStore.Inventory.ownedBackgrounds.Contains(id)) return;
+        if(!drafts.TryGetValue(id,out var nextDraft)) {nextDraft=EconomyStore.GetRoomLayout(id);drafts.Add(id,nextDraft);}
+        draft=nextDraft;selected=draft.items.Find(p=>EconomyStore.FindDecoration(p.itemId).slot==selectedSlot)?.itemId;inventoryPage=0;
+        CloseBackgrounds();ShowRoom();Render();RefreshInventory();status.text="Previewing "+item.displayName+". Save to apply your background and decorations.";
     }
     private void RefreshInventory()
     {
-        RefreshShop();if(!IsOpen) return;
+        RefreshShop();if(!IsOpen) return;RefreshBackgrounds();
         var inventory=EconomyStore.Inventory;coins.text=inventory.coins+" COIN";owned.Clear();
         foreach(var item in EconomyStore.Config.decorations)
             if(item.slot==selectedSlot && inventory.ownedDecorations.Contains(item.id)) owned.Add(item);
@@ -97,21 +158,26 @@ public class DecorationStudio : MonoBehaviour
             int index=inventoryPage*6+i;var card=inventoryCards[i];card.preview.transform.parent.gameObject.SetActive(index<owned.Count);
             if(index>=owned.Count) continue;
             var item=owned[index];bool isPlaced=draft.items.Exists(p=>p.itemId==item.id);
-            card.preview.sprite=item.sprite;card.title.text=item.displayName;card.detail.text=item.skin;
-            card.action.text=isPlaced ? "EQUIPPED" : "EQUIP";card.button.interactable=!isPlaced;
+            card.preview.sprite=item.sprite;card.preview.enabled=item.sprite;card.title.text=item.displayName;card.detail.text=item.sprite ? item.skin+(isPlaced ? "\nEQUIPPED" : "") : "DISPLAY COMING SOON";
+            card.action.text=!item.sprite ? "COLLECTED" : isPlaced ? "REMOVE" : "EQUIP";card.button.interactable=item.sprite;
         }
-        pageLabel.text=DecorationSlots.Label(selectedSlot)+"  /  "+owned.Count+" OWNED";
+        pageLabel.text=DecorationSlots.Label(selectedSlot)+" / "+owned.Count+" OWNED / "+(inventoryPage+1)+" OF "+pages;
         if(owned.Count==0) status.text="No owned items for this area. Visit ACCESSORIES in Shop.";
         previous.gameObject.SetActive(pages>1);next.gameObject.SetActive(pages>1);
         previous.interactable=inventoryPage>0;next.interactable=inventoryPage<pages-1;RefreshSelection();
     }
     public void Previous() {inventoryPage--;RefreshInventory();}
     public void Next() {inventoryPage++;RefreshInventory();}
-    private void PlaceOwned(int index) {if(index>=0 && index<owned.Count) Place(owned[index].id);}
+    private void PlaceOwned(int index)
+    {
+        if(index<0 || index>=owned.Count) return;
+        string id=owned[index].id;
+        if(draft.items.Exists(p=>p.itemId==id)) {selected=id;Remove();}else Place(id);
+    }
     public void Place(string id)
     {
         var item=EconomyStore.FindDecoration(id);
-        if(!IsOpen || !EconomyStore.Inventory.ownedDecorations.Contains(id) || item==null) return;
+        if(!IsOpen || !EconomyStore.Inventory.ownedDecorations.Contains(id) || item==null || !item.sprite) return;
         if(item.slot!=selectedSlot) {status.text="This item belongs to "+DecorationSlots.Label(item.slot)+".";return;}
         if(draft.items.Exists(p=>p.itemId==id)) return;
         draft.items.RemoveAll(p=>EconomyStore.FindDecoration(p.itemId).slot==selectedSlot);
@@ -132,15 +198,15 @@ public class DecorationStudio : MonoBehaviour
         RefreshInventory();
     }
     private DecorationPlacement Selected => draft?.items.Find(p=>p.itemId==selected);
-    public void Remove() {if(Selected==null) return;draft.items.Remove(Selected);selected=null;Changed();RefreshInventory();}
-    public void Clear() {if(draft==null) return;draft.items.Clear();selected=null;Changed();RefreshInventory();}
+    public void Remove() {if(Selected==null) return;draft.items.Remove(Selected);selected=null;status.text=DecorationSlots.Label(selectedSlot)+" cleared. Save to apply.";Changed();RefreshInventory();}
+    public void Clear() {if(draft==null) return;draft.items.Clear();selected=null;status.text="Room cleared. Save to apply.";Changed();RefreshInventory();}
     private void Changed() {dirty=true;Render();RefreshSelection();}
     private void RefreshSelection()
     {
         bool has=Selected!=null;var item=has ? EconomyStore.FindDecoration(selected) : null;
         selection.text=DecorationSlots.Label(selectedSlot)+"  /  "+(has ? item.displayName : "EMPTY");
         remove.interactable=has;
-        save.interactable=dirty;clear.interactable=draft!=null && draft.items.Count>0;
+        save.interactable=dirty || draft!=null && draft.backgroundId!=savedBackground;clear.interactable=draft!=null && draft.items.Count>0;
         for(int i=0;i<slotButtons.Length;i++) slotButtons[i].GetComponent<Image>().sprite=i+1==(int)selectedSlot ? shop.selectedTabSprite : shop.otherTabSprite;
         if(slotHighlight && draft!=null)
         {
@@ -150,6 +216,7 @@ public class DecorationStudio : MonoBehaviour
             rect.SetAsLastSibling();
         }
         foreach(var pair in placed) pair.Value.color=pair.Key==selected ? new Color(1,.88f,.7f) : Color.white;
+        var sizing=GetComponent<CacaoArtSizing>();if(sizing) sizing.Apply();
     }
     private void Render()
     {

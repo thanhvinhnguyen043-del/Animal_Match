@@ -81,6 +81,7 @@ public class DecorationItem
     public Sprite sprite;
     public Vector2 size=new Vector2(220,280);
     public DecorationSlot slot;
+    public bool rewardOnly;
 }
 
 [Serializable]

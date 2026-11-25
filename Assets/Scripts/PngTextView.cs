@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class PngTextView : MonoBehaviour
 {
     public TextMeshProUGUI source;
+    public Material textMaterialOverride;
     public PngLettering lettering;
     public Image wordImage;
     public PngTextGraphic dynamicText;
@@ -44,7 +45,8 @@ public class PngTextView : MonoBehaviour
             }
             var font=GameTypography.Current.font;
             if(source.font!=font) source.font=font;
-            if(source.fontSharedMaterial!=font.material) source.fontSharedMaterial=font.material;
+            var material=textMaterialOverride ? textMaterialOverride : font.material;
+            if(source.fontSharedMaterial!=material) source.fontSharedMaterial=material;
             if(source.fontStyle!=FontStyles.Normal) source.fontStyle=FontStyles.Normal;
             source.enabled=true;
             if(wordImage) wordImage.gameObject.SetActive(false);

@@ -165,7 +165,28 @@ public static class UnifiedCafeLayouts
         Button(studio.remove.transform,822,842,210,"REMOVE AREA");Button(studio.clear.transform,1050,842,210,"CLEAR ROOM");Button(studio.save.transform,1298,836,240,"SAVE ROOM",true);
         Text(studio.status.transform,60,855,730,34,17);
         Button(studio.previous.transform,1100,247,90);Button(studio.next.transform,1438,247,90);
+        StudioTypography(studio);
         // The dedicated list scrolls; page controls remain available when more than six items are owned.
+    }
+    private static void StudioTypography(DecorationStudio studio)
+    {
+        var root=studio.panel.transform;var body=Resources.Load<Material>("StudioTypography/CoffeeBody");var button=Resources.Load<Material>("StudioTypography/CoffeeButton");
+        foreach(var label in root.GetComponentsInChildren<TextMeshProUGUI>(true))
+        {
+            // The background chooser keeps its own layout and type sizes.
+            if(studio.backgroundPanel && label.transform.IsChildOf(studio.backgroundPanel.transform))continue;
+            bool onButton=label.GetComponentInParent<Button>(true) && !label.transform.IsChildOf(root.Find("StudioOwnedList"));
+            bool white=onButton || label.name=="Title";
+            var material=white?button:body;PngTextView.Attach(label);var lettering=label.GetComponent<PngTextView>();if(lettering)lettering.textMaterialOverride=material;
+            label.fontSharedMaterial=material;label.color=white?new Color(1,.973f,.875f):Cocoa;label.UpdateMeshPadding();
+        }
+        void Size(Transform node,float max,float min){if(!node)return;var t=node.GetComponent<TextMeshProUGUI>();if(!t)t=node.GetComponentInChildren<TextMeshProUGUI>(true);if(!t)return;t.fontSize=t.fontSizeMax=max;t.fontSizeMin=min;t.enableAutoSizing=true;}
+        Size(root.Find("Title"),40,36);Size(studio.roomName.transform,37,33);Size(root.Find("StudioRoomCaption"),21,19);
+        Size(root.Find("InventoryTitle"),37,33);Size(studio.pageLabel.transform,24,21);Size(root.Find("StudioPreviewHeading"),26,24);
+        Size(studio.selection.transform,32,27);Size(root.Find("StudioPreviewHint"),23,21);Size(studio.status.transform,23,20);
+        Size(root.Find("ChangeBackground"),30,26);Size(root.Find("StudioEquip"),30,26);Size(studio.save.transform,32,28);Size(studio.remove.transform,28,24);Size(studio.clear.transform,28,24);
+        foreach(var slot in studio.slotButtons)Size(slot.transform,23,21);
+        foreach(var c in studio.inventoryCards){Size(c.title.transform,27,23);Size(c.detail.transform,22,20);}
     }
     public static void StudioItem(DecorationStudio studio,DecorationItem item,bool equipped)
     {

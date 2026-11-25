@@ -9,7 +9,7 @@ using UnityEngine.UI;
 [InitializeOnLoad]
 public static class SceneUILayoutBuilder
 {
-    private const int CurrentFrameLayoutVersion = 31;
+    private const int CurrentFrameLayoutVersion = 34;
 
     static SceneUILayoutBuilder()
     {

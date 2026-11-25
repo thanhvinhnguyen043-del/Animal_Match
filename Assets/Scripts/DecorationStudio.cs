@@ -164,7 +164,7 @@ public class DecorationStudio : MonoBehaviour
             int index=inventoryPage*6+i;var card=inventoryCards[i];card.preview.transform.parent.gameObject.SetActive(index<owned.Count);
             if(index>=owned.Count) continue;
             var item=owned[index];bool isPlaced=draft.items.Exists(p=>p.itemId==item.id);
-            card.preview.sprite=item.sprite;card.preview.enabled=item.sprite;card.title.text=item.displayName;card.detail.text=item.sprite ? item.skin+(isPlaced ? "\nEQUIPPED" : "") : "DISPLAY COMING SOON";
+            card.preview.sprite=item.sprite;card.preview.enabled=item.sprite;card.title.text=item.displayName;card.detail.text=item.sprite ? item.skin+(isPlaced ? " / EQUIPPED" : "") : "DISPLAY COMING SOON";
             card.action.text=!item.sprite ? "COLLECTED" : isPlaced ? "REMOVE" : "EQUIP";card.button.interactable=item.sprite;
         }
         pageLabel.text=DecorationSlots.Label(selectedSlot)+" / "+owned.Count+" OWNED / "+(inventoryPage+1)+" OF "+pages;
@@ -211,7 +211,7 @@ public class DecorationStudio : MonoBehaviour
     private void RefreshSelection()
     {
         bool has=Selected!=null;var item=has ? EconomyStore.FindDecoration(selected) : null;
-        selection.text=DecorationSlots.Label(selectedSlot)+"  /  "+(has ? item.displayName : "EMPTY");
+        selection.text=has ? item.displayName : DecorationSlots.Label(selectedSlot)+" AREA";
         remove.interactable=has;
         save.interactable=dirty || draft!=null && draft.backgroundId!=savedBackground;clear.interactable=draft!=null && draft.items.Count>0;
         for(int i=0;i<slotButtons.Length;i++) slotButtons[i].GetComponent<Image>().sprite=Resources.Load<Sprite>("TabButtons/"+(i+1==(int)selectedSlot?"Green":"Blue"));

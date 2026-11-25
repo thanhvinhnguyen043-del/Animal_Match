@@ -25,7 +25,7 @@ public sealed class StarGoalTutorialUI : MonoBehaviour
         panel=Instantiate(mechanic.panel,mechanic.panel.transform.parent);panel.name="StarGoalTutorial";panel.SetActive(false);
         var popup=panel.transform.Find("Popup");
         foreach(Transform child in popup) if(child.name!="Panel" && child.name!="Header") child.gameObject.SetActive(false);
-        Label(popup,"Title","THREE STAR GOALS",370,70,540,80,42,true);
+        Label(popup,"Title","COFFEE MEDAL GOALS",370,70,540,80,42,true);
         Label(popup,"Level","LEVEL "+(progress.grid.levelIndex+1),400,210,480,48,30,false);
         var stars=new GameObject("Stars",typeof(RectTransform),typeof(CanvasRenderer),typeof(StarRatingGraphic)).GetComponent<StarRatingGraphic>();stars.transform.SetParent(popup,false);
         GameplayHudStyle.Place(stars.rectTransform,440,265,400,95);stars.SetStars(3);
@@ -35,11 +35,20 @@ public sealed class StarGoalTutorialUI : MonoBehaviour
         var button=new GameObject("Continue",typeof(RectTransform),typeof(CanvasRenderer),typeof(Image),typeof(Button));button.transform.SetParent(popup,false);
         GameplayHudStyle.Place(button.GetComponent<RectTransform>(),410,735,460,145);button.GetComponent<Image>().sprite=original.sprite;button.GetComponent<Button>().onClick.AddListener(Dismiss);
         Label(button.transform,"Label","LET'S PLAY!",20,35,420,70,38,true);
+        PrepareSceneView().onClick.AddListener(Open);
+    }
+    public Button PrepareSceneView()
+    {
+        progress=GetComponent<ProgressUI>();mechanic=GetComponent<WaterTutorialUI>();
+        var existing=progress.ui.gameplayPanel.Find("StarGoalHelp");
+        if(existing) return existing.GetComponent<Button>();
         var help=new GameObject("StarGoalHelp",typeof(RectTransform),typeof(CanvasRenderer),typeof(Image),typeof(Button));help.transform.SetParent(progress.ui.gameplayPanel,false);
         GameplayHudStyle.Place(help.GetComponent<RectTransform>(),1740,300,90,90);
-        help.GetComponent<Image>().sprite=original.sprite;help.GetComponent<Button>().onClick.AddListener(Open);
+        help.GetComponent<Image>().sprite=mechanic.panel.transform.Find("Popup/GotItButton").GetComponent<Image>().sprite;
         Label(help.transform,"Label","?",0,5,90,75,52,true);
+        return help.GetComponent<Button>();
     }
+
     private TextMeshProUGUI Label(Transform parent,string name,string value,float x,float y,float w,float h,float size,bool heading)
     {
         var text=new GameObject(name,typeof(RectTransform),typeof(CanvasRenderer),typeof(TextMeshProUGUI)).GetComponent<TextMeshProUGUI>();text.transform.SetParent(parent,false);
@@ -56,8 +65,10 @@ public sealed class StarGoalTutorialUI : MonoBehaviour
     {
         yield return null;
         var loading=GetComponent<LoadingUI>();
-        while((mechanic && mechanic.IsOpen) || (loading && loading.IsBusy)) yield return null;
-        pending=null;if(game.State==GameState.Playing) Open();
+        var spotlight=GetComponent<MechanicSpotlightUI>();
+        while((mechanic && mechanic.IsOpen) || (loading && loading.IsBusy) ||
+              (spotlight && spotlight.IsRunning)) yield return null;
+        pending=null;if(game.State==GameState.Playing && progress.grid.levelIndex!=3) Open();
     }
     public void Open()
     {
@@ -71,7 +82,7 @@ public sealed class StarGoalTutorialUI : MonoBehaviour
             default:goal="Reach combo x"+challenge.comboTarget;break;
         }
         panel.transform.Find("Popup/Level").GetComponent<TextMeshProUGUI>().text="LEVEL "+(progress.grid.levelIndex+1);
-        description.text="1 STAR  -  Clear the board\n\n2 STARS  -  Finish with at least "+ProgressUI.Clock(game.TimeLimit*challenge.timeRemainingFraction)+" left\n\n3 STARS  -  Meet the time goal AND\n"+goal+" within "+challenge.turnLimit+" turns";
+        description.text="BRONZE  -  Clear the board\n\nSILVER  -  Finish with at least "+ProgressUI.Clock(game.TimeLimit*challenge.timeRemainingFraction)+" left\n\nGOLD  -  Meet the time goal AND\n"+goal+" within "+challenge.turnLimit+" turns";
         previousScale=Time.timeScale;game.Pause();Time.timeScale=0;panel.SetActive(true);panel.transform.SetAsLastSibling();
     }
     public void Dismiss() {if(!IsOpen) return;Hide();if(game.State==GameState.Paused) game.Resume();}

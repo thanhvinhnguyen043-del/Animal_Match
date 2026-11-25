@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public enum GameState { Menu, LevelSelect, Playing, Paused, Win, Lose, Shop, Decorating, DailyRewards, Loading, Achievements, RoomRewards, Leaderboard }
+public enum GameState { Menu, LevelSelect, Playing, Paused, Win, Lose, Shop, Decorating, DailyRewards, Loading, Achievements, RoomRewards, Leaderboard, Activities, PlayerProfile }
 
 [DisallowMultipleComponent]
 public class GameManager : MonoBehaviour
@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour
     public int EarnedStars => 1+(TimeGoalAchieved ? 1 : 0)+(TimeGoalAchieved && GoalAchieved ? 1 : 0);
     private float comboDuration;
     private float timeBonus;
+    private GameState profileReturnState;
 
     public event Action<GameState> StateChanged;
     public event Action<int,int> ScoreChanged;
@@ -64,10 +65,12 @@ public class GameManager : MonoBehaviour
         LevelStarted?.Invoke();
     }
 
+    public bool TutorialTimerPaused { get; set; }
+
     private void Update() { Advance(Time.deltaTime); }
     public void Advance(float seconds)
     {
-        if(state!=GameState.Playing || IsResolvingMatch || seconds<=0) return;
+        if(state!=GameState.Playing || TutorialTimerPaused || IsResolvingMatch || seconds<=0) return;
         ElapsedSeconds+=Mathf.Min(seconds,TimeRemaining);
         TimeRemaining=Mathf.Max(0,TimeRemaining-seconds);
         TimeChanged?.Invoke(TimeRemaining,TimeLimit);
@@ -145,6 +148,14 @@ public class GameManager : MonoBehaviour
         if(state!=GameState.Menu) return false;
         SetState(GameState.DailyRewards);return true;
     }
+    public bool OpenActivities() {if(state!=GameState.Menu) return false;SetState(GameState.Activities);return true;}
+    public void CloseActivities() {if(state==GameState.Activities) SetState(GameState.Menu);}
+    public bool OpenPlayerProfile()
+    {
+        if(state!=GameState.Menu && state!=GameState.Playing || IsResolvingMatch) return false;
+        profileReturnState=state;SetState(GameState.PlayerProfile);return true;
+    }
+    public void ClosePlayerProfile() {if(state==GameState.PlayerProfile) SetState(profileReturnState);}
     public void CloseDailyRewards() {if(state==GameState.DailyRewards) SetState(GameState.Menu);}
     public bool OpenAchievements() {if(state!=GameState.Menu) return false;SetState(GameState.Achievements);return true;}
     public void CloseAchievements() {if(state==GameState.Achievements) SetState(GameState.Menu);}

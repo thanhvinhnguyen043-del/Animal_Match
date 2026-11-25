@@ -47,8 +47,22 @@ public sealed class RoomRewardsUI : MonoBehaviour
     {
         if(!IsOpen) return;panel.SetActive(false);RestoreInput();game.CloseRoomRewards();
     }
+    public void PrepareSceneView()
+    {
+        ApplyLayout();
+        var config=EconomyStore.Config;if(!config)return;
+        for(int i=0;i<cards.Length && i<config.roomRewards.Length;i++)
+        {
+            var reward=config.roomRewards[i];var card=cards[i];card.root.SetActive(true);
+            card.id=reward.id;card.title.text=reward.title;card.detail.text=reward.Condition;card.preview.sprite=reward.Sprite;card.preview.enabled=reward.Sprite;
+            card.progress.text="0 / "+reward.target;card.action.text="LOCKED";card.button.interactable=false;
+        }
+        summary.text="Play, collect and make your cafe your own.";
+    }
     private void ApplyLayout()
     {
+        var saved=GetComponent<SceneUILayout>();
+        if(saved && saved.decoratedFramesVersion>=1) return;
         var root=panel.transform;var frame=root.Find("Frame");
         if(frame)
         {
@@ -69,7 +83,7 @@ public sealed class RoomRewardsUI : MonoBehaviour
         Place(notice.transform,170,855,1580,62);Place(previous.transform,510,920,240,70);
         Place(next.transform,1170,920,240,70);Place(pageLabel.transform,810,930,300,45);
         pageLabel.fontSharedMaterial=summary.fontSharedMaterial;pageLabel.color=new Color(.29f,.135f,.065f);
-        CafePanelStyle.Rewards(root);
+        CafeFrameLayouts.RoomRewards(this);
     }
     private static void Place(Transform target,float x,float y,float w,float h)
     {
@@ -92,9 +106,9 @@ public sealed class RoomRewardsUI : MonoBehaviour
         int count=filter==2 ? config.roomCollections.Length : rewards.Count;
         int pages=Mathf.Max(1,Mathf.CeilToInt(count/(float)cards.Length));page=Mathf.Clamp(page,0,pages-1);
         pageLabel.text=(page+1)+" / "+pages;previous.interactable=page>0;next.interactable=page<pages-1;
-        summary.text=RoomProgress.CompletedChapters(inventory)+" LEVELS CLEARED  /  "+CareerStore.TotalStars(inventory.career)+" STARS  /  "+RoomProgress.CompletedCollections(inventory)+" OF "+config.roomCollections.Length+" COLLECTIONS";
+        summary.text=RoomProgress.CompletedChapters(inventory)+" LEVELS CLEARED  /  "+CareerStore.TotalStars(inventory.career)+" MEDALS  /  "+RoomProgress.CompletedCollections(inventory)+" OF "+config.roomCollections.Length+" COLLECTIONS";
         notice.text=filter==2 ? "Collect all four accessories in a set. Mix them freely with any room." : filter==3 ? "Keepsakes stay in your collection. Display items are coming soon." : "Rewards unlock automatically and stay in your inventory. Mix any skin you like.";
-        for(int i=0;i<filters.Length;i++) filters[i].GetComponent<Image>().color=i==filter ? new Color(.68f,.91f,.79f) : Color.white;
+        for(int i=0;i<filters.Length;i++) {var image=filters[i].GetComponent<Image>();image.color=Color.white;image.sprite=Resources.Load<Sprite>("TabButtons/"+(i==filter ? "Green" : "Blue"));}
         for(int i=0;i<cards.Length;i++)
         {
             int index=page*cards.Length+i;var card=cards[i];card.root.SetActive(index<count);card.id=null;if(index>=count) continue;
@@ -102,8 +116,8 @@ public sealed class RoomRewardsUI : MonoBehaviour
             {
                 var set=config.roomCollections[index];card.id=set.id;int value=RoomProgress.CollectionCount(set,inventory);
                 card.title.text=set.displayName;card.detail.text="";Sprite sprite=null;
-                card.detail.rectTransform.sizeDelta=new Vector2(370,140);
-                card.detail.rectTransform.anchoredPosition=new Vector2(220,-52);
+                card.detail.rectTransform.sizeDelta=new Vector2(285,105);
+                card.detail.rectTransform.anchoredPosition=new Vector2(225,-62);
                 card.detail.fontSizeMax=set.itemIds.Length>4 ? 18 : 24;card.detail.fontSizeMin=15;
                 card.detail.lineSpacing=set.itemIds.Length>4 ? -4 : 0;
                 foreach(string id in set.itemIds)
@@ -111,7 +125,7 @@ public sealed class RoomRewardsUI : MonoBehaviour
                     var item=EconomyStore.FindDecoration(id);if(item==null) continue;if(!sprite && item.sprite) sprite=item.sprite;
                     card.detail.text+=(inventory.ownedDecorations.Contains(id) ? "+ " : "- ")+item.displayName+"\n";
                 }
-                card.detail.text=card.detail.text.TrimEnd();card.preview.sprite=sprite;card.preview.enabled=sprite;card.progress.text=value+" / "+set.itemIds.Length+" OWNED";
+                card.detail.text="Collect "+set.itemIds.Length+" matching accessories";card.preview.sprite=sprite;card.preview.enabled=sprite;card.progress.text=value+" / "+set.itemIds.Length+" OWNED";
                 card.action.text=value==set.itemIds.Length ? "COMPLETE" : "BROWSE";card.button.interactable=value<set.itemIds.Length;
             }
             else
@@ -119,8 +133,8 @@ public sealed class RoomRewardsUI : MonoBehaviour
                 var reward=rewards[index];card.id=reward.id;int value=RoomProgress.Value(reward.goal,inventory);
                 bool earned=inventory.unlockedRoomRewards.Contains(reward.id),owned=string.IsNullOrEmpty(reward.backgroundId) ? inventory.ownedDecorations.Contains(reward.decorationId) : inventory.ownedBackgrounds.Contains(reward.backgroundId);
                 card.title.text=reward.title;card.detail.text=reward.Condition;
-                card.detail.rectTransform.sizeDelta=new Vector2(370,120);
-                card.detail.rectTransform.anchoredPosition=new Vector2(220,-64);
+                card.detail.rectTransform.sizeDelta=new Vector2(285,95);
+                card.detail.rectTransform.anchoredPosition=new Vector2(225,-65);
                 card.detail.fontSizeMax=24;card.detail.fontSizeMin=16;card.detail.lineSpacing=0;
                 card.preview.sprite=reward.Sprite;card.preview.enabled=reward.Sprite;
                 card.progress.text=(earned ? "UNLOCKED" : owned ? "ALREADY OWNED" : Mathf.Min(value,reward.target)+" / "+reward.target)+(!reward.Sprite ? " - DISPLAY COMING SOON" : "");
@@ -128,7 +142,10 @@ public sealed class RoomRewardsUI : MonoBehaviour
                 card.button.interactable=owned && reward.Sprite && inventory.selectedBackground!=reward.backgroundId;
             }
         }
+    
+        UnifiedCafeLayouts.Rooms(this);
     }
+    public void PreviewCard(int index) => PreviewBackground(index);
     private void PreviewBackground(int index)
     {
         if(!IsOpen || filter==2 || index<0 || index>=cards.Length) return;

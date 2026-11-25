@@ -7,6 +7,7 @@ public enum BoosterType { Hint, Shuffle }
 [Serializable]
 public class PlayerInventory
 {
+    public bool hintUnlocked, shuffleUnlocked;
     public int coins;
     public int hints;
     public int shuffles;
@@ -17,6 +18,8 @@ public class PlayerInventory
     public int dailyRewardsClaimed;
     public string dailyRewardLastClaimDate;
     public CareerProgress career=new CareerProgress();
+    public ActivityProgress activities;
+    public PlayerAvatarProfile avatar;
     public List<string> unlockedRoomRewards=new List<string>();
     public List<string> newRoomRewards=new List<string>();
 }
@@ -43,6 +46,27 @@ public static class EconomyStore
     private static EconomyConfig config;
     public static EconomyConfig Config => config ? config : config=Resources.Load<EconomyConfig>("EconomyConfig");
     public static PlayerInventory Inventory => Load();
+
+    public static bool IsBoosterUnlocked(BoosterType type)
+    {
+        var p = Inventory;
+        return type == BoosterType.Hint ? p.hintUnlocked : p.shuffleUnlocked;
+    }
+
+    public static bool ClaimFirstBooster(BoosterType type)
+    {
+        bool claimed = false;
+        UpdateCareer(p =>
+        {
+            if (type == BoosterType.Hint ? p.hintUnlocked : p.shuffleUnlocked) return false;
+            if (type == BoosterType.Hint) {p.hintUnlocked=true; p.hints=Add(p.hints,3);}
+            else {p.shuffleUnlocked=true; p.shuffles=Add(p.shuffles,3);}
+            claimed = true;
+            return true;
+        });
+        return claimed;
+    }
+
 
     private static PlayerInventory Load()
     {
@@ -79,10 +103,15 @@ public static class EconomyStore
         if(!inventory.ownedBackgrounds.Contains(inventory.selectedBackground) || FindBackground(inventory.selectedBackground)==null)
         { inventory.selectedBackground=DefaultBackgroundId; changed=true; }
         changed=CareerStore.Sanitize(inventory) || changed;
+        changed=ActivityStore.Touch(inventory,DateTime.Now) || changed;
+        changed=AvatarFashionRewards.Reconcile(inventory) || changed;
+        changed=PlayerAvatarStore.Reconcile(inventory,LevelProgress.HighestCompleted) || changed;
         return RoomProgress.Reconcile(inventory) || changed;
     }
     private static void Save(PlayerInventory inventory,bool notify=true)
     {
+        AvatarFashionRewards.Reconcile(inventory);
+        PlayerAvatarStore.Reconcile(inventory,LevelProgress.HighestCompleted);
         RoomProgress.Reconcile(inventory);
         PlayerPrefs.SetString(SaveKey,JsonUtility.ToJson(inventory)); PlayerPrefs.Save();
         if(notify) InventoryChanged?.Invoke();
@@ -138,6 +167,7 @@ public static class EconomyStore
             if(inventory.shuffles==0) return false;
             inventory.shuffles--;
         }
+        if(type==BoosterType.Hint) inventory.activities.hintsUsed++;
         Save(inventory); return true;
     }
     public static DailyRewardStatus DailyStatus => DailyRewardSchedule.Status(Load(),DateTime.Now);
@@ -151,7 +181,7 @@ public static class EconomyStore
         inventory.coins=Add(inventory.coins,reward.coins);inventory.hints=Add(inventory.hints,reward.hints);inventory.shuffles=Add(inventory.shuffles,reward.shuffles);
         inventory.dailyRewardsClaimed=status.day;inventory.dailyRewardLastClaimDate=now.ToString(DailyRewardSchedule.DateFormat,System.Globalization.CultureInfo.InvariantCulture);
         inventory.career.counters.dailyClaims++;
-        Save(inventory);message="Day "+status.day+" collected! "+reward.DisplayText();return true;
+        Save(inventory);message="Day "+status.day+" collected! "+reward.DisplayText()+(status.day==3 ? "  + CAFE CHEF HAT!" : status.day==7 ? "  + CAFE CAT + SAKURA BOW!" : "");return true;
     }
     public static bool TryBuyBooster(BoosterType type,out string message)
     {
@@ -199,7 +229,7 @@ public static class EconomyStore
         var config=Config;
         if(config && config.decorations!=null)
             foreach(var item in config.decorations) if(item!=null && item.id==id) return item;
-        return null;
+        return AvatarFashionRewards.Find(id);
     }
     public static bool TryBuyDecoration(string id,out string message)
     {
@@ -249,7 +279,12 @@ public static class EconomyStore
         {
             var room=CleanRoomLayout(inventory,layout);if(room==null || !ids.Add(room.backgroundId)) return false;clean.Add(room);
         }
-        foreach(var room in clean) {inventory.roomLayouts.RemoveAll(r=>r!=null && r.backgroundId==room.backgroundId);inventory.roomLayouts.Add(room);}
+        foreach(var room in clean)
+        {
+            var previous=inventory.roomLayouts.Find(r=>r!=null && r.backgroundId==room.backgroundId);
+            foreach(var item in room.items) if(previous==null || previous.items==null || !previous.items.Exists(old=>old.itemId==item.itemId)) inventory.activities.decorationsEquipped++;
+            inventory.roomLayouts.RemoveAll(r=>r!=null && r.backgroundId==room.backgroundId);inventory.roomLayouts.Add(room);
+        }
         if(selectedBackground!=null) inventory.selectedBackground=selectedBackground;
         Save(inventory);return true;
     }

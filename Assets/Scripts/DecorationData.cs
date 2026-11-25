@@ -42,6 +42,7 @@ public static class DecorationSlots
     public static DecorationSlotAnchor Default(string backgroundId,DecorationSlot slot)
     {
         Vector2 position=new Vector2(.26f,.33f),pivot=new Vector2(.5f,0),size=new Vector2(360,470);
+        if(backgroundId=="cafe" && slot==DecorationSlot.Plants){position=new Vector2(.28f,.23f);size=new Vector2(280,360);}
         switch(slot)
         {
             case DecorationSlot.Hanging:position=new Vector2(.78f,.97f);pivot=new Vector2(.5f,1);size=new Vector2(600,250);break;

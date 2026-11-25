@@ -42,6 +42,17 @@ public class ShopUI : MonoBehaviour
     public Image backgroundTab;
     public Sprite selectedTabSprite;
     public Sprite otherTabSprite;
+    public Sprite accessoriesTabSprite, selectedAccessoriesTabSprite;
+
+    public Sprite GetTabSprite(Image tab, bool selected)
+    {
+        if (tab == decorationTab)
+        {
+            var sprite = selected ? selectedAccessoriesTabSprite : accessoriesTabSprite;
+            if (sprite) return sprite;
+        }
+        return selected ? selectedTabSprite : otherTabSprite;
+    }
     public Button previousPageButton;
     public Button nextPageButton;
     public TextMeshProUGUI backgroundPageText;
@@ -79,7 +90,8 @@ public class ShopUI : MonoBehaviour
         session.OpenShop();
         mainMenuPanel.gameObject.SetActive(false);
         panel.SetActive(true);
-        CafePanelStyle.Shop(panel.transform);
+        if (!panel.transform.Find("ShopWorkspace/ThemedFrame"))
+            CafePanelStyle.Shop(panel.transform);
         panel.transform.SetAsLastSibling();
         Canvas.ForceUpdateCanvases();
         var canvas=panel.GetComponent<Canvas>();
@@ -123,7 +135,8 @@ public class ShopUI : MonoBehaviour
         }
         if(boosterTab) boosterTab.sprite=showingBackgrounds || showingDecorations ? otherTabSprite : selectedTabSprite;
         if(backgroundTab) backgroundTab.sprite=showingBackgrounds ? selectedTabSprite : otherTabSprite;
-        if(decorationTab) decorationTab.sprite=showingDecorations ? selectedTabSprite : otherTabSprite;
+        if(decorationTab) decorationTab.sprite=GetTabSprite(decorationTab, showingDecorations);
+        TabButtonStyle.ApplyAll(transform);
         if(showingDecorations && decorations) decorations.ShowShopPage(backgroundPage);
         if(previousPageButton)
         {
@@ -141,6 +154,8 @@ public class ShopUI : MonoBehaviour
             backgroundPageText.text=(backgroundPage+1)+" / "+pageCount;
         }
         var sizing=GetComponent<CacaoArtSizing>();if(sizing) sizing.Apply();
+    
+        UnifiedCafeLayouts.Shop(this);
     }
     private void BuyBooster(BoosterType booster)
     {
@@ -183,7 +198,7 @@ public class ShopUI : MonoBehaviour
                 UpdateBackgroundButton(card.id,card.button,card.buttonText,inventory,item);
                 bool rewardLocked=item!=null && item.rewardOnly && !inventory.ownedBackgrounds.Contains(card.id);
                 bool locked=rewardLocked || item!=null && !inventory.ownedBackgrounds.Contains(card.id) && !EconomyStore.IsBackgroundUnlocked(item);
-                if(card.description) card.description.text=locked ? (boosterPage ? "Unlock to buy" : "Complete level "+item.requiredCompletedLevel+" to unlock purchase") : card.id==EconomyStore.DefaultBackgroundId ? "Included" : inventory.ownedBackgrounds.Contains(card.id) ? "Owned" : "Permanent background";
+                if(card.description) card.description.text=locked ? (boosterPage ? "Unlock to buy" : "Complete level "+item.requiredCompletedLevel+" to unlock purchase") : card.id==EconomyStore.DefaultBackgroundId ? "Included" : inventory.ownedBackgrounds.Contains(card.id) ? "Owned" : "Background + pedestal";
                 if(card.description && item!=null && item.rewardOnly) card.description.text=inventory.ownedBackgrounds.Contains(card.id) ? "Chapter reward - owned" : RoomProgress.SourceForBackground(card.id);
                 if(card.preview)
                 {

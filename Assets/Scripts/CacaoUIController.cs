@@ -90,22 +90,25 @@ public class CacaoUIController : MonoBehaviour
         HideComboPraise();
         pausePanel.SetActive(false);
         totalTiles=CountTiles();
-        grid.boardContainer.localScale=Vector3.one;
-        float width=grid.columns*grid.tileSize,height=grid.rows*grid.tileSize;
-        grid.boardContainer.anchoredPosition=new Vector2(960,-580);
-        grid.boardContainer.sizeDelta=new Vector2(width,height);
-        if(boardFrame) FitBoardRect(boardFrame.rectTransform,width+96,height+96);
-        if(boardBacking) FitBoardRect(boardBacking,width+40,height+40);
+        PrepareBoardView(grid.columns*grid.tileSize,grid.rows*grid.tileSize);
         displayedSeconds=-1;
         OnTimeChanged(game.TimeRemaining,game.TimeLimit);
         OnScoreChanged(0,0);
         pairsDirty=true;
     }
+    public void PrepareBoardView(float width,float height)
+    {
+        grid.boardContainer.localScale=Vector3.one;
+        grid.boardContainer.anchoredPosition=new Vector2(960,-635);
+        grid.boardContainer.sizeDelta=new Vector2(width,height);
+        if(boardFrame) FitBoardRect(boardFrame.rectTransform,width+96,height+96);
+        if(boardBacking) FitBoardRect(boardBacking,width+40,height+40);
+    }
     private static void FitBoardRect(RectTransform rect,float width,float height)
     {
         rect.anchorMin=rect.anchorMax=new Vector2(0,1);
         rect.pivot=new Vector2(.5f,.5f);
-        rect.anchoredPosition=new Vector2(960,-580);
+        rect.anchoredPosition=new Vector2(960,-635);
         rect.sizeDelta=new Vector2(width,height);
     }
     private void OnTimeChanged(float remaining,float limit)
@@ -129,7 +132,7 @@ public class CacaoUIController : MonoBehaviour
     {
         pairsDirty=true;
         string word=ComboPraiseWord(game.Combo);
-        if(comboPraise && word!=null) ShowComboPraise(word,game.Combo);
+        if(comboPraise && word!=null && !GetComponent<GameplayCompanionUI>()) ShowComboPraise(word,game.Combo);
     }
     public static string ComboPraiseWord(int combo)
     {
@@ -172,7 +175,7 @@ public class CacaoUIController : MonoBehaviour
         pausePanel.SetActive(false);
         winPanel.SetActive(won);
         losePanel.SetActive(!won);
-        grid.textTitle.text="WELL DONE!";
+        grid.textTitle.text="FRESHLY BREWED!";
         winLevelText.text="LEVEL "+(grid.levelIndex+1)+" COMPLETE";
         winScoreText.text=game.Score.ToString("N0");
         winRewardText.text="+"+grid.LastReward.coins;

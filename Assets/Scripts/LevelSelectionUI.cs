@@ -8,9 +8,9 @@ public class LevelSelectionUI : MonoBehaviour
     public Button levelButtonTemplate;
     public UIManager ui;
     public bool compactTiles;
-    private Button[] buttons;
+    [SerializeField, HideInInspector] private Button[] buttons;
     private ScrollRect scroll;
-    private StarRatingGraphic[] stars;
+    [SerializeField, HideInInspector] private StarRatingGraphic[] stars;
     private Sprite levelBadge;
 
     private void Awake()
@@ -55,7 +55,13 @@ public class LevelSelectionUI : MonoBehaviour
 
     private void Start() { Refresh(); }
 
-    public void Refresh()
+    public void PrepareSceneView()
+    {
+        levelBadge=Resources.Load<Sprite>("MenuIcons/LevelBadge");
+        ConfigureScrolling();RefreshView(true);
+    }
+    public void Refresh() => RefreshView(false);
+    private void RefreshView(bool preview)
     {
         if (scroll == null) ConfigureScrolling();
         var database = Resources.Load<LevelDatabase>("LevelDatabase");
@@ -72,7 +78,7 @@ public class LevelSelectionUI : MonoBehaviour
                 foreach (var old in buttons) if (old)
                 {
                     old.gameObject.SetActive(false);
-                    Destroy(old.gameObject);
+                    if(Application.isPlaying) Destroy(old.gameObject);else DestroyImmediate(old.gameObject);
                 }
             buttons = new Button[count];
             stars=new StarRatingGraphic[count];
@@ -97,14 +103,17 @@ public class LevelSelectionUI : MonoBehaviour
                 stars[i]=button.GetComponentInChildren<StarRatingGraphic>(true);
             }
         }
-        int unlocked = LevelProgress.HighestUnlocked(count);
-        var career=EconomyStore.Inventory.career;
+        int unlocked = preview ? 0 : LevelProgress.HighestUnlocked(count);
+        var career=preview ? null : EconomyStore.Inventory.career;
         for (int i = 0; i < count; i++)
         {
+            int index=i;
+            buttons[i].onClick=new Button.ButtonClickedEvent();
+            if(!preview) buttons[i].onClick.AddListener(()=>ui.StartLevel(index));
             buttons[i].interactable = i <= unlocked;
             if(stars[i])
             {
-                var record=CareerStore.Record(career,CareerStore.LevelId(i,database));
+                var record=career==null ? null : CareerStore.Record(career,CareerStore.LevelId(i,database));
                 stars[i].SetStars(record==null ? 0 : record.stars);stars[i].gameObject.SetActive(i<=unlocked);
             }
             var label = buttons[i].GetComponentInChildren<TextMeshProUGUI>(true);
@@ -132,9 +141,9 @@ public class LevelSelectionUI : MonoBehaviour
                 if(status)
                 {
                     status.gameObject.SetActive(!locked && !levelBadge);
-                    status.GetComponent<TextMeshProUGUI>().text=i==LevelProgress.Latest(count) ? "PLAY" : "OPEN";
+                    status.GetComponent<TextMeshProUGUI>().text=i==(preview ? 0 : LevelProgress.Latest(count)) ? "PLAY" : "OPEN";
                 }
-                buttons[i].GetComponent<Image>().color=locked ? new Color(.93f,.88f,.8f) : i==LevelProgress.Latest(count) ? new Color(.87f,.94f,.72f) : new Color(1,.98f,.91f);
+                buttons[i].GetComponent<Image>().color=locked ? new Color(.93f,.88f,.8f) : i==(preview ? 0 : LevelProgress.Latest(count)) ? new Color(.87f,.94f,.72f) : new Color(1,.98f,.91f);
             }
         }
 

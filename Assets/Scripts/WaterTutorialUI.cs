@@ -4,7 +4,7 @@ using UnityEngine.UI;
 [DefaultExecutionOrder(200)]
 public class WaterTutorialUI : MonoBehaviour
 {
-    public const string SeenKey="Tutorial.Water.Seen";
+    public const string SeenKey="Tutorial.Water.DesignedLevels.Seen";
     public GridManager grid;
     public GameObject panel;
     public Image waterAnimal;
@@ -23,7 +23,7 @@ public class WaterTutorialUI : MonoBehaviour
     }
     private void OnLevelStarted()
     {
-        if(PlayerPrefs.GetInt(SeenKey,0)==1 || IsOpen || game.State!=GameState.Playing || grid.gridArray==null) return;
+        if(grid.levelIndex != 3 || (!MechanicSpotlightUI.ReplayForDemo && PlayerPrefs.GetInt(SeenKey,0)==1) || IsOpen || game.State!=GameState.Playing || grid.gridArray==null) return;
         foreach(var tile in grid.gridArray)
         {
             if(!tile || tile.currentState!=TileState.Ice) continue;
@@ -40,8 +40,11 @@ public class WaterTutorialUI : MonoBehaviour
     public void Dismiss()
     {
         if(!IsOpen) return;
-        PlayerPrefs.SetInt(SeenKey,1);
-        PlayerPrefs.Save();
+        if (!MechanicSpotlightUI.ReplayForDemo)
+        {
+            PlayerPrefs.SetInt(SeenKey,1);
+            PlayerPrefs.Save();
+        }
         Hide();
         if(game.State==GameState.Paused) game.Resume();
     }

@@ -25,13 +25,15 @@ public sealed class ProgressUI : MonoBehaviour
     public Button menuButton,closeButton,previousButton,nextButton,milestoneButton;
     public Button[] filters;
     public AchievementCard[] cards;
+    public ScrollRect achievementScroll;
     public TextMeshProUGUI menuStars,levelStars,summary,pageLabel,notice,milestoneLabel,milestoneProgress;
     public TextMeshProUGUI goalTitle,timeGoal,challengeGoal,turns,resultRecords,resultNotice;
     public StarRatingGraphic goalStars,resultStars;
     private readonly List<AchievementDefinition> visible=new List<AchievementDefinition>(64);
+    // Catalog keys stay stable; the visible tab caption is MEDALS.
     private readonly string[] categories={"ALL","STARS","COMBOS","PLAY","COLLECTION","READY"};
     private GameManager game;
-    private int page,filter,displayedSecond=-1;
+    private int filter,displayedSecond=-1;
     private bool menuBlocked,oldInteractable,oldRaycasts,goalsDirty;
     private Image starProgressFill;
     private float starProgress,targetStarProgress;
@@ -40,10 +42,20 @@ public sealed class ProgressUI : MonoBehaviour
     private void Start()
     {
         PrepareAchievementIcons();
-        PrepareMenuIcons();
-        starProgressFill=GameplayHudStyle.Apply(this);
+        CafeFrameLayouts.Achievements(this);
+        var sceneLayout=GetComponent<SceneUILayout>();
+        if(sceneLayout && sceneLayout.starFill) starProgressFill=sceneLayout.starFill;
+        else starProgressFill=PrepareSceneView();
+        GameplayProgressStyle.Apply(this);
+        if(!GetComponent<FirstBoosterRewardUI>()) gameObject.AddComponent<FirstBoosterRewardUI>();
+        if(!GetComponent<MechanicSpotlightUI>()) gameObject.AddComponent<MechanicSpotlightUI>();
         if(!GetComponent<StarGoalTutorialUI>()) gameObject.AddComponent<StarGoalTutorialUI>();
         if(!GetComponent<LeaderboardUI>()) gameObject.AddComponent<LeaderboardUI>();
+        if(!GetComponent<ActivityUI>()) gameObject.AddComponent<ActivityUI>();
+        if(!GetComponent<PlayerAvatarUI>()) gameObject.AddComponent<PlayerAvatarUI>();
+        if(!GetComponent<GameplayCompanionUI>()) gameObject.AddComponent<GameplayCompanionUI>();
+        if(!GetComponent<CafeVictoryUI>()) gameObject.AddComponent<CafeVictoryUI>();
+        if(!GetComponent<CoffeeMatchEffects>()) gameObject.AddComponent<CoffeeMatchEffects>();
         if(!GetComponent<CacaoArtSizing>()) gameObject.AddComponent<CacaoArtSizing>();
         game=grid.Session;game.StateChanged+=OnState;game.LevelStarted+=OnLevelStarted;game.GameEnded+=OnEnded;
         game.MatchResolved+=OnMatch;game.TileBroken+=OnBroken;game.TimeChanged+=OnTime;
@@ -55,9 +67,9 @@ public sealed class ProgressUI : MonoBehaviour
     public void Open()
     {
         if(!game || ui.settingsPanel.gameObject.activeSelf || !game.OpenAchievements()) return;
-        page=filter=0;panel.SetActive(true);panel.transform.SetAsLastSibling();notice.text="";
+        filter=0;panel.SetActive(true);panel.transform.SetAsLastSibling();notice.text="";
         if(menuInput) {oldInteractable=menuInput.interactable;oldRaycasts=menuInput.blocksRaycasts;menuInput.interactable=menuInput.blocksRaycasts=false;menuBlocked=true;}
-        Refresh();if(EventSystem.current) EventSystem.current.SetSelectedGameObject(closeButton.gameObject);
+        Refresh();ResetScroll();if(EventSystem.current) EventSystem.current.SetSelectedGameObject(closeButton.gameObject);
     }
     public void Close()
     {
@@ -71,13 +83,12 @@ public sealed class ProgressUI : MonoBehaviour
         if(state!=GameState.Achievements && IsOpen) {panel.SetActive(false);RestoreInput();}
         if(state==GameState.Menu) Refresh();
     }
-    public void SetFilter(int value) {filter=Mathf.Clamp(value,0,categories.Length-1);page=0;Refresh();}
-    public void Previous() {page--;Refresh();}
-    public void Next() {page++;Refresh();}
+    public void SetFilter(int value) {filter=Mathf.Clamp(value,0,categories.Length-1);Refresh();ResetScroll();}
+    private void ResetScroll() {achievementScroll.StopMovement();achievementScroll.verticalNormalizedPosition=1;}
     public void Refresh()
     {
         var inventory=EconomyStore.Inventory;var career=inventory.career;var database=grid.levelDatabase;
-        string stars="STARS  "+CareerStore.TotalStars(career)+" / "+(database ? database.levels.Count*3 : 0);
+        string stars="MEDALS  "+CareerStore.TotalStars(career)+" / "+(database ? database.levels.Count*3 : 0);
         menuStars.text=stars;levelStars.text=stars;
         int ready=0;
         foreach(var item in AchievementCatalog.All)
@@ -93,16 +104,16 @@ public sealed class ProgressUI : MonoBehaviour
             bool claimed=career.claimedAchievements.Contains(item.id);
             if(filter==0 || filter==5 && !claimed && AchievementCatalog.Value(item.metric,inventory)>=item.target || filter>0 && filter<5 && item.category==categories[filter]) visible.Add(item);
         }
-        int pages=Mathf.Max(1,Mathf.CeilToInt(visible.Count/(float)cards.Length));page=Mathf.Clamp(page,0,pages-1);
-        pageLabel.text=(page+1)+" / "+pages;previousButton.interactable=page>0;nextButton.interactable=page<pages-1;
+        CafeFrameLayouts.SizeAchievementList(this,visible.Count);
         summary.text=career.claimedAchievements.Count+" / "+AchievementCatalog.All.Count+" CLAIMED     "+ready+" READY";
-        for(int index=0;index<filters.Length;index++) filters[index].GetComponent<Image>().color=index==filter ? new Color(.65f,.9f,.78f) : Color.white;
+        for(int index=0;index<filters.Length;index++) {var image=filters[index].GetComponent<Image>();image.color=Color.white;image.sprite=Resources.Load<Sprite>("TabButtons/"+(index==filter ? "Green" : "Blue"));}
         for(int index=0;index<cards.Length;index++)
         {
-            var card=cards[index];int row=page*cards.Length+index;card.root.SetActive(row<visible.Count);card.id=null;if(row>=visible.Count) continue;
+            var card=cards[index];int row=index;card.root.SetActive(row<visible.Count);card.id=null;if(row>=visible.Count) continue;
             var item=visible[row];card.id=item.id;int value=AchievementCatalog.Value(item.metric,inventory);bool claimed=career.claimedAchievements.Contains(item.id),complete=value>=item.target;
             card.icon.sprite=achievementIcons[item.metric];card.icon.enabled=card.icon.sprite;
             card.title.text=item.title;card.description.text=item.description;card.reward.text=RewardText(item.reward);
+            // Rewards share the unified achievement list surface.
             card.progress.text=Mathf.Min(value,item.target).ToString("N0")+" / "+item.target.ToString("N0");
             card.fill.rectTransform.anchorMax=new Vector2(Mathf.Clamp01(value/(float)item.target),1);
             card.fill.color=claimed ? new Color(.58f,.69f,.55f) : new Color(.39f,.77f,.67f);
@@ -110,7 +121,26 @@ public sealed class ProgressUI : MonoBehaviour
         }
         milestoneButton.interactable=chestReady;
         milestoneLabel.text=nextChest==null ? "ALL CHESTS CLAIMED" : chestReady ? "CLAIM BONUS CHEST" : "BONUS CHEST AT "+nextChest.target;
-        milestoneProgress.text=nextChest==null ? "All milestones completed!" : career.claimedAchievements.Count+" / "+nextChest.target+" CLAIMED  |  "+RewardText(nextChest.reward);
+        milestoneProgress.text=nextChest==null ? "All milestones completed!" : career.claimedAchievements.Count+" / "+nextChest.target+" CLAIMED  |  "+RewardText(nextChest.reward)+(nextChest.target==10 ? " + DREAMY NIGHTCAP" : "");
+    }
+    public Image PrepareSceneView()
+    {
+        PrepareMenuIcons();
+        return GameplayHudStyle.Apply(this);
+    }
+    public void PrepareAchievementSceneView()
+    {
+        PrepareAchievementIcons();
+        CafeFrameLayouts.Achievements(this);
+        for(int i=0;i<cards.Length && i<AchievementCatalog.All.Count;i++)
+        {
+            var item=AchievementCatalog.All[i];var card=cards[i];
+            card.title.text=item.title;card.description.text=item.description;card.reward.text=RewardText(item.reward);
+            card.icon.sprite=achievementIcons[item.metric];card.progress.text="0 / "+item.target;
+            card.action.text="IN PROGRESS";card.button.interactable=false;
+        }
+        CafeFrameLayouts.SizeAchievementList(this,AchievementCatalog.All.Count);
+        summary.text="Complete goals, collect rewards and celebrate your progress.";
     }
     private void PrepareMenuIcons()
     {
@@ -176,6 +206,7 @@ public sealed class ProgressUI : MonoBehaviour
                 image.transform.SetParent(card.root.transform,false);card.icon=image.GetComponent<Image>();
             }
             card.icon.preserveAspect=true;card.icon.raycastTarget=false;
+            var saved=GetComponent<SceneUILayout>();if(saved && saved.decoratedFramesVersion>=1)continue;
             PlaceCardElement(card.icon.rectTransform,12,16,112,112);
             PlaceCardElement(card.title.rectTransform,134,10,385,38);
             PlaceCardElement(card.description.rectTransform,134,48,385,48);
@@ -210,7 +241,7 @@ public sealed class ProgressUI : MonoBehaviour
     private void OnLevelStarted() {displayedSecond=-1;goalsDirty=false;starProgress=targetStarProgress=0;goalStars.SetStars(0);resultNotice.text="";RefreshGoals();}
     private void OnMatch(int points,float bonus,Vector2 position) {goalsDirty=true;}
     private void OnBroken(TileState state) {goalsDirty=true;}
-    private void OnTime(float remaining,float limit) {int second=Mathf.CeilToInt(remaining);if(second!=displayedSecond) {displayedSecond=second;goalsDirty=true;var fill=grid.timeSlider.fillRect.GetComponent<Image>();fill.color=remaining/limit<.2f ? new Color(.9f,.31f,.22f) : remaining/limit<.4f ? new Color(.96f,.67f,.23f) : new Color(.43f,.72f,.35f);}}
+    private void OnTime(float remaining,float limit) {int second=Mathf.CeilToInt(remaining);if(second!=displayedSecond) {displayedSecond=second;goalsDirty=true;var fill=grid.timeSlider.fillRect.GetComponent<Image>();fill.color=remaining/limit<.2f ? new Color(.9f,.31f,.22f) : remaining/limit<.4f ? new Color(.96f,.67f,.23f) : new Color(1,.92f,.79f);}}
     private void LateUpdate()
     {
         if(goalsDirty) {goalsDirty=false;RefreshGoals();}
@@ -219,22 +250,22 @@ public sealed class ProgressUI : MonoBehaviour
         if(starProgressFill.type==Image.Type.Filled) starProgressFill.fillAmount=starProgress;
         else starProgressFill.rectTransform.anchorMax=new Vector2(starProgress,1);
         starProgressFill.enabled=starProgress>.005f;
-        int lit=Mathf.Clamp(Mathf.FloorToInt(starProgress*3+.001f),0,3);if(goalStars.Stars!=lit) goalStars.SetStars(lit);
+        int lit=Mathf.Clamp(Mathf.FloorToInt(starProgress*3+.001f),0,3);if(goalStars.Stars!=lit) goalStars.SetStarsAnimated(lit);
     }
     public static string Clock(float seconds) {int whole=Mathf.Max(0,Mathf.CeilToInt(seconds-.0001f));return (whole/60).ToString("00")+":"+(whole%60).ToString("00");}
     private void RefreshGoals()
     {
         var challenge=game.Challenge;
-        goalTitle.text="STAR PROGRESS";
+        goalTitle.text="MEDAL PROGRESS";
         targetStarProgress=game.State==GameState.Win ? game.EarnedStars/3f : Mathf.Min(.99f,grid.ClearProgress)*game.EarnedStars/3f;
-        timeGoal.text="2 STARS\nFinish with "+Clock(game.TimeLimit*challenge.timeRemainingFraction)+" left";
+        timeGoal.text="SILVER\nFinish with "+Clock(game.TimeLimit*challenge.timeRemainingFraction)+" left";
         timeGoal.color=game.TimeGoalAchieved ? new Color(.36f,.3f,.2f) : new Color(.7f,.3f,.22f);
         string target;
         if(game.ActiveGoal==StarGoal.Combo) target="Reach combo x"+challenge.comboTarget+"\nBest x"+game.PeakCombo;
         else if(game.ActiveGoal==StarGoal.Water) target="Break all water\n"+game.WaterBroken+" / "+game.InitialWater;
         else if(game.ActiveGoal==StarGoal.Stone) target="Break all stone\n"+game.StoneBroken+" / "+game.InitialStone;
         else target="Break all water + stone\n"+(game.WaterBroken+game.StoneBroken)+" / "+(game.InitialWater+game.InitialStone);
-        challengeGoal.text="3 STARS\n"+target+"\nWithin "+challenge.turnLimit+" turns";
+        challengeGoal.text="GOLD\n"+target+"\nWithin "+challenge.turnLimit+" turns";
         bool failed=!game.GoalAchieved && game.Moves>=challenge.turnLimit;
         challengeGoal.color=game.GoalAchieved ? new Color(.28f,.52f,.24f) : failed ? new Color(.7f,.3f,.22f) : new Color(.36f,.3f,.2f);
         turns.text=game.GoalAchieved ? "GOAL COMPLETE!" : failed ? "TRY AGAIN FOR 3!" : "TURN "+game.Moves+" / "+challenge.turnLimit;
@@ -245,8 +276,8 @@ public sealed class ProgressUI : MonoBehaviour
         RefreshGoals();
         var result=grid.LastResult;resultStars.SetStars(result.stars);
         var record=CareerStore.Record(EconomyStore.Inventory.career,CareerStore.LevelId(grid.levelIndex,grid.levelDatabase));
-        resultRecords.text="BEST SCORE "+record.bestScore.ToString("N0")+"   |   BEST TIME "+Clock(record.bestSeconds)+"\nBEST COMBO x"+record.bestCombo+"   |   BEST STARS "+record.stars+" / 3";
-        resultNotice.text=result.moreStars ? "NEW STAR RECORD!" : result.newScore || result.newTime || result.newCombo ? "NEW PERSONAL BEST!" : "BEST RECORDS SAVED";
+        resultRecords.text="BEST SCORE "+record.bestScore.ToString("N0")+"   |   BEST TIME "+Clock(record.bestSeconds)+"\nBEST COMBO x"+record.bestCombo+"   |   BEST MEDALS "+record.stars+" / 3";
+        resultNotice.text=result.moreStars ? "NEW MEDAL RECORD!" : result.newScore || result.newTime || result.newCombo ? "NEW PERSONAL BEST!" : "BEST RECORDS SAVED";
         Refresh();
     }
     private void OnDestroy()

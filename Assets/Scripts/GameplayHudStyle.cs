@@ -27,7 +27,7 @@ public static class GameplayHudStyle
             {surface.gameObject.SetActive(false);}
         var goalRoot=progress.goalTitle.transform.parent;
         var backing=goalRoot.Find("Backing");if(backing) backing.gameObject.SetActive(false);
-        progress.goalTitle.text="STAR PROGRESS";Place(progress.goalTitle.rectTransform,15,12,270,40);
+        progress.goalTitle.text="MEDAL PROGRESS";Place(progress.goalTitle.rectTransform,15,12,270,40);
         var track=Box(goalRoot,"StarTrack",30,83,240,18,new Color(1,.9f,.67f));track.transform.SetSiblingIndex(1);
         var fill=Box(track.transform,"Earned",3,3,234,12,new Color(1,.73f,.15f));
         fill.rectTransform.anchorMin=Vector2.zero;fill.rectTransform.anchorMax=Vector2.one;fill.rectTransform.offsetMin=new Vector2(3,3);fill.rectTransform.offsetMax=new Vector2(-3,-3);
@@ -40,9 +40,11 @@ public static class GameplayHudStyle
         if(trackPng && fillPng)
         {
             track.enabled=false;fill.enabled=false;
-            var trackImage=new GameObject("TrackPNG",typeof(RectTransform),typeof(CanvasRenderer),typeof(Image)).GetComponent<Image>();trackImage.transform.SetParent(goalRoot,false);
+            var savedTrack=goalRoot.Find("TrackPNG");
+            var trackImage=savedTrack ? savedTrack.GetComponent<Image>() : new GameObject("TrackPNG",typeof(RectTransform),typeof(CanvasRenderer),typeof(Image)).GetComponent<Image>();trackImage.transform.SetParent(goalRoot,false);
             trackImage.sprite=trackPng;trackImage.raycastTarget=false;Place(trackImage.rectTransform,20,67,260,72);trackImage.transform.SetSiblingIndex(track.transform.GetSiblingIndex());
-            var fillImage=new GameObject("FillPNG",typeof(RectTransform),typeof(CanvasRenderer),typeof(Image)).GetComponent<Image>();fillImage.transform.SetParent(trackImage.transform,false);
+            var savedFill=trackImage.transform.Find("FillPNG");
+            var fillImage=savedFill ? savedFill.GetComponent<Image>() : new GameObject("FillPNG",typeof(RectTransform),typeof(CanvasRenderer),typeof(Image)).GetComponent<Image>();fillImage.transform.SetParent(trackImage.transform,false);
             fillImage.sprite=fillPng;fillImage.type=Image.Type.Filled;fillImage.fillMethod=Image.FillMethod.Horizontal;fillImage.fillOrigin=0;fillImage.raycastTarget=false;
             fillImage.rectTransform.anchorMin=new Vector2(0,.25f);fillImage.rectTransform.anchorMax=new Vector2(1,.75f);fillImage.rectTransform.offsetMin=new Vector2(7,0);fillImage.rectTransform.offsetMax=new Vector2(-7,0);
             progress.goalStars.UsePngStars();return fillImage;

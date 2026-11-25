@@ -39,6 +39,14 @@ public class DailyRewardUI : MonoBehaviour
     private void Start()
     {
         game=GridManager.Instance.Session;game.StateChanged+=OnStateChanged;EconomyStore.InventoryChanged+=Refresh;
+        foreach(var image in panel.GetComponentsInChildren<Image>(true)) if(image.name=="Chest") {image.sprite=Resources.Load<Sprite>("PlayerAvatars/Cat");image.preserveAspect=true;}
+        foreach(var label in panel.GetComponentsInChildren<TextMeshProUGUI>(true)) if(label.name=="WeeklyTitle") label.text="CAFE CAT + BONUS GIFTS";
+        for(int i=0;i<cards.Length;i++) if(i==2 || i==6)
+        {
+            var extra=new GameObject("FashionReward",typeof(RectTransform),typeof(CanvasRenderer),typeof(Image)).GetComponent<Image>();extra.transform.SetParent(cards[i].background.transform,false);
+            extra.sprite=Resources.Load<Sprite>("AvatarFashion/"+(i==2 ? "Chef" : "Sakura"));extra.preserveAspect=true;extra.raycastTarget=false;AvatarFashionRewards.Style(extra);
+            Position(extra.rectTransform,i==2 ? 210 : 380,i==2 ? 95 : 100,i==2 ? 48 : 96,i==2 ? 48 : 96);
+        }
         panel.SetActive(false);Refresh();
         TryAutoShow();
     }
@@ -82,9 +90,16 @@ public class DailyRewardUI : MonoBehaviour
     private void RefreshCard(DailyRewardCard card,int index,DailyRewardStatus state)
     {
         bool claimed=index<state.collected,ready=state.canClaim && index+1==state.day,weekly=index==6;
-        if(!weekly) card.background.sprite=claimed ? claimedCard : ready ? todayCard : upcomingCard;
-        card.claimed.SetActive(claimed);card.locked.SetActive(!claimed && !ready);card.today.SetActive(ready);
+        if(!weekly) card.background.rectTransform.sizeDelta=new Vector2(card.background.rectTransform.sizeDelta.x,240);
+        if(RewardFrameArt.Load("Common")) RewardFrameArt.Apply(card.background,weekly ? "Day7" : claimed ? "Claimed" : ready ? "Ready" : "Common");
+        else if(!weekly) card.background.sprite=claimed ? claimedCard : ready ? todayCard : upcomingCard;
+        card.claimed.SetActive(claimed && (weekly || !RewardFrameArt.Load("Claimed")));card.locked.SetActive(!claimed && !ready);card.today.SetActive(ready);
         card.status.text=claimed ? "CLAIMED" : ready ? "READY TO CLAIM" : "COMING UP";
+        if(index==2) card.status.text=(claimed ? "CLAIMED" : ready ? "READY" : "COMING UP")+" + CHEF HAT";
+        if(index==6) card.status.text+=" / + SAKURA BOW";
+        foreach(var label in card.background.GetComponentsInChildren<TextMeshProUGUI>(true))
+            if(label.text.StartsWith("DAY ") && !weekly) {Position(label.rectTransform,110,44,135,30);label.fontSizeMax=25;label.fontSizeMin=22;label.enableAutoSizing=true;}
+        if(!weekly) {Position(card.status.rectTransform,25,246,240,26);card.status.fontSizeMax=16;card.status.fontSizeMin=13;card.status.enableAutoSizing=true;}
         card.status.color=claimed ? new Color(.34f,.47f,.25f) : new Color(.58f,.38f,.16f);
         var reward=DailyRewardSchedule.Reward(index+1);int[] values={reward.coins,reward.hints,reward.shuffles};
         int count=0;foreach(int value in values) if(value>0) count++;
@@ -94,12 +109,13 @@ public class DailyRewardUI : MonoBehaviour
             var icon=card.icons[kind];var amount=card.amounts[kind];bool visible=values[kind]>0;icon.gameObject.SetActive(visible);amount.gameObject.SetActive(visible);
             icon.color=new Color(1,1,1,claimed ? .58f : 1);
             if(!visible) continue;
-            float size=weekly ? 76 : count==1 ? 130 : count==2 ? 95 : 76;
+            float size=weekly ? 76 : count==1 ? 100 : count==2 ? 84 : 76;
             float spacing=weekly ? 139 : count==2 ? 118 : 87;
             float center=(weekly ? 255 : 145)+(column-(count-1)*.5f)*spacing;
-            Position(icon.rectTransform,center-size/2,weekly ? 397 : count==1 ? 60 : 68,size,size);
-            Position(amount.rectTransform,center-(weekly ? 65 : count==1 ? 138 : 58),weekly ? 474 : count==1 ? 182 : 171,weekly ? 130 : count==1 ? 276 : 116,40);
-            amount.text=(kind==0 ? "+" : "x")+values[kind]+(!weekly && count==1 ? kind==0 ? " COINS" : kind==1 ? " HINT" : " SHUFFLE" : "");
+            Position(icon.rectTransform,center-size/2,weekly ? 397 : count==1 ? 78 : 82,size,size);
+            Position(amount.rectTransform,center-(weekly ? 65 : count==1 ? 138 : 58),weekly ? 474 : ready ? 190 : 181,weekly ? 130 : count==1 ? 276 : 116,weekly ? 40 : 26);
+            if(!weekly) {amount.fontSizeMax=23;amount.fontSizeMin=20;amount.enableAutoSizing=true;}
+            amount.text=(kind==0 ? "+" : "x")+values[kind]+(!weekly && count==1 && !ready ? kind==0 ? " COINS" : kind==1 ? " HINT" : " SHUFFLE" : "");
             column++;
         }
     }

@@ -11,6 +11,8 @@ public class ShopBackground
     public bool rewardOnly;
     public Sprite sprite;
     public Sprite baseSprite;
+    [Tooltip("Included with this background; used under the gameplay companion.")]
+    public Sprite companionPedestal;
 }
 
 [CreateAssetMenu(fileName="EconomyConfig",menuName="Game/Economy Config")]

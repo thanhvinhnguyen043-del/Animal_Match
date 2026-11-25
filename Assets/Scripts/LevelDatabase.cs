@@ -33,6 +33,8 @@ public class LevelDefinition
     [Range(0, 1)] public float iceChance;
     [Range(0, 1)] public float barrierChance;
 
+    public bool useDesignedBoardRules;
+
     public List<LevelCell> cells = new List<LevelCell>();
 
     public List<LevelCell> Generate(int spriteCount, int generationSeed)
@@ -90,6 +92,7 @@ public class LevelDefinition
                     { error = "ID thu khong hop le hoac trang thai Hidden khong duoc ho tro."; break; }
                     occupied++;
                     if (cell.state != TileState.Barrier) selectable++;
+                    if (useDesignedBoardRules && cell.state == TileState.Ice) continue;
                     counts.TryGetValue(cell.animalID, out int count);
                     counts[cell.animalID] = count + 1;
                 }

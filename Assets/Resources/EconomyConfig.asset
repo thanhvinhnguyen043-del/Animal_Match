@@ -26,6 +26,7 @@ MonoBehaviour:
     rewardOnly: 0
     sprite: {fileID: 21300000, guid: d382d35218f77e246aab0ea18cce8fb0, type: 3}
     baseSprite: {fileID: 21300000, guid: deef8b9cb0d6ef64ca32201a0ce63a31, type: 3}
+    companionPedestal: {fileID: 21300000, guid: b8421e03933fdff87ac0da2990e8e97d, type: 3}
   - id: japan
     displayName: Japan Cafe
     price: 2000
@@ -33,6 +34,7 @@ MonoBehaviour:
     rewardOnly: 1
     sprite: {fileID: 21300000, guid: a4f80bd2e648bcb48953cfcf54efb2a1, type: 3}
     baseSprite: {fileID: 21300000, guid: b6bf82cb8ff4f0d41b2b584dba306546, type: 3}
+    companionPedestal: {fileID: 21300000, guid: 37adf7fe825f4dcd9a4e28e014b57287, type: 3}
   - id: winter
     displayName: Winter Cafe
     price: 2000
@@ -40,6 +42,7 @@ MonoBehaviour:
     rewardOnly: 1
     sprite: {fileID: 21300000, guid: 86761ffceb5e10a429e0c2efdf2ee54f, type: 3}
     baseSprite: {fileID: 21300000, guid: 7f78a0fb2dc8ba547a3bed63dbad1b12, type: 3}
+    companionPedestal: {fileID: 21300000, guid: cf239dbe66fb439f9bcbd5cc10891947, type: 3}
   - id: tet
     displayName: Vietnamese Tet Cafe
     price: 2000
@@ -47,6 +50,7 @@ MonoBehaviour:
     rewardOnly: 0
     sprite: {fileID: 21300000, guid: d01da84738832bc4b9b5aa4710e66848, type: 3}
     baseSprite: {fileID: 21300000, guid: d42a382886d171044bf581892eecc470, type: 3}
+    companionPedestal: {fileID: 21300000, guid: a8f5ad1e7dea4770a406b4e1e7b27a07, type: 3}
   - id: halloween
     displayName: Halloween Cafe
     price: 2000
@@ -54,6 +58,7 @@ MonoBehaviour:
     rewardOnly: 0
     sprite: {fileID: 21300000, guid: 3c7b5558766037b429d1d5cb79c46ed4, type: 3}
     baseSprite: {fileID: 21300000, guid: e8865c6db00d74341bf7ed1b808a2d86, type: 3}
+    companionPedestal: {fileID: 21300000, guid: 2cf08be768a8480485211f00b12908c1, type: 3}
   - id: beach
     displayName: Beach Cafe
     price: 2000
@@ -61,6 +66,7 @@ MonoBehaviour:
     rewardOnly: 0
     sprite: {fileID: 21300000, guid: a606c83421e3d5a4798c68a4979ce4f0, type: 3}
     baseSprite: {fileID: 21300000, guid: 6c0817aac7269df41b8426c5c0cd994c, type: 3}
+    companionPedestal: {fileID: 21300000, guid: cc3aab95794c4aaab13cb5afb13ab5b1, type: 3}
   - id: jungle
     displayName: Jungle Cafe
     price: 2000
@@ -68,6 +74,7 @@ MonoBehaviour:
     rewardOnly: 1
     sprite: {fileID: 21300000, guid: e106dab627df3f247a84e68b35cf6232, type: 3}
     baseSprite: {fileID: 21300000, guid: 6ce6d18079b04c94da8b3cbbc807ba47, type: 3}
+    companionPedestal: {fileID: 21300000, guid: 614250328eb84098b6c9de0949bfdd05, type: 3}
   - id: moonlight
     displayName: Moonlight Cafe
     price: 2400
@@ -75,6 +82,7 @@ MonoBehaviour:
     rewardOnly: 1
     sprite: {fileID: 21300000, guid: bc82580853fd02b4ea84d6c9383b0e14, type: 3}
     baseSprite: {fileID: 21300000, guid: bc82580853fd02b4ea84d6c9383b0e14, type: 3}
+    companionPedestal: {fileID: 21300000, guid: f5a01deb1f9a4a258af671d65602be7b, type: 3}
   - id: bakery
     displayName: Sweet Bakery Cafe
     price: 2400
@@ -82,6 +90,7 @@ MonoBehaviour:
     rewardOnly: 0
     sprite: {fileID: 21300000, guid: 39610728781dcfd498a86d6fd3648e4f, type: 3}
     baseSprite: {fileID: 21300000, guid: 39610728781dcfd498a86d6fd3648e4f, type: 3}
+    companionPedestal: {fileID: 21300000, guid: e9680b33c155434ca92f152d22b646bf, type: 3}
   - id: aquarium
     displayName: Aquarium Cafe
     price: 2400
@@ -89,6 +98,7 @@ MonoBehaviour:
     rewardOnly: 0
     sprite: {fileID: 21300000, guid: 294519dc341606f4aa05110ea15c89e9, type: 3}
     baseSprite: {fileID: 21300000, guid: 294519dc341606f4aa05110ea15c89e9, type: 3}
+    companionPedestal: {fileID: 21300000, guid: 17f392c30fec497cbc2a084216d531f7, type: 3}
   - id: greenhouse
     displayName: Greenhouse Cafe
     price: 2400
@@ -96,6 +106,7 @@ MonoBehaviour:
     rewardOnly: 0
     sprite: {fileID: 21300000, guid: 3a47920d28531b143b6699c856cbda32, type: 3}
     baseSprite: {fileID: 21300000, guid: 3a47920d28531b143b6699c856cbda32, type: 3}
+    companionPedestal: {fileID: 21300000, guid: c2b158d98c79424095321bdfabf51b5e, type: 3}
   - id: magiclibrary
     displayName: Magic Library Cafe
     price: 2400
@@ -103,6 +114,7 @@ MonoBehaviour:
     rewardOnly: 0
     sprite: {fileID: 21300000, guid: 112cac1087fd9e44bb4fd2a6790035ee, type: 3}
     baseSprite: {fileID: 21300000, guid: 112cac1087fd9e44bb4fd2a6790035ee, type: 3}
+    companionPedestal: {fileID: 21300000, guid: 44104f7dc3d64dbeb13e9517526aa05b, type: 3}
   - id: cloud
     displayName: Cloud Cafe
     price: 2400
@@ -110,6 +122,7 @@ MonoBehaviour:
     rewardOnly: 0
     sprite: {fileID: 21300000, guid: e15912e5c301ab14dbd008ebdf9a4709, type: 3}
     baseSprite: {fileID: 21300000, guid: e15912e5c301ab14dbd008ebdf9a4709, type: 3}
+    companionPedestal: {fileID: 21300000, guid: 9d01b23929f84fcd99a07fbe250ef0fd, type: 3}
   decorations:
   - id: cafe_catplant
     displayName: Cat Planter
@@ -682,9 +695,9 @@ MonoBehaviour:
   decorationSlots:
   - backgroundId: cafe
     slot: 1
-    position: {x: 0.26, y: 0.33}
+    position: {x: 0.28, y: 0.23}
     pivot: {x: 0.5, y: 0}
-    maxSize: {x: 360, y: 470}
+    maxSize: {x: 280, y: 360}
   - backgroundId: cafe
     slot: 2
     position: {x: 0.78, y: 0.97}

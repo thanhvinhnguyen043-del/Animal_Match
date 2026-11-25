@@ -35,7 +35,7 @@ public class DecorationStudio : MonoBehaviour
     private readonly List<DecorationItem> shopItems=new List<DecorationItem>();
     private readonly Dictionary<string,Image> placed=new Dictionary<string,Image>();
     private RoomLayout draft;
-    private string selected,savedBackground;
+    private string selected,savedBackground,browsed;
     private DecorationSlot selectedSlot=DecorationSlot.Plants;
     private int inventoryPage,shopPage,backgroundPage;
     private bool returnToShop,dirty;
@@ -46,8 +46,10 @@ public class DecorationStudio : MonoBehaviour
     private void Awake()
     {
         CafePanelStyle.Studio(panel.transform);
+        panel.transform.Find("StudioEquip").GetComponent<Button>().onClick.AddListener(EquipBrowsed);
+        var sample=room.transform.Find("StudioSceneSample");if(sample)sample.gameObject.SetActive(false);
         for(int i=0;i<shopCards.Length;i++) {int slot=i;shopCards[i].button.onClick.AddListener(()=>Preview(shopPage*6+slot));}
-        for(int i=0;i<inventoryCards.Length;i++) {int slot=i;inventoryCards[i].button.onClick.AddListener(()=>PlaceOwned(inventoryPage*6+slot));}
+        for(int i=0;i<inventoryCards.Length;i++) {int slot=i;inventoryCards[i].button.onClick.AddListener(()=>BrowseOwned(inventoryPage*6+slot));}
         for(int i=0;i<slotButtons.Length;i++) {int slot=i+1;slotButtons[i].onClick.AddListener(()=>SelectSlot(slot));}
         for(int i=0;i<backgroundCards.Length;i++) {int slot=i;backgroundCards[i].button.onClick.AddListener(()=>ChooseBackground(backgroundPage*backgroundCards.Length+slot));DecorationPreview.BindThumbnail(backgroundCards[i].preview,()=>PreviewBackground(slot));}
         EconomyStore.InventoryChanged+=RefreshInventory;
@@ -62,15 +64,19 @@ public class DecorationStudio : MonoBehaviour
     {
         if(index>=0 && index<shopItems.Count && preview) preview.Open(shopItems[index].id);
     }
-    private void RefreshShop()
+    private void RefreshShop() => RefreshShop(EconomyStore.Inventory, shopPage);
+
+    public void PrepareShopSceneView() => RefreshShop(new PlayerInventory(), 0);
+
+    private void RefreshShop(PlayerInventory inventory, int page)
     {
-        var inventory=EconomyStore.Inventory;BuildShopList();var items=shopItems;
+        BuildShopList();var items=shopItems;
         for(int i=0;i<shopCards.Length;i++)
         {
-            int index=shopPage*6+i;var card=shopCards[i];card.preview.transform.parent.gameObject.SetActive(index<items.Count);
+            int index=page*6+i;var card=shopCards[i];card.preview.transform.parent.gameObject.SetActive(index<items.Count);
             if(index>=items.Count) continue;
             var item=items[index];bool has=inventory.ownedDecorations.Contains(item.id);
-            card.preview.sprite=item.sprite;card.title.text=item.displayName;card.detail.text=item.skin+" / "+DecorationSlots.Label(item.slot);
+            card.preview.sprite=item.sprite;card.title.text=item.displayName;
             card.detail.text=DecorationSlots.Label(item.slot)+" / "+(has ? "OWNED" : item.rewardOnly ? "PLAY REWARD" : item.price.ToString("N0")+" COINS");
             card.action.text="PREVIEW";
             card.button.interactable=true;
@@ -82,12 +88,12 @@ public class DecorationStudio : MonoBehaviour
         var game=GridManager.Instance.Session;returnToShop=game.State==GameState.Shop;
         if(!game.OpenDecorations()) return;
         drafts.Clear();savedBackground=EconomyStore.Inventory.selectedBackground;
-        draft=EconomyStore.GetRoomLayout(savedBackground);drafts.Add(savedBackground,draft);dirty=false;selected=null;inventoryPage=0;selectedSlot=DecorationSlot.Plants;
+        draft=EconomyStore.GetRoomLayout(savedBackground);drafts.Add(savedBackground,draft);dirty=false;selected=null;browsed=null;inventoryPage=0;selectedSlot=DecorationSlot.Plants;
         CloseBackgrounds();
         selected=draft.items.Find(p=>EconomyStore.FindDecoration(p.itemId).slot==selectedSlot)?.itemId;
         shop.panel.SetActive(false);shop.mainMenuPanel.gameObject.SetActive(false);
         panel.SetActive(true);panel.transform.SetAsLastSibling();
-        ShowRoom();
+        slotHighlight.gameObject.SetActive(true);ShowRoom();
         status.text="Choose an area, then equip one item for that area.";RefreshInventory();Render();
     }
     public void Close()
@@ -143,7 +149,7 @@ public class DecorationStudio : MonoBehaviour
         var item=EconomyStore.FindBackground(id);
         if(!IsOpen || draft==null || item==null || !item.sprite || !EconomyStore.Inventory.ownedBackgrounds.Contains(id)) return;
         if(!drafts.TryGetValue(id,out var nextDraft)) {nextDraft=EconomyStore.GetRoomLayout(id);drafts.Add(id,nextDraft);}
-        draft=nextDraft;selected=draft.items.Find(p=>EconomyStore.FindDecoration(p.itemId).slot==selectedSlot)?.itemId;inventoryPage=0;
+        draft=nextDraft;selected=draft.items.Find(p=>EconomyStore.FindDecoration(p.itemId).slot==selectedSlot)?.itemId;browsed=null;inventoryPage=0;
         CloseBackgrounds();ShowRoom();Render();RefreshInventory();status.text="Previewing "+item.displayName+". Save to apply your background and decorations.";
     }
     private void RefreshInventory()
@@ -164,16 +170,17 @@ public class DecorationStudio : MonoBehaviour
         pageLabel.text=DecorationSlots.Label(selectedSlot)+" / "+owned.Count+" OWNED / "+(inventoryPage+1)+" OF "+pages;
         if(owned.Count==0) status.text="No owned items for this area. Visit ACCESSORIES in Shop.";
         previous.gameObject.SetActive(pages>1);next.gameObject.SetActive(pages>1);
-        previous.interactable=inventoryPage>0;next.interactable=inventoryPage<pages-1;RefreshSelection();
+        previous.interactable=inventoryPage>0;next.interactable=inventoryPage<pages-1;
+        var list=panel.transform.Find("StudioOwnedList/Items") as RectTransform;if(list)list.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,Mathf.Max(187.2f,Mathf.Min(6,owned.Count-inventoryPage*6)*84));
+        if(!owned.Exists(i=>i.id==browsed))browsed=owned.Exists(i=>i.id==selected)?selected:owned.Count>0?owned[0].id:null;
+        RefreshSelection();
     }
     public void Previous() {inventoryPage--;RefreshInventory();}
     public void Next() {inventoryPage++;RefreshInventory();}
-    private void PlaceOwned(int index)
-    {
-        if(index<0 || index>=owned.Count) return;
-        string id=owned[index].id;
-        if(draft.items.Exists(p=>p.itemId==id)) {selected=id;Remove();}else Place(id);
-    }
+    public void BrowseOwned(int index)
+    {if(index<0 || index>=owned.Count)return;browsed=owned[index].id;RefreshSelection();}
+    public void EquipBrowsed()
+    {if(string.IsNullOrEmpty(browsed))return;if(draft.items.Exists(p=>p.itemId==browsed)){selected=browsed;Remove();}else Place(browsed);}
     public void Place(string id)
     {
         var item=EconomyStore.FindDecoration(id);
@@ -192,7 +199,7 @@ public class DecorationStudio : MonoBehaviour
     public void SelectSlot(int slot)
     {
         if(!IsOpen || slot<1 || slot>DecorationSlots.Count) return;
-        selectedSlot=(DecorationSlot)slot;inventoryPage=0;
+        selectedSlot=(DecorationSlot)slot;inventoryPage=0;browsed=null;
         selected=draft.items.Find(p=>EconomyStore.FindDecoration(p.itemId).slot==selectedSlot)?.itemId;
         status.text="Choose one item for "+DecorationSlots.Label(selectedSlot)+". It stays in the highlighted area.";
         RefreshInventory();
@@ -207,7 +214,8 @@ public class DecorationStudio : MonoBehaviour
         selection.text=DecorationSlots.Label(selectedSlot)+"  /  "+(has ? item.displayName : "EMPTY");
         remove.interactable=has;
         save.interactable=dirty || draft!=null && draft.backgroundId!=savedBackground;clear.interactable=draft!=null && draft.items.Count>0;
-        for(int i=0;i<slotButtons.Length;i++) slotButtons[i].GetComponent<Image>().sprite=i+1==(int)selectedSlot ? shop.selectedTabSprite : shop.otherTabSprite;
+        for(int i=0;i<slotButtons.Length;i++) slotButtons[i].GetComponent<Image>().sprite=Resources.Load<Sprite>("TabButtons/"+(i+1==(int)selectedSlot?"Green":"Blue"));
+        TabButtonStyle.ApplyAll(transform);
         if(slotHighlight && draft!=null)
         {
             var anchor=DecorationSlots.Anchor(draft.backgroundId,selectedSlot);var rect=slotHighlight.rectTransform;
@@ -215,8 +223,9 @@ public class DecorationStudio : MonoBehaviour
             rect.sizeDelta=new Vector2(anchor.maxSize.x*room.rectTransform.rect.width/1920,anchor.maxSize.y*room.rectTransform.rect.height/1080);
             rect.SetAsLastSibling();
         }
-        foreach(var pair in placed) pair.Value.color=pair.Key==selected ? new Color(1,.88f,.7f) : Color.white;
+        foreach(var pair in placed) pair.Value.color=Color.white;
         var sizing=GetComponent<CacaoArtSizing>();if(sizing) sizing.Apply();
+        var shown=EconomyStore.FindDecoration(browsed);UnifiedCafeLayouts.StudioItem(this,shown,shown!=null && draft!=null && draft.items.Exists(p=>p.itemId==shown.id));
     }
     private void Render()
     {
@@ -234,6 +243,18 @@ public class DecorationStudio : MonoBehaviour
             RoomDecorationView.ApplyRect(image.rectTransform,room.rectTransform,item,draft.backgroundId);
         }
         RefreshSelection();
+    }
+    public void PrepareStudioSceneView()
+    {
+        UnifiedCafeLayouts.Studio(this);var bg=EconomyStore.FindBackground("cafe");room.sprite=bg.baseSprite?bg.baseSprite:bg.sprite;roomName.text=bg.displayName;
+        var sample=EconomyStore.FindDecoration("moonlight_moonflowerplant");
+        for(int i=0;i<inventoryCards.Length;i++){var c=inventoryCards[i];c.preview.transform.parent.gameObject.SetActive(i==0);if(i==0){c.preview.sprite=sample.sprite;c.title.text=sample.displayName;c.detail.text=sample.skin+" collection";}}
+        var list=(RectTransform)panel.transform.Find("StudioOwnedList/Items");list.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,187.2f);
+        pageLabel.text="PLANTS / 1 OWNED";selection.text="PLANTS AREA";status.text="Choose an area, preview an item, then save your room.";
+        UnifiedCafeLayouts.StudioItem(this,sample,false);previous.gameObject.SetActive(false);next.gameObject.SetActive(false);
+        var old=room.transform.Find("StudioSceneSample");var image=old?old.GetComponent<Image>():new GameObject("StudioSceneSample",typeof(RectTransform),typeof(CanvasRenderer),typeof(Image)).GetComponent<Image>();image.transform.SetParent(room.transform,false);image.sprite=sample.sprite;image.preserveAspect=true;image.raycastTarget=false;image.gameObject.SetActive(true);
+        RoomDecorationView.ApplyRect(image.rectTransform,room.rectTransform,sample,"cafe");
+        slotHighlight.gameObject.SetActive(false);panel.SetActive(false);
     }
     private void OnDestroy() {EconomyStore.InventoryChanged-=RefreshInventory;}
 }

@@ -13,6 +13,7 @@ public static class CafePanelStyle
     }
     public static void Frame(Transform root)
     {
+        if(CafeComponentArt.Sprite("Popup_Paper_Panel")) {CafeComponentArt.Panel(root);return;}
         var image=root.GetComponent<RoundedImage>();if(image) image.color=Wood;
         Layer(root,"WarmTrim",5,5,((RectTransform)root).rect.width-10,((RectTransform)root).rect.height-10,Trim).transform.SetAsFirstSibling();
         Layer(root,"CreamInset",13,13,((RectTransform)root).rect.width-26,((RectTransform)root).rect.height-26,Paper).transform.SetSiblingIndex(1);
@@ -23,6 +24,7 @@ public static class CafePanelStyle
     }
     public static void Studio(Transform root)
     {
+        var studio=root.GetComponentInParent<DecorationStudio>();if(studio && studio.room){UnifiedCafeLayouts.Studio(studio);return;}
         var background=root.GetComponent<Image>();if(background) background.color=new Color(.91f,.82f,.65f);
         var room=Layer(root,"RoomWorkspace",65,245,1170,655,Wood);room.transform.SetAsFirstSibling();Frame(room.transform);
         var inventory=Layer(root,"InventoryWorkspace",1295,125,590,805,Wood);inventory.transform.SetSiblingIndex(1);Frame(inventory.transform);

@@ -89,7 +89,7 @@ public static class RoomProgress
         return "Earn this special reward through play.";
     }
     public static string SourceForBackground(string id)=>Source(id,true);
-    public static string SourceForDecoration(string id)=>Source(id,false);
+    public static string SourceForDecoration(string id)=>AvatarFashionRewards.Find(id)!=null ? AvatarFashionRewards.Source(id) : Source(id,false);
     public static void MarkSeen()=>EconomyStore.UpdateCareer(inventory=>
     {if(inventory.newRoomRewards.Count==0) return false;inventory.newRoomRewards.Clear();return true;});
 }

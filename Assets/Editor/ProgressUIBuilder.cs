@@ -134,9 +134,9 @@ public static class ProgressUIBuilder
             card.fill.rectTransform.anchorMin=Vector2.zero;card.fill.rectTransform.anchorMax=Vector2.one;card.fill.rectTransform.offsetMin=card.fill.rectTransform.offsetMax=Vector2.zero;
             progress.cards[index]=card;
         }
-        progress.previousButton=Button(popup,"Previous","PREV",130,826,190,62,progress.Previous,progress.grid);
+        progress.previousButton=Button(popup,"Previous","PREV",130,826,190,62,null,progress.grid);
         progress.pageLabel=Text(popup,"Page","1 / 1",330,836,175,42,30);
-        progress.nextButton=Button(popup,"Next","NEXT",515,826,190,62,progress.Next,progress.grid);
+        progress.nextButton=Button(popup,"Next","NEXT",515,826,190,62,null,progress.grid);
         progress.milestoneButton=Button(popup,"Milestone","BONUS CHEST",1040,820,580,88,progress.ClaimMilestone,progress.grid,true);
         progress.milestoneLabel=progress.milestoneButton.GetComponentInChildren<TextMeshProUGUI>();
         Place(progress.milestoneLabel.transform,15,10,550,32);

@@ -141,10 +141,13 @@ public class GridManager : MonoBehaviour
         if (gridArray != null) CaptureBoard();
     }
 
+    private List<LevelCell> designedLayout;
+
     public bool GenerateGrid()
     {
         if (levelDatabase == null) levelDatabase = Resources.Load<LevelDatabase>("LevelDatabase");
         List<LevelCell> layout;
+        designedLayout = null;
         if (levelDatabase != null)
         {
             if (levelDatabase.levels == null || levelIndex < 0 || levelIndex >= levelDatabase.levels.Count)
@@ -157,6 +160,7 @@ public class GridManager : MonoBehaviour
             currentGravity = level.gravity; animalSprites = levelDatabase.animalSprites;
             layout = level.mode == LevelLayoutMode.Manual ? level.cells :
                 level.Generate(animalSprites.Length, level.randomEachPlay ? Random.Range(0, int.MaxValue) : level.seed);
+            if (level.mode == LevelLayoutMode.Manual && level.useDesignedBoardRules) designedLayout = layout;
         }
         else
         {
@@ -211,6 +215,84 @@ public class GridManager : MonoBehaviour
         initialTileCount=totalTiles;
         boardRevision++;
         return true;
+    }
+
+    public bool TutorialBoardBusy => BoardBusy || isBoosterCooldown;
+
+    public void PracticeBooster(BoosterType booster)
+    {
+        practicingBooster = true;
+        try
+        {
+            if (booster == BoosterType.Hint) ShowHint();
+            else ShuffleBoard();
+        }
+        finally { practicingBooster = false; }
+    }
+
+    private bool practicingBooster;
+
+    public bool FindTutorialPair(TileState target, out AnimalTile first, out AnimalTile second, bool opensWater = false)
+    {
+        CaptureBoard();
+        first = second = null;
+        foreach (var a in gridArray)
+        {
+            if (!a || !a.IsSelectable) continue;
+            if (target == TileState.Ice && a.currentState != TileState.Ice) continue;
+            if (target == TileState.Barrier)
+            {
+                if (a.currentState != TileState.Normal) continue;
+                bool besideBarrier = false;
+                foreach (var direction in NeighborDirections)
+                {
+                    var tile = TileAt(a.gridX + direction.x, a.gridY + direction.y);
+                    if (tile && tile.currentState == TileState.Barrier) { besideBarrier = true; break; }
+                }
+                if (!besideBarrier) continue;
+            }
+
+            foreach (var b in gridArray)
+            {
+                if (!b || b.currentState != TileState.Normal || a.animalID != b.animalID) continue;
+                if (!boardLogic.CanMatch(new Vector2Int(a.gridX, a.gridY), new Vector2Int(b.gridX, b.gridY))) continue;
+                if (opensWater && !OpensWaterPath(a, b)) continue;
+                first = a;
+                second = b;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private bool OpensWaterPath(AnimalTile first, AnimalTile second)
+    {
+        var a = new Vector2Int(first.gridX, first.gridY);
+        var b = new Vector2Int(second.gridX, second.gridY);
+        var firstCell = boardLogic.GetCell(a.x, a.y);
+        var secondCell = boardLogic.GetCell(b.x, b.y);
+        boardLogic.SetCell(a.x, a.y, default);
+        boardLogic.SetCell(b.x, b.y, default);
+        try
+        {
+            foreach (var waterTile in gridArray)
+            {
+                if (!waterTile || waterTile.currentState != TileState.Ice) continue;
+                var from = new Vector2Int(waterTile.gridX, waterTile.gridY);
+                foreach (var normal in gridArray)
+                {
+                    if (!normal || normal == first || normal == second ||
+                        normal.currentState != TileState.Normal || normal.animalID != waterTile.animalID) continue;
+                    if (boardLogic.CanMatch(from, new Vector2Int(normal.gridX, normal.gridY))) return true;
+                }
+            }
+            return false;
+        }
+        finally
+        {
+            boardLogic.SetCell(a.x, a.y, firstCell);
+            boardLogic.SetCell(b.x, b.y, secondCell);
+        }
     }
 
     public void SelectTile(AnimalTile clickedTile)
@@ -268,7 +350,11 @@ public class GridManager : MonoBehaviour
         while(elapsed<.14f)
         {
             yield return null;
-            if(Session.State==GameState.Playing) elapsed+=Time.deltaTime;
+            if(Session.State==GameState.Playing)
+            {
+                elapsed+=Time.deltaTime;
+                matchPath.SetReveal(elapsed/.1f);
+            }
         }
         Session.IsResolvingMatch=false;
         CompleteMatch(first,second);
@@ -279,7 +365,7 @@ public class GridManager : MonoBehaviour
             yield return null;
             if(Session.State!=GameState.Playing) continue;
             elapsed+=Time.deltaTime;
-            matchPath.canvasRenderer.SetAlpha(1-Mathf.Clamp01(elapsed/.14f));
+            matchPath.canvasRenderer.SetAlpha(1-Mathf.SmoothStep(0,1,Mathf.Clamp01(elapsed/.14f)));
         }
         matchPath.ClearPath();matchPathCoroutine=null;
     }
@@ -309,11 +395,13 @@ public class GridManager : MonoBehaviour
         int x1 = t1.gridX, y1 = t1.gridY;
         int x2 = t2.gridX, y2 = t2.gridY;
 
+        bool firstRemoved = t1.currentState != TileState.Ice;
+        bool secondRemoved = t2.currentState != TileState.Ice;
         BreakTile(t1);
         BreakTile(t2);
 
-        BreakNeighborBarriers(x1, y1);
-        BreakNeighborBarriers(x2, y2);
+        if (designedLayout == null || firstRemoved) BreakNeighborBarriers(x1, y1);
+        if (designedLayout == null || secondRemoved) BreakNeighborBarriers(x2, y2);
 
         ClearSelection();
 
@@ -400,6 +488,7 @@ public class GridManager : MonoBehaviour
             {
                 var neighbor = TileAt(tile.gridX + direction.x, tile.gridY + direction.y);
                 if (!neighbor || neighbor == tile || !neighbor.IsSelectable || neighbor.animalID != tile.animalID) continue;
+                if (designedLayout != null && (tile.currentState == TileState.Ice || neighbor.currentState == TileState.Ice)) continue;
                 if(ProcessMatch(tile,neighbor)) yield break;
             }
         }
@@ -412,7 +501,7 @@ public class GridManager : MonoBehaviour
         var tiles=new List<AnimalTile>();
         var positions=new List<Vector2Int>();
         foreach(var tile in gridArray)
-            if(tile) { tiles.Add(tile); positions.Add(new Vector2Int(tile.gridX,tile.gridY)); }
+            if(tile && (designedLayout == null || tile.currentState != TileState.Barrier)) { tiles.Add(tile); positions.Add(new Vector2Int(tile.gridX,tile.gridY)); }
         if(tiles.Count<2) { CheckBoardAvailability(); return; }
         if (!TryStartBooster(BoosterType.Shuffle)) return;
         ClearHint();
@@ -424,7 +513,7 @@ public class GridManager : MonoBehaviour
                 int other=Random.Range(i,positions.Count);
                 var temp=positions[i]; positions[i]=positions[other]; positions[other]=temp;
             }
-            System.Array.Clear(gridArray,0,gridArray.Length);
+            foreach (var pos in positions) gridArray[pos.x,pos.y] = null;
             for(int i=0;i<tiles.Count;i++)
             {
                 var tile=tiles[i]; var pos=positions[i];
@@ -468,7 +557,8 @@ public class GridManager : MonoBehaviour
 
     private bool TryStartBooster(BoosterType booster)
     {
-        if (!EconomyStore.TryUseBooster(booster))
+        if (!BoosterAvailable(booster)) return false;
+        if (!practicingBooster && !EconomyStore.TryUseBooster(booster))
         {
             string stock = booster == BoosterType.Hint ? "hints" : "shuffles";
             Session.Notify("No " + stock + " left. Buy more in the shop from the menu.");
@@ -478,10 +568,16 @@ public class GridManager : MonoBehaviour
         return true;
     }
 
+    private bool BoosterAvailable(BoosterType type)
+    {
+        var unlocks=FindObjectOfType<FirstBoosterRewardUI>();
+        return unlocks ? unlocks.CanUse(type) : EconomyStore.IsBoosterUnlocked(type);
+    }
+
     private void SetBoostersInteractable(bool value)
     {
-        if (btnShuffle) btnShuffle.interactable = value;
-        if (btnHint) btnHint.interactable = value;
+        if (btnShuffle) btnShuffle.interactable = value && BoosterAvailable(BoosterType.Shuffle);
+        if (btnHint) btnHint.interactable = value && BoosterAvailable(BoosterType.Hint);
     }
 
     private void ClearHint()
@@ -506,9 +602,23 @@ public class GridManager : MonoBehaviour
 
         SetBoostersInteractable(true);
     }
+    private bool finishingCoffee;
     private void GameOver(bool isWin)
     {
+        var coffee=FindObjectOfType<CoffeeMatchEffects>();
+        if(finishingCoffee) return;
+        if(isWin && coffee) {finishingCoffee=true; SetBoostersInteractable(false); StartCoroutine(FinishCoffee(coffee));return;}
         Session.Finish(isWin);
+    }
+    private System.Collections.IEnumerator FinishCoffee(CoffeeMatchEffects coffee)
+    {
+        Session.IsResolvingMatch=true;
+        while(coffee && coffee.HasPendingCoffee && (Session.State==GameState.Playing || Session.State==GameState.Paused)) yield return null;
+        while(Session.State==GameState.Paused) yield return null;
+        if(coffee && Session.State==GameState.Playing) yield return coffee.PourFinalCup();
+        while(Session.State==GameState.Paused) yield return null;
+        if(Session.State==GameState.Playing) Session.Finish(true);
+        finishingCoffee=false;
     }
 
     private void HandleGameEnded(bool won)
@@ -570,6 +680,7 @@ public class GridManager : MonoBehaviour
 
     public void RestartGame()
     {
+        finishingCoffee=false;
         progressTracker.Flush();LastResult=default;
         ClearMatchPath();boardMovingUntil=0;
         LastReward=default;
@@ -623,11 +734,12 @@ public class GridManager : MonoBehaviour
         int width=gridArray.GetLength(0), height=gridArray.GetLength(1);
         if(boardLogic==null || boardLogic.Columns!=width || boardLogic.Rows!=height)
             boardLogic=new BoardLogic(width,height);
+        boardLogic.UseDesignedBoardRules = designedLayout != null;
         for(int x=0;x<width;x++)
             for(int y=0;y<height;y++)
             {
                 var tile=gridArray[x,y];
-                boardLogic.SetCell(x,y,tile ? new BoardCell { occupied=true,animalID=tile.animalID,state=tile.currentState } : default);
+                boardLogic.SetCell(x,y,tile ? new BoardCell { occupied=true,animalID=tile.animalID,state=tile.currentState } : new BoardCell { blocksGravity = designedLayout != null && designedLayout[x + y * width].empty });
             }
     }
 

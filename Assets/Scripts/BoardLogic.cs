@@ -4,6 +4,7 @@ using UnityEngine;
 public struct BoardCell
 {
     public bool occupied;
+    public bool blocksGravity;
     public int animalID;
     public TileState state;
     public bool Selectable => occupied && state != TileState.Hidden && state != TileState.Barrier;
@@ -19,6 +20,7 @@ public sealed class BoardLogic
 {
     private BoardCell[,] cells;
     public int Columns => cells.GetLength(0);
+    public bool UseDesignedBoardRules { get; set; }
     public int Rows => cells.GetLength(1);
 
     public BoardLogic(int columns, int rows) { cells = new BoardCell[columns, rows]; }
@@ -34,6 +36,7 @@ public sealed class BoardLogic
         if (a == b || !Inside(a) || !Inside(b)) return false;
         var first = cells[a.x,a.y];
         var second = cells[b.x,b.y];
+        if (UseDesignedBoardRules && first.state == TileState.Ice && second.state == TileState.Ice) return false;
         return first.Selectable && second.Selectable && first.animalID == second.animalID && FindPath(a,b,path);
     }
 
@@ -148,8 +151,9 @@ public sealed class BoardLogic
             {
                 var from=vertical ? new Vector2Int(lane,index) : new Vector2Int(index,lane);
                 var cell=cells[from.x,from.y];
+                if (cell.blocksGravity) { target = index + step; continue; }
                 if(!cell.occupied) continue;
-                if(cell.state==TileState.Ice || cell.state==TileState.Barrier) { target=index+step; continue; }
+                if((!UseDesignedBoardRules && cell.state==TileState.Ice) || cell.state==TileState.Barrier) { target=index+step; continue; }
                 if(index!=target)
                 {
                     var to=vertical ? new Vector2Int(lane,target) : new Vector2Int(target,lane);

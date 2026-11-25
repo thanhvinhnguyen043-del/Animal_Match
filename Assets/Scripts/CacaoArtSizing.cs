@@ -20,11 +20,13 @@ public sealed class CacaoArtSizing : MonoBehaviour
     private IEnumerator RefreshNextFrame() {yield return null;Apply();pending=null;}
     public void Apply()
     {
+        TabButtonStyle.ApplyAll(transform);
         foreach(var image in GetComponentsInChildren<Image>(true))
         {
             if(!image.sprite || image is RoundedImage) continue;
             var source=image.sprite;string name=source.name;
             if(name!="Panel__Header" && name!="Button__Primary" && name!="Button__Secondary") continue;
+            if(name=="Panel__Header" && image.type==Image.Type.Simple && image.preserveAspect) continue;
             float height=image.rectTransform.rect.height;if(height<=0) continue;
             if(!slices.TryGetValue(source,out var sliced))
             {
